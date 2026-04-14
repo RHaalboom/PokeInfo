@@ -1,38 +1,48 @@
-# Poké-info
+ï»¿# PokÃ©-info
 
-Poké-info is een webapplicatie waarmee gebruikers Pokémon-informatie kunnen bekijken en hun eigen collectie kunnen bijhouden.
+PokÃ©-info is een webapplicatie waarin gebruikers PokÃ©mon-informatie kunnen bekijken en hun eigen collectie kunnen bijhouden.
 
-## Technologieën
+## ğŸ§± Architectuur
 
-Frontend:
-- React (Vite)
-- HTML, CSS, JavaScript
+De applicatie bestaat uit drie onderdelen:
 
-Backend:
-- ASP.NET Core Web API
-- C#
+- **Frontend:** React (Vite)
+- **Backend:** ASP.NET Core Web API
+- **Database:** MySQL
 
-Database:
+De frontend communiceert via HTTP met de backend.  
+De backend verwerkt de requests en slaat gegevens op in de database via Entity Framework Core.
+
+## âš™ï¸ Functionaliteiten (huidige versie)
+
+- PokÃ©mon-overzicht ophalen via externe API (PokÃ©API)
+- PokÃ©mon details bekijken via popup
+- Gebruikersregistratie (account aanmaken)
+- Opslaan van gebruikers in MySQL database
+
+## ğŸ› ï¸ TechnologieÃ«n
+
+- React
+- ASP.NET Core (.NET 8)
+- Entity Framework Core
 - MySQL
-- DataGrip
+- DataGrip / MySQL Workbench
 
-## Functionaliteiten (huidig)
-
-- Pokémon-overzicht bekijken
-- Pokémon details bekijken via popup
-- Data ophalen via externe API (PokéAPI)
-
-## Architectuur
-
-Frontend (React) communiceert via HTTP met de backend (ASP.NET API).  
-De backend haalt data op uit de PokéAPI en (later) uit een MySQL database.
-
-## Installatie
+## ğŸš€ Installatie & starten
 
 ### Backend
-Open in Visual Studio en run het project.
+
+1. Open het project in Visual Studio
+2. Zorg dat MySQL draait
+3. Controleer je connection string in `appsettings.Development.json`
+4. Run het project (Swagger opent)
 
 ### Frontend
+
+```bash
 cd pokeinfo-client
 npm install
 npm run dev
+
+Ga naar:
+http://localhost:5173
