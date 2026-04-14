@@ -39,45 +39,47 @@ De backend verwerkt de requests en slaat gegevens op in de database via Entity F
 
 ### Frontend
 
-cd pokeinfo-client
-npm install
-npm run dev
+1. cd pokeinfo-client
+2. npm install
+3. npm run dev
 
 Ga naar:
 http://localhost:5173
 
-🔐 Security (Datapunt 6b)
+## 🔐 Security
 
 Bij de ontwikkeling is rekening gehouden met security:
 
-Wachtwoorden worden gehasht opgeslagen (niet als plain text)
-Gevoelige gegevens (zoals database wachtwoorden) staan niet in de repository
-Gebruik van appsettings.Development.json om secrets lokaal te houden
-Validatie van input via DataAnnotations en ModelState
-Controle op dubbele accounts (email en username)
-📦 Database
+- Wachtwoorden worden gehasht opgeslagen (niet als plain text)
+- Gevoelige gegevens (zoals database wachtwoorden) staan niet in de repository
+- Gebruik van appsettings.Development.json om secrets lokaal te houden
+- Validatie van input via DataAnnotations en ModelState
+- Controle op dubbele accounts (email en username)
+
+## 📦 Database
 
 De database wordt beheerd via Entity Framework Core migrations.
 
 Belangrijke tabel:
 
 - Users
--- Id
--- Username
--- Email
--- PasswordHash
+  - Id
+  - Username
+  - Email
+  - PasswordHash
 
 De database kan ook bekeken worden via DataGrip of MySQL Workbench.
 
-🔄 Ontwikkelproces
+## 🔄 Ontwikkelproces
 
 Er wordt gewerkt met Git en branches:
 
-- main → stabiele versie
-- develop → integratiebranch
-- feature/* → nieuwe functionaliteiten
+- ```main``` → stabiele versie
+- ```develop``` → integratiebranch
+- ```feature/*``` → nieuwe functionaliteiten
 
-📌 Toekomstige functionaliteiten
+## 📌 Toekomstige functionaliteiten
+
 - Inloggen
 - Pokémon collectie opslaan
 - Gebruikersprofielen
