@@ -1,4 +1,7 @@
+using Microsoft.EntityFrameworkCore;
+using PokeInfo.Data;
 using PokeInfo.Services;
+using System;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -6,6 +9,16 @@ builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddDbContext<PokeInfoDbContext>(options =>
+{
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+    options.UseMySql(
+        connectionString,
+        ServerVersion.AutoDetect(connectionString)
+    );
+});
 
 builder.Services.AddHttpClient<IPokemonService, PokemonService>(client =>
 {
