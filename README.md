@@ -39,7 +39,6 @@ De backend verwerkt de requests en slaat gegevens op in de database via Entity F
 
 ### Frontend
 
-```bash
 cd pokeinfo-client
 npm install
 npm run dev
