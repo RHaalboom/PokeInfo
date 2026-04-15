@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { registerUser } from "../services/authService";
 import "../styles/register.css";
 
@@ -49,7 +49,7 @@ export default function RegisterPage() {
         <main className="register-page">
             <section className="register-card">
                 <h1>Account aanmaken</h1>
-                <p>Maak een account aan om je Pok�mon-collectie te beheren.</p>
+                <p>Maak een account aan om je Pokémon-collectie te beheren.</p>
 
                 <form onSubmit={handleSubmit} className="register-form">
                     <div className="form-group">

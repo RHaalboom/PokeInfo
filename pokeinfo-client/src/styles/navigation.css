@@ -1,0 +1,17 @@
+.main-nav {
+    padding: 16px 24px;
+    display: flex;
+    gap: 16px;
+    background: white;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+    .main-nav a {
+        text-decoration: none;
+        color: #1f2937;
+        font-weight: 600;
+    }
+
+        .main-nav a:hover {
+            color: #d62828;
+        }
