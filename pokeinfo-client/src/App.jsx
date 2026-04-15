@@ -1,5 +1,8 @@
 import HomePage from "./pages/HomePage";
+import RegisterPage from "./pages/RegisterPage";
 
-export default function App() {
-    return <HomePage />;
+function App() {
+    return <RegisterPage />;
 }
+
+export default App;
