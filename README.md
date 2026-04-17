@@ -1,38 +1,86 @@
-# Pok�-info
+﻿# Poké-info
 
-Pok�-info is een webapplicatie waarmee gebruikers Pok�mon-informatie kunnen bekijken en hun eigen collectie kunnen bijhouden.
+Poké-info is een webapplicatie waarin gebruikers Pokémon-informatie kunnen bekijken en hun eigen collectie kunnen bijhouden.
 
-## Technologie�n
+## 🧱 Architectuur
 
-Frontend:
-- React (Vite)
-- HTML, CSS, JavaScript
+De applicatie bestaat uit drie onderdelen:
 
-Backend:
-- ASP.NET Core Web API
-- C#
+- **Frontend:** React (Vite)
+- **Backend:** ASP.NET Core Web API
+- **Database:** MySQL
 
-Database:
+De frontend communiceert via HTTP met de backend.  
+De backend verwerkt de requests en slaat gegevens op in de database via Entity Framework Core.
+
+## ⚙️ Functionaliteiten (huidige versie)
+
+- Pokémon-overzicht ophalen via externe API (PokéAPI)
+- Pokémon details bekijken via popup
+- Gebruikersregistratie (account aanmaken)
+- Opslaan van gebruikers in MySQL database
+
+## 🛠️ Technologieën
+
+- React
+- ASP.NET Core (.NET 8)
+- Entity Framework Core
 - MySQL
-- DataGrip
+- DataGrip / MySQL Workbench
 
-## Functionaliteiten (huidig)
-
-- Pok�mon-overzicht bekijken
-- Pok�mon details bekijken via popup
-- Data ophalen via externe API (Pok�API)
-
-## Architectuur
-
-Frontend (React) communiceert via HTTP met de backend (ASP.NET API).  
-De backend haalt data op uit de Pok�API en (later) uit een MySQL database.
-
-## Installatie
+## 🚀 Installatie & starten
 
 ### Backend
-Open in Visual Studio en run het project.
+
+1. Open het project in Visual Studio
+2. Zorg dat MySQL draait
+3. Controleer je connection string in `appsettings.Development.json`
+4. Run het project (Swagger opent)
 
 ### Frontend
-cd pokeinfo-client
-npm install
-npm run dev
+
+1. cd pokeinfo-client
+2. npm install
+3. npm run dev
+
+Ga naar:
+http://localhost:5173
+
+## 🔐 Security
+
+Bij de ontwikkeling is rekening gehouden met security:
+
+- Wachtwoorden worden gehasht opgeslagen (niet als plain text)
+- Gevoelige gegevens (zoals database wachtwoorden) staan niet in de repository
+- Gebruik van appsettings.Development.json om secrets lokaal te houden
+- Validatie van input via DataAnnotations en ModelState
+- Controle op dubbele accounts (email en username)
+
+## 📦 Database
+
+De database wordt beheerd via Entity Framework Core migrations.
+
+Belangrijke tabel:
+
+- Users
+  - Id
+  - Username
+  - Email
+  - PasswordHash
+
+De database kan ook bekeken worden via DataGrip of MySQL Workbench.
+
+## 🔄 Ontwikkelproces
+
+Er wordt gewerkt met Git en branches:
+
+- ```main``` → stabiele versie
+- ```develop``` → integratiebranch
+- ```feature/*``` → nieuwe functionaliteiten
+
+## 📌 Toekomstige functionaliteiten
+
+- Inloggen
+- Pokémon collectie opslaan
+- Gebruikersprofielen
+- Ranking systeem
