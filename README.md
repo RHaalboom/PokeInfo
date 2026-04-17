@@ -1,86 +1,45 @@
-﻿# Poké-info
+# Poké-info – Security Mitigation
 
-Poké-info is een webapplicatie waarin gebruikers Pokémon-informatie kunnen bekijken en hun eigen collectie kunnen bijhouden.
+## Inleiding
 
-## 🧱 Architectuur
+Deze README beschrijft de implementatie van een beveiligingsmaatregel binnen de Poké-info applicatie.  
+Het doel is om aan te tonen hoe een specifieke bedreiging uit het threat model is gemitigeerd in de codebase.
 
-De applicatie bestaat uit drie onderdelen:
+---
 
-- **Frontend:** React (Vite)
-- **Backend:** ASP.NET Core Web API
-- **Database:** MySQL
+## Gemitigeerde dreiging
 
-De frontend communiceert via HTTP met de backend.  
-De backend verwerkt de requests en slaat gegevens op in de database via Entity Framework Core.
+**Threat ID:** 123  
+**Naam:** Potential SQL Injection vulnerability  
+**Categorie (STRIDE):** Tampering  
 
-## ⚙️ Functionaliteiten (huidige versie)
+SQL Injection is een aanval waarbij kwaadaardige invoer wordt gebruikt om databasequeries te manipuleren. Dit kan leiden tot het uitlezen, aanpassen of verwijderen van data.
 
-- Pokémon-overzicht ophalen via externe API (PokéAPI)
-- Pokémon details bekijken via popup
-- Gebruikersregistratie (account aanmaken)
-- Opslaan van gebruikers in MySQL database
+---
 
-## 🛠️ Technologieën
+## Implementatie
 
-- React
-- ASP.NET Core (.NET 8)
-- Entity Framework Core
-- MySQL
-- DataGrip / MySQL Workbench
+De mitigatie is toegepast in:
 
-## 🚀 Installatie & starten
+`CollectionRepository.cs`
 
-### Backend
+Binnen deze klasse wordt gebruik gemaakt van **parameterized queries / Entity Framework**, waardoor gebruikersinvoer nooit direct in SQL-queries wordt geplaatst.
 
-1. Open het project in Visual Studio
-2. Zorg dat MySQL draait
-3. Controleer je connection string in `appsettings.Development.json`
-4. Run het project (Swagger opent)
+Voorbeeld:
 
-### Frontend
+```csharp
+var pokemon = _context.Pokemon
+    .Where(p => p.Name == inputName)
+    .FirstOrDefault();
+```
+## Waarom dit werkt
 
-1. cd pokeinfo-client
-2. npm install
-3. npm run dev
+Door gebruik te maken van parameterized queries:
 
-Ga naar:
-http://localhost:5173
+- Wordt invoer behandeld als data in plaats van code
+- Kan de structuur van de query niet worden aangepast
+- Wordt SQL Injection effectief voorkomen
 
-## 🔐 Security
-
-Bij de ontwikkeling is rekening gehouden met security:
-
-- Wachtwoorden worden gehasht opgeslagen (niet als plain text)
-- Gevoelige gegevens (zoals database wachtwoorden) staan niet in de repository
-- Gebruik van appsettings.Development.json om secrets lokaal te houden
-- Validatie van input via DataAnnotations en ModelState
-- Controle op dubbele accounts (email en username)
-
-## 📦 Database
-
-De database wordt beheerd via Entity Framework Core migrations.
-
-Belangrijke tabel:
-
-- Users
-  - Id
-  - Username
-  - Email
-  - PasswordHash
-
-De database kan ook bekeken worden via DataGrip of MySQL Workbench.
-
-## 🔄 Ontwikkelproces
-
-Er wordt gewerkt met Git en branches:
-
-- ```main``` → stabiele versie
-- ```develop``` → integratiebranch
-- ```feature/*``` → nieuwe functionaliteiten
-
-## 📌 Toekomstige functionaliteiten
-
-- Inloggen
-- Pokémon collectie opslaan
-- Gebruikersprofielen
-- Ranking systeem
+## Conclusie
+De dreiging #123 (SQL Injection) is succesvol gemitigeerd door veilige database-interactie toe te passen.
+Hiermee wordt de kans op ongeautoriseerde toegang tot gegevens aanzienlijk verkleind.
