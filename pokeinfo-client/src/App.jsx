@@ -1,30 +1,19 @@
 ﻿import { Routes, Route, Link, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
 import HomePage from "./pages/HomePage";
 import RegisterPage from "./pages/RegisterPage";
 import LoginPage from "./pages/LoginPage";
 import ProfilePage from "./pages/ProfilePage";
-import { isAuthenticated, logout } from "./services/authService";
+import { useAuth } from "./hooks/useAuth";
+import { logout as logoutService } from "./services/authService";
 import "./styles/navigation.css";
 
 function App() {
-    const [isAuth, setIsAuth] = useState(isAuthenticated());
+    const { isAuthenticated, logout } = useAuth();
     const navigate = useNavigate();
 
-    useEffect(() => {
-        // Update auth state on mount and when localStorage changes
-        const checkAuth = () => {
-            setIsAuth(isAuthenticated());
-        };
-
-        checkAuth();
-        window.addEventListener("storage", checkAuth);
-        return () => window.removeEventListener("storage", checkAuth);
-    }, []);
-
     function handleLogout() {
+        logoutService();
         logout();
-        setIsAuth(false);
         navigate("/login");
     }
 
@@ -32,7 +21,8 @@ function App() {
         <>
             <nav className="main-nav">
                 <Link to="/">Home</Link>
-                {isAuth ? (
+
+                {isAuthenticated ? (
                     <>
                         <Link to="/profile">Profile</Link>
                         <button onClick={handleLogout} className="logout-nav-btn">
