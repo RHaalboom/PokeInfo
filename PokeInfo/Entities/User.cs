@@ -17,4 +17,8 @@ public class User
 
     [Required]
     public string PasswordHash { get; set; } = string.Empty;
+
+    public int RoleId { get; set; } = 1;
+
+    public Role Role { get; set; } = null!;
 }
