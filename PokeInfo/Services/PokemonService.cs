@@ -63,6 +63,8 @@ public class PokemonService : IPokemonService
                     $"ability/{name.ToLowerInvariant()}", ParseAbility))
             );
 
+            var variants = species?.Variants ?? new List<PokemonVariantDto>();
+
             return new PokemonDetailDto
             {
                 Id = root.GetProperty("id").GetInt32(),
@@ -71,6 +73,7 @@ public class PokemonService : IPokemonService
                 Types = types,
                 Abilities = abilities.Where(a => a != null).OfType<AbilityDto>().ToList(),
                 Games = games,
+                Variants = variants,
                 EvolutionChain = evolutionChain
             };
         });
@@ -93,6 +96,25 @@ public class PokemonService : IPokemonService
         };
     }
 
+    private static ItemDto? ParseItem(JsonDocument doc)
+    {
+        var root = doc.RootElement;
+        var sprites = root.GetProperty("sprites");
+
+        var imageUrl = string.Empty;
+        if (sprites.TryGetProperty("default", out var defaultSprite) && defaultSprite.ValueKind != JsonValueKind.Null)
+        {
+            imageUrl = defaultSprite.GetString() ?? string.Empty;
+        }
+
+        return new ItemDto
+        {
+            Id = root.GetProperty("id").GetInt32(),
+            Name = root.GetProperty("name").GetString() ?? string.Empty,
+            ImageUrl = imageUrl
+        };
+    }
+
     private async Task<PokemonSpeciesDto?> GetSpeciesByUrlAsync(string? speciesUrl)
     {
         if (string.IsNullOrWhiteSpace(speciesUrl))
@@ -101,11 +123,46 @@ public class PokemonService : IPokemonService
         return await GetOrCreateCachedAsync($"pokemon:species:{speciesUrl}", speciesUrl, doc =>
         {
             var root = doc.RootElement;
+            var variants = new List<PokemonVariantDto>();
+
+            if (root.TryGetProperty("varieties", out var varietiesElement))
+            {
+                foreach (var variety in varietiesElement.EnumerateArray())
+                {
+                    if (variety.TryGetProperty("pokemon", out var pokemonElement) &&
+                        variety.TryGetProperty("is_default", out var isDefaultElement))
+                    {
+                        // Skip the default variant as it's shown as "Default" button
+                        if (isDefaultElement.GetBoolean())
+                            continue;
+
+                        var variantName = pokemonElement.GetProperty("name").GetString() ?? string.Empty;
+                        var variantUrl = pokemonElement.GetProperty("url").GetString();
+
+                        // Extract ID from URL (format: .../pokemon/12345/)
+                        if (!string.IsNullOrEmpty(variantUrl))
+                        {
+                            var urlParts = variantUrl.TrimEnd('/').Split('/');
+                            if (urlParts.Length > 0 && int.TryParse(urlParts[urlParts.Length - 1], out var variantId))
+                            {
+                                var imageUrl = $"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/{variantId}.png";
+                                variants.Add(new PokemonVariantDto
+                                {
+                                    Name = variantName,
+                                    ImageUrl = imageUrl
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+
             return new PokemonSpeciesDto
             {
                 Id = root.GetProperty("id").GetInt32(),
                 Name = root.GetProperty("name").GetString() ?? string.Empty,
-                EvolutionChainUrl = root.GetProperty("evolution_chain").GetProperty("url").GetString() ?? string.Empty
+                EvolutionChainUrl = root.GetProperty("evolution_chain").GetProperty("url").GetString() ?? string.Empty,
+                Variants = variants
             };
         });
     }
@@ -133,7 +190,7 @@ public class PokemonService : IPokemonService
 
         int? minLevel = null;
         string? triggerName = null;
-        string? itemName = null;
+        ItemDto? item = null;
 
         if (evolutionDetails.GetArrayLength() > 0)
         {
@@ -142,8 +199,11 @@ public class PokemonService : IPokemonService
                 minLevel = lvl.GetInt32();
             if (detail.TryGetProperty("trigger", out var trig) && trig.ValueKind != JsonValueKind.Null)
                 triggerName = trig.GetProperty("name").GetString();
-            if (detail.TryGetProperty("item", out var item) && item.ValueKind != JsonValueKind.Null)
-                itemName = item.GetProperty("name").GetString();
+            if (detail.TryGetProperty("item", out var itemElement) && itemElement.ValueKind != JsonValueKind.Null)
+            {
+                var itemName = itemElement.GetProperty("name").GetString() ?? string.Empty;
+                item = await GetOrCreateCachedAsync($"pokemon:item:{itemName}", $"item/{itemName}", ParseItem);
+            }
         }
 
         var imageUrl = await GetOrCreateCachedAsync($"pokemon:image:{pokemonName}", $"pokemon/{pokemonName}", doc =>
@@ -157,7 +217,7 @@ public class PokemonService : IPokemonService
             ImageUrl = imageUrl,
             MinLevel = minLevel,
             TriggerName = triggerName,
-            ItemName = itemName
+            Item = item
         });
 
         foreach (var nextEvolution in chainElement.GetProperty("evolves_to").EnumerateArray())

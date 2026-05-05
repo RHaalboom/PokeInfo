@@ -38,6 +38,15 @@
     position: relative;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
     animation: fadeIn 0.2s ease;
+    color: #000;
+}
+
+.modal-content h2 {
+    color: #000;
+}
+
+.modal-content p {
+    color: #000;
 }
 
 @keyframes fadeIn {
@@ -63,6 +72,42 @@
     padding: 6px 10px;
     border-radius: 8px;
     cursor: pointer;
+}
+
+/* Variants Section */
+.variants-section {
+    margin: 16px 0;
+}
+
+.variants-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 8px;
+}
+
+.variant-btn {
+    padding: 8px 12px;
+    border: 2px solid #cbd5e1;
+    background: white;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.2s ease;
+    color: #000;
+}
+
+.variant-btn:hover {
+    border-color: #d62828;
+    background: #fef2f2;
+    color: #000;
+}
+
+.variant-btn.active {
+    background: #d62828;
+    color: white;
+    border-color: #d62828;
 }
 
 /* Evolution Chain */
@@ -98,6 +143,19 @@
     font-size: 0.8rem;
     color: #666;
     font-style: italic;
+}
+
+.evolution-item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 40px;
+}
+
+.evolution-item img {
+    max-width: 100%;
+    max-height: 40px;
+    object-fit: contain;
 }
 
 .evolution-arrow {
