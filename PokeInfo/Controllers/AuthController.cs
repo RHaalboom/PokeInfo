@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using PokeInfo.Data;
 using PokeInfo.Entities;
@@ -14,11 +15,13 @@ public class AuthController : ControllerBase
 {
     private readonly PokeInfoDbContext _context;
     private readonly PasswordHasher<User> _passwordHasher;
+    private readonly JwtService _jwtService;
 
-    public AuthController(PokeInfoDbContext context)
+    public AuthController(PokeInfoDbContext context, JwtService jwtService)
     {
         _context = context;
         _passwordHasher = new PasswordHasher<User>();
+        _jwtService = jwtService;
     }
 
     [HttpPost("register")]
@@ -56,11 +59,57 @@ public class AuthController : ControllerBase
         return Ok(new { message = "Account successfully created." });
     }
 
+    [HttpPost("login")]
+    public async Task<IActionResult> Login(LoginRequestDto request)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var user = await _context.Users
+            .Include(u => u.Role)
+            .FirstOrDefaultAsync(u => u.Email == request.UsernameOrEmail || u.Username == request.UsernameOrEmail);
+
+        if (user == null)
+        {
+            return Unauthorized(new { message = "Invalid credentials." });
+        }
+
+        var result = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, request.Password);
+        if (result == PasswordVerificationResult.Failed)
+        {
+            return Unauthorized(new { message = "Invalid credentials." });
+        }
+
+        var token = _jwtService.GenerateToken(user);
+        var response = new LoginResponseDto
+        {
+            Message = "Login successful.",
+            Token = token,
+            User = new UserResponseDto
+            {
+                Id = user.Id,
+                Username = user.Username,
+                Email = user.Email,
+                RoleName = user.Role.Name
+            }
+        };
+
+        return Ok(response);
+    }
+
     [HttpGet("users")]
+    [Authorize]
     public async Task<IActionResult> GetAllUsers()
     {
-        // TODO: Add JWT token validation to check if user is moderator
-        // For now, this endpoint is open. Add authorization middleware when implementing authentication
+        var roleClaim = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+
+        if (roleClaim?.ToLower() != "moderator")
+        {
+            return Forbid();
+        }
+
         var users = await _context.Users
             .Include(u => u.Role)
             .Select(u => new UserResponseDto
@@ -76,10 +125,16 @@ public class AuthController : ControllerBase
     }
 
     [HttpPut("users/{id}/role/{roleId}")]
+    [Authorize]
     public async Task<IActionResult> UpdateUserRole(int id, int roleId)
     {
-        // TODO: Add JWT token validation to check if user is moderator
-        // For now, this endpoint is open. Add authorization middleware when implementing authentication
+        var roleClaim = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+
+        if (roleClaim?.ToLower() != "moderator")
+        {
+            return Forbid();
+        }
+
         var user = await _context.Users.FindAsync(id);
         if (user == null)
         {
@@ -106,4 +161,3 @@ public class AuthController : ControllerBase
         return Ok(roles);
     }
 }
-
