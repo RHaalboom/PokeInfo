@@ -8,7 +8,7 @@ function App() {
         <>
             <nav className="main-nav">
                 <Link to="/">Home</Link>
-                <Link to="/register">Registreren</Link>
+                <Link to="/register">Registrer</Link>
             </nav>
 
             <Routes>

@@ -1,4 +1,6 @@
-﻿export default function PokemonDetail({ pokemon, onClose }) {
+﻿import "../styles/pokemonDetail.css";
+
+export default function PokemonDetail({ pokemon, onClose }) {
     if (!pokemon) return null;
 
     return (
@@ -28,7 +30,7 @@
                     <strong>Abilities:</strong>
                     <ul>
                         {pokemon.abilities.map((ability) => (
-                            <li key={ability}>{ability}</li>
+                            <li key={ability.id}>{ability.name}</li>
                         ))}
                     </ul>
                 </div>
@@ -41,6 +43,28 @@
                         ))}
                     </ul>
                 </div>
+
+                {pokemon.evolutionChain && pokemon.evolutionChain.stages.length > 0 && (
+                    <div>
+                        <strong>Evolution Chain:</strong>
+                        <div className="evolution-stages">
+                            {pokemon.evolutionChain.stages.map((stage, index) => (
+                                <div key={stage.pokemonName} className="evolution-stage">
+                                    {stage.imageUrl && (
+                                        <img src={stage.imageUrl} alt={stage.pokemonName} />
+                                    )}
+                                    <p>{stage.pokemonName}</p>
+                                    {stage.minLevel && <p className="evolution-info">Level {stage.minLevel}</p>}
+                                    {stage.triggerName && <p className="evolution-info">{stage.triggerName}</p>}
+                                    {stage.itemName && <p className="evolution-info">Item: {stage.itemName}</p>}
+                                    {index < pokemon.evolutionChain.stages.length - 1 && (
+                                        <div className="evolution-arrow">→</div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

@@ -31,7 +31,7 @@ export default function RegisterPage() {
 
         try {
             const result = await registerUser(formData);
-            setSuccessMessage(result.message || "Account succesvol aangemaakt.");
+            setSuccessMessage(result.message || "Account succesfully created.");
 
             setFormData({
                 username: "",
@@ -48,12 +48,12 @@ export default function RegisterPage() {
     return (
         <main className="register-page">
             <section className="register-card">
-                <h1>Account aanmaken</h1>
-                <p>Maak een account aan om je Pokémon-collectie te beheren.</p>
+                <h1>Create your account</h1>
+                <p>Create an account to start your Pokémon-collection!</p>
 
                 <form onSubmit={handleSubmit} className="register-form">
                     <div className="form-group">
-                        <label htmlFor="username">Gebruikersnaam</label>
+                        <label htmlFor="username">Username</label>
                         <input
                             id="username"
                             name="username"
@@ -66,7 +66,7 @@ export default function RegisterPage() {
                     </div>
 
                     <div className="form-group">
-                        <label htmlFor="email">E-mailadres</label>
+                        <label htmlFor="email">E-mail</label>
                         <input
                             id="email"
                             name="email"
@@ -79,7 +79,7 @@ export default function RegisterPage() {
                     </div>
 
                     <div className="form-group">
-                        <label htmlFor="password">Wachtwoord</label>
+                        <label htmlFor="password">Password</label>
                         <input
                             id="password"
                             name="password"
@@ -92,7 +92,7 @@ export default function RegisterPage() {
                     </div>
 
                     <button type="submit" disabled={isSubmitting}>
-                        {isSubmitting ? "Bezig met registreren..." : "Account aanmaken"}
+                        {isSubmitting ? "Creating account..." : "Account aanmaken"}
                     </button>
                 </form>
 
