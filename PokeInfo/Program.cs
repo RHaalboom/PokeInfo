@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using PokeInfo.Data;
 using PokeInfo.Services;
 using System;
+using Microsoft.Extensions.Caching.Memory;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +10,8 @@ builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddMemoryCache();
 
 builder.Services.AddDbContext<PokeInfoDbContext>(options =>
 {

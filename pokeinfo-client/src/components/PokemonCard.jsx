@@ -1,3 +1,5 @@
+import "../styles/pokemonCard.css";
+
 export default function PokemonCard({ pokemon, onSelect }) {
     return (
         <article className="pokemon-card" onClick={() => onSelect(pokemon.name)}>

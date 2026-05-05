@@ -3,6 +3,8 @@ import { getPokemonOverview, getPokemonByName } from "../services/pokemonService
 import PokemonCard from "../components/PokemonCard";
 import PokemonDetail from "../components/PokemonDetail";
 import "../styles/home.css";
+import "../styles/pokemonCard.css";
+import "../styles/pokemonDetail.css";
 
 export default function HomePage() {
     const [pokemon, setPokemon] = useState([]);
@@ -42,7 +44,7 @@ export default function HomePage() {
             setPokemon(data);
             setFilteredPokemon(data);
         } catch (err) {
-            setError("Het ophalen van Pok�mon is mislukt.");
+            setError("Fetching Pokémon failed.");
         } finally {
             setLoading(false);
         }
@@ -54,7 +56,7 @@ export default function HomePage() {
             const details = await getPokemonByName(name);
             setSelectedPokemon(details);
         } catch (err) {
-            setError("Het ophalen van details is mislukt.");
+            setError("Fetching details failed.");
         } finally {
             setDetailLoading(false);
         }
@@ -69,27 +71,26 @@ export default function HomePage() {
             <section className="hero">
                 <h1>Poké-info</h1>
                 <p>
-                    Eén centrale plek voor Pokémon-informatie en het bijhouden van je
-                    collectie.
+                    A cental place for your Pokémon-information and maintaining your own collection!
                 </p>
             </section>
 
             <section className="search-section">
                 <label htmlFor="pokemonSearch" className="sr-only">
-                    Zoek een Pokémon
+                    Search for a Pokémon
                 </label>
                 <input
                     id="pokemonSearch"
                     type="text"
-                    placeholder="Zoek een Pokémon..."
+                    placeholder="Search..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
             </section>
 
-            {loading && <p>Pokémon worden geladen...</p>}
+            {loading && <p>Loading...</p>}
             {error && <p className="error-message">{error}</p>}
-            {detailLoading && <p>Details worden geladen...</p>}
+            {detailLoading && <p>Loading...</p>}
 
             {!loading && !error && (
                 <section className="pokemon-grid">
