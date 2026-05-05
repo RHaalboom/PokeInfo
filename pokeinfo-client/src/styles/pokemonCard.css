@@ -14,12 +14,24 @@
     transition: transform 0.15s ease;
 }
 
-    .pokemon-card:hover {
-        transform: translateY(-4px);
-    }
+.pokemon-card:hover {
+    transform: translateY(-4px);
+}
 
-    .pokemon-card img {
-        width: 120px;
-        height: 120px;
-        object-fit: contain;
-    }
+.pokemon-card h2 {
+    margin: 0 0 12px 0;
+    font-size: 1.1rem;
+    color: #000;
+}
+
+.pokemon-card p {
+    margin: 8px 0 0 0;
+    color: #000;
+    font-size: 0.9rem;
+}
+
+.pokemon-card img {
+    width: 120px;
+    height: 120px;
+    object-fit: contain;
+}
