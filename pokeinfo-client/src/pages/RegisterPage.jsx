@@ -92,7 +92,7 @@ export default function RegisterPage() {
                     </div>
 
                     <button type="submit" disabled={isSubmitting}>
-                        {isSubmitting ? "Creating account..." : "Account aanmaken"}
+                        {isSubmitting ? "Creating account..." : "Create account"}
                     </button>
                 </form>
 
