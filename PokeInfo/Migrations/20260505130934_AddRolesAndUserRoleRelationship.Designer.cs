@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PokeInfo.Data;
 
@@ -10,9 +11,11 @@ using PokeInfo.Data;
 namespace PokeInfo.Migrations
 {
     [DbContext(typeof(PokeInfoDbContext))]
-    partial class PokeInfoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260505130934_AddRolesAndUserRoleRelationship")]
+    partial class AddRolesAndUserRoleRelationship
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -47,18 +50,12 @@ namespace PokeInfo.Migrations
                         new
                         {
                             Id = 1,
-                            Description = "Standard user role without rankings",
+                            Description = "Standard user role",
                             Name = "User"
                         },
                         new
                         {
                             Id = 2,
-                            Description = "User role with access to rankings",
-                            Name = "RankedUser"
-                        },
-                        new
-                        {
-                            Id = 3,
                             Description = "Moderator role with access to all accounts",
                             Name = "Moderator"
                         });

@@ -1,112 +1,270 @@
-﻿using System.Text.Json;
+﻿using Microsoft.Extensions.Caching.Memory;
 using PokeInfo.Models;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace PokeInfo.Services;
 
 public class PokemonService : IPokemonService
 {
     private readonly HttpClient _httpClient;
+    private readonly IMemoryCache _cache;
+    private const string EnglishLanguage = "en";
 
-    public PokemonService(HttpClient httpClient)
+    public PokemonService(HttpClient httpClient, IMemoryCache cache)
     {
         _httpClient = httpClient;
+        _cache = cache;
     }
 
     public async Task<List<PokemonListItemDto>> GetOverviewAsync()
     {
-        var results = new List<PokemonListItemDto>();
-
-        for (int i = 1; i <= 151; i++)
+        return await GetOrCreateCachedAsync("pokemon:overview", "pokemon?limit=1025", doc =>
         {
-            var response = await _httpClient.GetAsync($"pokemon/{i}");
-            response.EnsureSuccessStatusCode();
+            var root = JsonNode.Parse(doc.RootElement.GetRawText());
+            var result = new List<PokemonListItemDto>();
+            int index = 0;
 
-            var json = await response.Content.ReadAsStringAsync();
-            using var document = JsonDocument.Parse(json);
-
-            var root = document.RootElement;
-
-            results.Add(new PokemonListItemDto
+            foreach (var item in root!["results"]!.AsArray())
             {
-                Id = root.GetProperty("id").GetInt32(),
-                Name = root.GetProperty("name").GetString() ?? string.Empty,
-                ImageUrl = root
-                    .GetProperty("sprites")
-                    .GetProperty("front_default")
-                    .GetString() ?? string.Empty
-            });
-        }
+                index++;
+                var name = item!["name"]!.GetValue<string>();
+                result.Add(new PokemonListItemDto
+                {
+                    Id = index,
+                    Name = name,
+                    ImageUrl = $"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/{index}.png"
+                });
+            }
 
-        return results;
+            return result;
+        }) ?? new List<PokemonListItemDto>();
     }
 
     public async Task<PokemonDetailDto?> GetPokemonByNameAsync(string name)
     {
-        var response = await _httpClient.GetAsync($"pokemon/{name.ToLower()}");
-
-        if (!response.IsSuccessStatusCode)
+        var normalizedName = name.ToLowerInvariant();
+        return await GetOrCreateCachedAsync($"pokemon:detail:{normalizedName}", $"pokemon/{normalizedName}", async doc =>
         {
-            return null;
-        }
+            var root = doc.RootElement;
+            var types = GetArrayPropertyValues(root, "types", "type", "name");
+            var games = GetArrayPropertyValues(root, "game_indices", "version", "name");
+            var abilityNames = GetArrayPropertyValues(root, "abilities", "ability", "name");
 
-        var json = await response.Content.ReadAsStringAsync();
-        using var document = JsonDocument.Parse(json);
+            var speciesUrl = root.GetProperty("species").GetProperty("url").GetString();
+            var species = await GetSpeciesByUrlAsync(speciesUrl);
 
-        var root = document.RootElement;
+            EvolutionChainDto? evolutionChain = null;
+            if (!string.IsNullOrWhiteSpace(species?.EvolutionChainUrl))
+                evolutionChain = await GetEvolutionChainByUrlAsync(species.EvolutionChainUrl);
 
-        var types = new List<string>();
-        foreach (var typeEntry in root.GetProperty("types").EnumerateArray())
-        {
-            var typeName = typeEntry
-                .GetProperty("type")
-                .GetProperty("name")
-                .GetString();
+            var abilities = await Task.WhenAll(
+                abilityNames.Select(name => GetOrCreateCachedAsync($"pokemon:ability:{name.ToLowerInvariant()}", 
+                    $"ability/{name.ToLowerInvariant()}", ParseAbility))
+            );
 
-            if (!string.IsNullOrWhiteSpace(typeName))
+            var variants = species?.Variants ?? new List<PokemonVariantDto>();
+
+            return new PokemonDetailDto
             {
-                types.Add(typeName);
-            }
-        }
+                Id = root.GetProperty("id").GetInt32(),
+                Name = root.GetProperty("name").GetString() ?? string.Empty,
+                ImageUrl = root.GetProperty("sprites").GetProperty("front_default").GetString() ?? string.Empty,
+                Types = types,
+                Abilities = abilities.Where(a => a != null).OfType<AbilityDto>().ToList(),
+                Games = games,
+                Variants = variants,
+                EvolutionChain = evolutionChain
+            };
+        });
+    }
 
-        var abilities = new List<string>();
-        foreach (var abilityEntry in root.GetProperty("abilities").EnumerateArray())
-        {
-            var abilityName = abilityEntry
-                .GetProperty("ability")
-                .GetProperty("name")
-                .GetString();
+    private static AbilityDto? ParseAbility(JsonDocument doc)
+    {
+        var root = doc.RootElement;
+        var englishEntry = root.GetProperty("effect_entries").EnumerateArray()
+            .FirstOrDefault(e => e.GetProperty("language").GetProperty("name").GetString() == "en");
 
-            if (!string.IsNullOrWhiteSpace(abilityName))
-            {
-                abilities.Add(abilityName);
-            }
-        }
-
-        var games = new List<string>();
-        foreach (var gameEntry in root.GetProperty("game_indices").EnumerateArray())
-        {
-            var gameName = gameEntry
-                .GetProperty("version")
-                .GetProperty("name")
-                .GetString();
-
-            if (!string.IsNullOrWhiteSpace(gameName))
-            {
-                games.Add(gameName);
-            }
-        }
-
-        return new PokemonDetailDto
+        return new AbilityDto
         {
             Id = root.GetProperty("id").GetInt32(),
             Name = root.GetProperty("name").GetString() ?? string.Empty,
-            ImageUrl = root
-                .GetProperty("sprites")
-                .GetProperty("front_default")
-                .GetString() ?? string.Empty,
-            Types = types,
-            Abilities = abilities,
-            Games = games
+            ShortEffect = englishEntry.ValueKind == JsonValueKind.Undefined ? string.Empty 
+                : englishEntry.GetProperty("short_effect").GetString() ?? string.Empty,
+            Effect = englishEntry.ValueKind == JsonValueKind.Undefined ? string.Empty 
+                : englishEntry.GetProperty("effect").GetString() ?? string.Empty
         };
+    }
+
+    private static ItemDto? ParseItem(JsonDocument doc)
+    {
+        var root = doc.RootElement;
+        var sprites = root.GetProperty("sprites");
+
+        var imageUrl = string.Empty;
+        if (sprites.TryGetProperty("default", out var defaultSprite) && defaultSprite.ValueKind != JsonValueKind.Null)
+        {
+            imageUrl = defaultSprite.GetString() ?? string.Empty;
+        }
+
+        return new ItemDto
+        {
+            Id = root.GetProperty("id").GetInt32(),
+            Name = root.GetProperty("name").GetString() ?? string.Empty,
+            ImageUrl = imageUrl
+        };
+    }
+
+    private async Task<PokemonSpeciesDto?> GetSpeciesByUrlAsync(string? speciesUrl)
+    {
+        if (string.IsNullOrWhiteSpace(speciesUrl))
+            return null;
+
+        return await GetOrCreateCachedAsync($"pokemon:species:{speciesUrl}", speciesUrl, doc =>
+        {
+            var root = doc.RootElement;
+            var variants = new List<PokemonVariantDto>();
+
+            if (root.TryGetProperty("varieties", out var varietiesElement))
+            {
+                foreach (var variety in varietiesElement.EnumerateArray())
+                {
+                    if (variety.TryGetProperty("pokemon", out var pokemonElement) &&
+                        variety.TryGetProperty("is_default", out var isDefaultElement))
+                    {
+                        // Skip the default variant as it's shown as "Default" button
+                        if (isDefaultElement.GetBoolean())
+                            continue;
+
+                        var variantName = pokemonElement.GetProperty("name").GetString() ?? string.Empty;
+                        var variantUrl = pokemonElement.GetProperty("url").GetString();
+
+                        // Extract ID from URL (format: .../pokemon/12345/)
+                        if (!string.IsNullOrEmpty(variantUrl))
+                        {
+                            var urlParts = variantUrl.TrimEnd('/').Split('/');
+                            if (urlParts.Length > 0 && int.TryParse(urlParts[urlParts.Length - 1], out var variantId))
+                            {
+                                var imageUrl = $"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/{variantId}.png";
+                                variants.Add(new PokemonVariantDto
+                                {
+                                    Name = variantName,
+                                    ImageUrl = imageUrl
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+
+            return new PokemonSpeciesDto
+            {
+                Id = root.GetProperty("id").GetInt32(),
+                Name = root.GetProperty("name").GetString() ?? string.Empty,
+                EvolutionChainUrl = root.GetProperty("evolution_chain").GetProperty("url").GetString() ?? string.Empty,
+                Variants = variants
+            };
+        });
+    }
+
+    private async Task<EvolutionChainDto?> GetEvolutionChainByUrlAsync(string evolutionChainUrl)
+    {
+        return await GetOrCreateCachedAsync($"pokemon:evolution-chain:{evolutionChainUrl}", evolutionChainUrl, async doc =>
+        {
+            var root = doc.RootElement;
+            var stages = new List<EvolutionStageDto>();
+            await AddEvolutionStagesAsync(root.GetProperty("chain"), stages);
+
+            return new EvolutionChainDto
+            {
+                Id = root.GetProperty("id").GetInt32(),
+                Stages = stages
+            };
+        });
+    }
+
+    private async Task AddEvolutionStagesAsync(JsonElement chainElement, List<EvolutionStageDto> stages)
+    {
+        var pokemonName = chainElement.GetProperty("species").GetProperty("name").GetString() ?? string.Empty;
+        var evolutionDetails = chainElement.GetProperty("evolution_details");
+
+        int? minLevel = null;
+        string? triggerName = null;
+        ItemDto? item = null;
+
+        if (evolutionDetails.GetArrayLength() > 0)
+        {
+            var detail = evolutionDetails[0];
+            if (detail.TryGetProperty("min_level", out var lvl) && lvl.ValueKind != JsonValueKind.Null)
+                minLevel = lvl.GetInt32();
+            if (detail.TryGetProperty("trigger", out var trig) && trig.ValueKind != JsonValueKind.Null)
+                triggerName = trig.GetProperty("name").GetString();
+            if (detail.TryGetProperty("item", out var itemElement) && itemElement.ValueKind != JsonValueKind.Null)
+            {
+                var itemName = itemElement.GetProperty("name").GetString() ?? string.Empty;
+                item = await GetOrCreateCachedAsync($"pokemon:item:{itemName}", $"item/{itemName}", ParseItem);
+            }
+        }
+
+        var imageUrl = await GetOrCreateCachedAsync($"pokemon:image:{pokemonName}", $"pokemon/{pokemonName}", doc =>
+        {
+            return doc.RootElement.GetProperty("sprites").GetProperty("front_default").GetString() ?? string.Empty;
+        }) ?? string.Empty;
+
+        stages.Add(new EvolutionStageDto
+        {
+            PokemonName = pokemonName,
+            ImageUrl = imageUrl,
+            MinLevel = minLevel,
+            TriggerName = triggerName,
+            Item = item
+        });
+
+        foreach (var nextEvolution in chainElement.GetProperty("evolves_to").EnumerateArray())
+            await AddEvolutionStagesAsync(nextEvolution, stages);
+    }
+
+    private static List<string> GetArrayPropertyValues(JsonElement root, string propertyName, params string[] childPath)
+    {
+        var values = new List<string>();
+        foreach (var entry in root.GetProperty(propertyName).EnumerateArray())
+        {
+            JsonElement current = entry;
+            foreach (var path in childPath)
+                current = current.GetProperty(path);
+
+            var value = current.GetString();
+            if (!string.IsNullOrWhiteSpace(value))
+                values.Add(value);
+        }
+        return values;
+    }
+
+    private async Task<T?> GetOrCreateCachedAsync<T>(string cacheKey, string endpoint, Func<JsonDocument, T> parser) where T : class
+    {
+        return await _cache.GetOrCreateAsync(cacheKey, async entry =>
+        {
+            var response = await _httpClient.GetAsync(endpoint);
+            if (!response.IsSuccessStatusCode)
+                return null;
+
+            var json = await response.Content.ReadAsStringAsync();
+            using var doc = JsonDocument.Parse(json);
+            return parser(doc);
+        });
+    }
+
+    private async Task<T?> GetOrCreateCachedAsync<T>(string cacheKey, string endpoint, Func<JsonDocument, Task<T>> asyncParser) where T : class
+    {
+        return await _cache.GetOrCreateAsync(cacheKey, async entry =>
+        {
+            var response = await _httpClient.GetAsync(endpoint);
+            if (!response.IsSuccessStatusCode)
+                return null;
+
+            var json = await response.Content.ReadAsStringAsync();
+            using var doc = JsonDocument.Parse(json);
+            return await asyncParser(doc);
+        });
     }
 }

@@ -4,14 +4,31 @@
     gap: 16px;
     background: white;
     border-bottom: 1px solid #e5e7eb;
+    align-items: center;
 }
 
-    .main-nav a {
-        text-decoration: none;
-        color: #1f2937;
-        font-weight: 600;
-    }
+.main-nav a {
+    text-decoration: none;
+    color: #1f2937;
+    font-weight: 600;
+}
 
-        .main-nav a:hover {
-            color: #d62828;
-        }
+.main-nav a:hover {
+    color: #d62828;
+}
+
+.logout-nav-btn {
+    padding: 8px 16px;
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s;
+    font-size: 14px;
+}
+
+.logout-nav-btn:hover {
+    background: #764ba2;
+}

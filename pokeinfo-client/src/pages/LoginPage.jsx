@@ -1,17 +1,15 @@
-﻿import { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { registerUser, loginUser, getCurrentUser } from "../services/authService";
+import { loginUser, getCurrentUser } from "../services/authService";
 import { useAuth } from "../hooks/useAuth";
-import "../styles/register.css";
+import "../styles/login.css";
 
-export default function RegisterPage() {
+export default function LoginPage() {
     const [formData, setFormData] = useState({
-        username: "",
-        email: "",
+        usernameOrEmail: "",
         password: ""
     });
 
-    const [successMessage, setSuccessMessage] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const navigate = useNavigate();
@@ -29,22 +27,11 @@ export default function RegisterPage() {
     async function handleSubmit(event) {
         event.preventDefault();
 
-        setSuccessMessage("");
         setErrorMessage("");
         setIsSubmitting(true);
 
         try {
-            const result = await registerUser(formData);
-            setSuccessMessage(result.message || "Account succesfully created.");
-
-            setFormData({
-                username: "",
-                email: "",
-                password: ""
-            });
-
-            // Auto-login after successful registration
-            await loginUser({ usernameOrEmail: formData.username, password: formData.password });
+            await loginUser(formData);
             const currentUser = getCurrentUser();
             login(currentUser);
             navigate("/profile");
@@ -56,35 +43,21 @@ export default function RegisterPage() {
     }
 
     return (
-        <main className="register-page">
-            <section className="register-card">
-                <h1>Create your account</h1>
-                <p>Create an account to start your Pokémon-collection!</p>
+        <main className="login-page">
+            <section className="login-card">
+                <h1>Login</h1>
+                <p>Sign in to your account</p>
 
-                <form onSubmit={handleSubmit} className="register-form">
+                <form onSubmit={handleSubmit} className="login-form">
                     <div className="form-group">
-                        <label htmlFor="username">Username</label>
+                        <label htmlFor="usernameOrEmail">Username or Email</label>
                         <input
-                            id="username"
-                            name="username"
+                            id="usernameOrEmail"
+                            name="usernameOrEmail"
                             type="text"
-                            value={formData.username}
+                            value={formData.usernameOrEmail}
                             onChange={handleChange}
                             required
-                            maxLength="50"
-                        />
-                    </div>
-
-                    <div className="form-group">
-                        <label htmlFor="email">E-mail</label>
-                        <input
-                            id="email"
-                            name="email"
-                            type="email"
-                            value={formData.email}
-                            onChange={handleChange}
-                            required
-                            maxLength="100"
                         />
                     </div>
 
@@ -102,17 +75,17 @@ export default function RegisterPage() {
                     </div>
 
                     <button type="submit" disabled={isSubmitting}>
-                        {isSubmitting ? "Creating account..." : "Create account"}
+                        {isSubmitting ? "Signing in..." : "Sign In"}
                     </button>
                 </form>
-
-                {successMessage && (
-                    <p className="success-message">{successMessage}</p>
-                )}
 
                 {errorMessage && (
                     <p className="error-message">{errorMessage}</p>
                 )}
+
+                <p className="register-link">
+                    Don't have an account? <a href="/register">Register here</a>
+                </p>
             </section>
         </main>
     );
