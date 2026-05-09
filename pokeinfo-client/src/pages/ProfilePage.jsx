@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getCurrentUser, logout, isAuthenticated, getAllUsers } from "../services/authService";
+import { getCurrentUser, logout as logoutService, isAuthenticated, getAllUsers } from "../services/authService";
+import { useAuth } from "../hooks/useAuth";
 import "../styles/profile.css";
 
 export default function ProfilePage() {
@@ -9,6 +10,7 @@ export default function ProfilePage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const navigate = useNavigate();
+    const { logout } = useAuth();
 
     useEffect(() => {
         if (!isAuthenticated()) {
@@ -39,8 +41,9 @@ export default function ProfilePage() {
     }
 
     function handleLogout() {
+        logoutService();
         logout();
-        navigate("/login");
+        navigate("/");
     }
 
     if (loading) {

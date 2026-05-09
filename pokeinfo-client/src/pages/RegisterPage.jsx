@@ -1,5 +1,7 @@
 ﻿import { useState } from "react";
-import { registerUser } from "../services/authService";
+import { useNavigate } from "react-router-dom";
+import { registerUser, loginUser, getCurrentUser } from "../services/authService";
+import { useAuth } from "../hooks/useAuth";
 import "../styles/register.css";
 
 export default function RegisterPage() {
@@ -12,6 +14,8 @@ export default function RegisterPage() {
     const [successMessage, setSuccessMessage] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const navigate = useNavigate();
+    const { login } = useAuth();
 
     function handleChange(event) {
         const { name, value } = event.target;
@@ -38,6 +42,12 @@ export default function RegisterPage() {
                 email: "",
                 password: ""
             });
+
+            // Auto-login after successful registration
+            await loginUser({ usernameOrEmail: formData.username, password: formData.password });
+            const currentUser = getCurrentUser();
+            login(currentUser);
+            navigate("/profile");
         } catch (error) {
             setErrorMessage(error.message);
         } finally {

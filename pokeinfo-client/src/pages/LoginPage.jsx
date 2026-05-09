@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { loginUser } from "../services/authService";
+import { loginUser, getCurrentUser } from "../services/authService";
+import { useAuth } from "../hooks/useAuth";
 import "../styles/login.css";
 
 export default function LoginPage() {
@@ -12,6 +13,7 @@ export default function LoginPage() {
     const [errorMessage, setErrorMessage] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const navigate = useNavigate();
+    const { login } = useAuth();
 
     function handleChange(event) {
         const { name, value } = event.target;
@@ -30,6 +32,8 @@ export default function LoginPage() {
 
         try {
             await loginUser(formData);
+            const currentUser = getCurrentUser();
+            login(currentUser);
             navigate("/profile");
         } catch (error) {
             setErrorMessage(error.message);
