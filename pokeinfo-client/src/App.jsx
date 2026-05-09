@@ -14,7 +14,7 @@ function App() {
     function handleLogout() {
         logoutService();
         logout();
-        navigate("/login");
+        navigate("/");
     }
 
     return (
