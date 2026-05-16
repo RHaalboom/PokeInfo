@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PokeInfo.Data;
 
@@ -11,9 +12,11 @@ using PokeInfo.Data;
 namespace PokeInfo.Migrations
 {
     [DbContext(typeof(PokeInfoDbContext))]
-    partial class PokeInfoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260516171652_AddCollectionsFeature")]
+    partial class AddCollectionsFeature
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -53,7 +56,7 @@ namespace PokeInfo.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Collections", (string)null);
+                    b.ToTable("Collections");
                 });
 
             modelBuilder.Entity("PokeInfo.Entities.CollectionPokemon", b =>
@@ -82,7 +85,7 @@ namespace PokeInfo.Migrations
 
                     b.HasIndex("CollectionId");
 
-                    b.ToTable("CollectionPokemons", (string)null);
+                    b.ToTable("CollectionPokemons");
                 });
 
             modelBuilder.Entity("PokeInfo.Entities.Role", b =>
@@ -105,7 +108,7 @@ namespace PokeInfo.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Roles", (string)null);
+                    b.ToTable("Roles");
 
                     b.HasData(
                         new
@@ -157,7 +160,7 @@ namespace PokeInfo.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("PokeInfo.Entities.Collection", b =>

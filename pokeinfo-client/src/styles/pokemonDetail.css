@@ -98,6 +98,79 @@
     color: #000;
 }
 
+.variant-btn.active {
+    background: #3b82f6;
+    border-color: #3b82f6;
+    color: white;
+}
+
+/* Add to Collection Section */
+.add-to-collection-section {
+    margin: 20px 0 0 0;
+    padding-top: 16px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.collection-selector {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.collection-dropdown {
+    flex: 1;
+    min-width: 150px;
+    padding: 8px 12px;
+    border: 2px solid #cbd5e1;
+    border-radius: 6px;
+    background: white;
+    color: #000;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.collection-dropdown:disabled {
+    background: #f3f4f6;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.add-collection-btn {
+    padding: 8px 16px;
+    background: #10b981;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: background 0.2s ease;
+}
+
+.add-collection-btn:hover:not(:disabled) {
+    background: #059669;
+}
+
+.add-collection-btn:disabled {
+    background: #d1d5db;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.add-error {
+    color: #dc2626;
+    font-size: 0.85rem;
+    margin: 8px 0;
+}
+
+.add-success {
+    color: #10b981;
+    font-size: 0.85rem;
+    margin: 8px 0;
+}
+
 .variant-btn:hover {
     border-color: #d62828;
     background: #fef2f2;
