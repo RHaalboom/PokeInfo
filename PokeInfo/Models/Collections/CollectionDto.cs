@@ -15,5 +15,6 @@ public class CollectionPokemonDto
     public int Id { get; set; }
     public int PokemonId { get; set; }
     public string PokemonName { get; set; } = string.Empty;
+    public string? CaughtInGame { get; set; }
     public DateTime AddedAt { get; set; }
 }

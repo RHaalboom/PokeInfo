@@ -12,8 +12,8 @@ using PokeInfo.Data;
 namespace PokeInfo.Migrations
 {
     [DbContext(typeof(PokeInfoDbContext))]
-    [Migration("20260516171652_AddCollectionsFeature")]
-    partial class AddCollectionsFeature
+    [Migration("20260516180734_AddCaughtInGameColumn")]
+    partial class AddCaughtInGameColumn
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -69,6 +69,10 @@ namespace PokeInfo.Migrations
 
                     b.Property<DateTime>("AddedAt")
                         .HasColumnType("datetime(6)");
+
+                    b.Property<string>("CaughtInGame")
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
 
                     b.Property<int>("CollectionId")
                         .HasColumnType("int");

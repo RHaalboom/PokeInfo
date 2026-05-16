@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getCollection, updateCollection, deleteCollection, removePokemonFromCollection } from "../services/collectionService";
+import { getCollection, updateCollection, deleteCollection, removePokemonFromCollection, updatePokemonGame } from "../services/collectionService";
 import { getPokemonByName } from "../services/pokemonService";
 import { isAuthenticated } from "../services/authService";
 import PokemonDetail from "../components/PokemonDetail";
@@ -17,6 +17,9 @@ export default function CollectionDetailsPage() {
     const [editDescription, setEditDescription] = useState("");
     const [isSaving, setIsSaving] = useState(false);
     const [selectedPokemon, setSelectedPokemon] = useState(null);
+    const [editingGamePokemonId, setEditingGamePokemonId] = useState(null);
+    const [updatingGame, setUpdatingGame] = useState(false);
+    const [pokemonGamesMap, setPokemonGamesMap] = useState({});
 
     useEffect(() => {
         if (!isAuthenticated()) {
@@ -98,13 +101,57 @@ export default function CollectionDetailsPage() {
         try {
             const details = await getPokemonByName(pokemonName);
             setSelectedPokemon(details);
+            // Store the games list for this pokemon by ID
+            if (collection) {
+                const pokemon = collection.pokemons.find(p => p.pokemonName.toLowerCase() === pokemonName.toLowerCase());
+                if (pokemon && details.games) {
+                    setPokemonGamesMap(prev => ({
+                        ...prev,
+                        [pokemon.pokemonId]: details.games
+                    }));
+                }
+            }
         } catch {
             setError("Fetching Pokémon details failed.");
         }
     }
 
+    async function handleFetchGamesForPokemon(pokemonName, pokemonId) {
+        try {
+            const details = await getPokemonByName(pokemonName);
+            if (details.games) {
+                setPokemonGamesMap(prev => ({
+                    ...prev,
+                    [pokemonId]: details.games
+                }));
+            }
+        } catch {
+            setError("Fetching Pokémon games failed.");
+        }
+    }
+
     function handleCloseDetail() {
         setSelectedPokemon(null);
+    }
+
+    async function handleUpdatePokemonGame(pokemonId, newGame) {
+        try {
+            setUpdatingGame(true);
+            await updatePokemonGame(id, pokemonId, newGame);
+            setCollection({
+                ...collection,
+                pokemons: collection.pokemons.map(p => 
+                    p.pokemonId === pokemonId 
+                        ? { ...p, caughtInGame: newGame }
+                        : p
+                )
+            });
+            setEditingGamePokemonId(null);
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setUpdatingGame(false);
+        }
     }
 
     if (loading) {
@@ -222,6 +269,7 @@ export default function CollectionDetailsPage() {
                                 <div className="table-col-no">Entry</div>
                                 <div className="table-col-pic">Img</div>
                                 <div className="table-col-name">Name</div>
+                                <div className="table-col-game">Game</div>
                                 <div className="table-col-added">Added</div>
                                 <div className="table-col-action"></div>
                             </div>
@@ -229,6 +277,8 @@ export default function CollectionDetailsPage() {
                                 const capitalizedName = pokemon.pokemonName.charAt(0).toUpperCase() + pokemon.pokemonName.slice(1);
                                 const formattedId = `#${pokemon.pokemonId.toString().padStart(4, '0')}`;
                                 const addedDate = new Date(pokemon.addedAt).toLocaleDateString();
+                                const isEditingGame = editingGamePokemonId === pokemon.pokemonId;
+
                                 return (
                                     <div key={pokemon.id} className="pokemons-table-row">
                                         <div className="table-col-no">{formattedId}</div>
@@ -247,6 +297,38 @@ export default function CollectionDetailsPage() {
                                             style={{ cursor: 'pointer' }}
                                         >
                                             {capitalizedName}
+                                        </div>
+                                        <div className="table-col-game">
+                                            {isEditingGame ? (
+                                                <select 
+                                                    className="game-select"
+                                                    value={pokemon.caughtInGame || ""}
+                                                    onChange={(e) => handleUpdatePokemonGame(pokemon.pokemonId, e.target.value || null)}
+                                                    disabled={updatingGame}
+                                                    onBlur={() => setEditingGamePokemonId(null)}
+                                                    autoFocus
+                                                >
+                                                    <option value="">Select game...</option>
+                                                    {pokemonGamesMap[pokemon.pokemonId] && pokemonGamesMap[pokemon.pokemonId].map(game => (
+                                                        <option key={game} value={game}>{game}</option>
+                                                    ))}
+                                                </select>
+                                            ) : (
+                                                <div className="game-display">
+                                                    <span className="game-name">{pokemon.caughtInGame || "—"}</span>
+                                                    <button
+                                                        className="game-edit-btn"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setEditingGamePokemonId(pokemon.pokemonId);
+                                                            handleFetchGamesForPokemon(pokemon.pokemonName, pokemon.pokemonId);
+                                                        }}
+                                                        title="Edit game"
+                                                    >
+                                                        ⚙️
+                                                    </button>
+                                                </div>
+                                            )}
                                         </div>
                                         <div className="table-col-added">{addedDate}</div>
                                         <div className="table-col-action">

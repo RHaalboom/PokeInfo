@@ -77,11 +77,11 @@ export async function deleteCollection(id) {
     }
 }
 
-export async function addPokemonToCollection(collectionId, pokemonId, pokemonName) {
+export async function addPokemonToCollection(collectionId, pokemonId, pokemonName, caughtInGame = null) {
     const response = await fetch(`${API_BASE_URL}/${collectionId}/pokemon`, {
         method: "POST",
         headers: getHeaders(),
-        body: JSON.stringify({ pokemonId, pokemonName })
+        body: JSON.stringify({ pokemonId, pokemonName, caughtInGame })
     });
 
     const data = await response.json();
@@ -91,6 +91,18 @@ export async function addPokemonToCollection(collectionId, pokemonId, pokemonNam
     }
 
     return data;
+}
+
+export async function updatePokemonGame(collectionId, pokemonId, game) {
+    const response = await fetch(`${API_BASE_URL}/${collectionId}/pokemon/${pokemonId}/game`, {
+        method: "PUT",
+        headers: getHeaders(),
+        body: JSON.stringify({ game })
+    });
+
+    if (!response.ok) {
+        throw new Error("Couldn't update Pokémon game.");
+    }
 }
 
 export async function removePokemonFromCollection(collectionId, pokemonId) {

@@ -344,7 +344,7 @@
 
 .pokemons-table-header {
     display: grid;
-    grid-template-columns: 80px 100px 1fr 120px 60px;
+    grid-template-columns: 80px 100px 1fr 150px 120px 60px;
     gap: 16px;
     align-items: center;
     background: #7fb069;
@@ -367,6 +367,10 @@
     text-align: left;
 }
 
+.table-col-game {
+    text-align: center;
+}
+
 .table-col-added {
     text-align: center;
 }
@@ -377,7 +381,7 @@
 
 .pokemons-table-row {
     display: grid;
-    grid-template-columns: 80px 100px 1fr 120px 60px;
+    grid-template-columns: 80px 100px 1fr 150px 120px 60px;
     gap: 16px;
     align-items: center;
     padding: 12px 16px;
@@ -430,6 +434,45 @@
 
 .table-col-action {
     text-align: right;
+}
+
+.game-display {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.game-name {
+    font-size: 13px;
+    color: #e0e0e0;
+}
+
+.game-edit-btn {
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 4px 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.game-edit-btn:hover {
+    opacity: 1;
+}
+
+.game-select {
+    padding: 6px 8px;
+    border: 1px solid #888;
+    border-radius: 4px;
+    background: #555;
+    color: white;
+    font-size: 13px;
+    cursor: pointer;
 }
 
 .remove-pokemon-btn {
@@ -495,13 +538,13 @@
     }
 
     .pokemons-table-header {
-        grid-template-columns: 60px 80px 1fr 100px 50px;
+        grid-template-columns: 60px 80px 1fr 120px 100px 50px;
         padding: 10px 12px;
         font-size: 12px;
     }
 
     .pokemons-table-row {
-        grid-template-columns: 60px 80px 1fr 100px 50px;
+        grid-template-columns: 60px 80px 1fr 120px 100px 50px;
         padding: 10px 12px;
         gap: 12px;
     }
@@ -519,6 +562,15 @@
 
     .table-col-added {
         font-size: 11px;
+    }
+
+    .game-name {
+        font-size: 11px;
+    }
+
+    .game-edit-btn {
+        font-size: 14px;
+        padding: 2px 4px;
     }
 }
 

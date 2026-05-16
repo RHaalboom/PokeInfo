@@ -18,5 +18,8 @@ public class CollectionPokemon
 
     public int PokemonId { get; set; }
 
+    [MaxLength(100)]
+    public string? CaughtInGame { get; set; }
+
     public DateTime AddedAt { get; set; } = DateTime.UtcNow;
 }

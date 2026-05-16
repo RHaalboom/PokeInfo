@@ -53,7 +53,7 @@ namespace PokeInfo.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Collections", (string)null);
+                    b.ToTable("Collections");
                 });
 
             modelBuilder.Entity("PokeInfo.Entities.CollectionPokemon", b =>
@@ -66,6 +66,10 @@ namespace PokeInfo.Migrations
 
                     b.Property<DateTime>("AddedAt")
                         .HasColumnType("datetime(6)");
+
+                    b.Property<string>("CaughtInGame")
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
 
                     b.Property<int>("CollectionId")
                         .HasColumnType("int");
@@ -82,7 +86,7 @@ namespace PokeInfo.Migrations
 
                     b.HasIndex("CollectionId");
 
-                    b.ToTable("CollectionPokemons", (string)null);
+                    b.ToTable("CollectionPokemons");
                 });
 
             modelBuilder.Entity("PokeInfo.Entities.Role", b =>
@@ -105,7 +109,7 @@ namespace PokeInfo.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Roles", (string)null);
+                    b.ToTable("Roles");
 
                     b.HasData(
                         new
@@ -157,7 +161,7 @@ namespace PokeInfo.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("PokeInfo.Entities.Collection", b =>

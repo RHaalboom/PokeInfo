@@ -49,6 +49,7 @@ public class CollectionsController : ControllerBase
                     Id = cp.Id,
                     PokemonId = cp.PokemonId,
                     PokemonName = cp.PokemonName,
+                    CaughtInGame = cp.CaughtInGame,
                     AddedAt = cp.AddedAt
                 }).ToList()
             })
@@ -84,6 +85,7 @@ public class CollectionsController : ControllerBase
                 Id = cp.Id,
                 PokemonId = cp.PokemonId,
                 PokemonName = cp.PokemonName,
+                CaughtInGame = cp.CaughtInGame,
                 AddedAt = cp.AddedAt
             }).ToList()
         });
@@ -198,6 +200,7 @@ public class CollectionsController : ControllerBase
             CollectionId = collectionId,
             PokemonId = request.PokemonId,
             PokemonName = request.PokemonName,
+            CaughtInGame = request.CaughtInGame,
             AddedAt = DateTime.UtcNow
         };
 
@@ -209,8 +212,35 @@ public class CollectionsController : ControllerBase
             Id = collectionPokemon.Id,
             PokemonId = collectionPokemon.PokemonId,
             PokemonName = collectionPokemon.PokemonName,
+            CaughtInGame = collectionPokemon.CaughtInGame,
             AddedAt = collectionPokemon.AddedAt
         });
+    }
+
+    [HttpPut("{collectionId}/pokemon/{pokemonId}/game")]
+    public async Task<IActionResult> UpdatePokemonGame(int collectionId, int pokemonId, [FromBody] UpdatePokemonGameDto request)
+    {
+        var userId = GetCurrentUserId();
+        if (userId == 0)
+            return Unauthorized();
+
+        var collection = await _context.Collections
+            .FirstOrDefaultAsync(c => c.Id == collectionId && c.UserId == userId);
+
+        if (collection == null)
+            return NotFound("Collection not found");
+
+        var collectionPokemon = await _context.CollectionPokemons
+            .FirstOrDefaultAsync(cp => cp.CollectionId == collectionId && cp.PokemonId == pokemonId);
+
+        if (collectionPokemon == null)
+            return NotFound("Pokémon not found in collection");
+
+        collectionPokemon.CaughtInGame = request.Game;
+        _context.CollectionPokemons.Update(collectionPokemon);
+        await _context.SaveChangesAsync();
+
+        return NoContent();
     }
 
     [HttpDelete("{collectionId}/pokemon/{pokemonId}")]
