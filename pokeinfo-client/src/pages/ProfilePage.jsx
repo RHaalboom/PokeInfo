@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getCurrentUser, logout as logoutService, isAuthenticated, getAllUsers } from "../services/authService";
 import { useAuth } from "../hooks/useAuth";
+import CollectionsSection from "../components/CollectionsSection";
 import "../styles/profile.css";
 
 export default function ProfilePage() {
@@ -98,6 +99,8 @@ export default function ProfilePage() {
                     )}
                 </section>
             )}
+
+            <CollectionsSection />
         </main>
     );
 }

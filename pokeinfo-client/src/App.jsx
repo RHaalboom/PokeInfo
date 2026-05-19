@@ -3,6 +3,7 @@ import HomePage from "./pages/HomePage";
 import RegisterPage from "./pages/RegisterPage";
 import LoginPage from "./pages/LoginPage";
 import ProfilePage from "./pages/ProfilePage";
+import CollectionDetailsPage from "./pages/CollectionDetailsPage";
 import { useAuth } from "./hooks/useAuth";
 import { logout as logoutService } from "./services/authService";
 import "./styles/navigation.css";
@@ -42,6 +43,7 @@ function App() {
                 <Route path="/register" element={<RegisterPage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
+                <Route path="/collections/:id" element={<CollectionDetailsPage />} />
             </Routes>
         </>
     );

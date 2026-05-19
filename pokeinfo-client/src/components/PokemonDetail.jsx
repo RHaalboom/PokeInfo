@@ -1,6 +1,8 @@
 ﻿import "../styles/pokemonDetail.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { getPokemonByName } from "../services/pokemonService";
+import { getCollections, addPokemonToCollection } from "../services/collectionService";
+import { isAuthenticated } from "../services/authService";
 
 const formatPokemonName = (name) => {
     return name
@@ -12,6 +14,56 @@ const formatPokemonName = (name) => {
 export default function PokemonDetail({ pokemon, onClose }) {
     const [selectedVariant, setSelectedVariant] = useState(null);
     const [displayedPokemon, setDisplayedPokemon] = useState(pokemon);
+    const [collections, setCollections] = useState([]);
+    const [selectedCollectionId, setSelectedCollectionId] = useState("");
+    const [isAddingToCollection, setIsAddingToCollection] = useState(false);
+    const [addMessage, setAddMessage] = useState("");
+    const [addError, setAddError] = useState("");
+
+    useEffect(() => {
+        if (isAuthenticated()) {
+            fetchCollections();
+        }
+    }, []);
+
+    async function fetchCollections() {
+        try {
+            const data = await getCollections();
+            setCollections(data);
+        } catch (err) {
+            console.error("Failed to fetch collections:", err);
+        }
+    }
+
+    async function handleAddToCollection() {
+        if (!selectedCollectionId) {
+            setAddError("Please select a collection");
+            return;
+        }
+
+        try {
+            setIsAddingToCollection(true);
+            setAddError("");
+            setAddMessage("");
+
+            await addPokemonToCollection(
+                parseInt(selectedCollectionId),
+                displayedPokemon.id,
+                displayedPokemon.name
+            );
+
+            setAddMessage(`${formatPokemonName(displayedPokemon.name)} added to collection!`);
+            setSelectedCollectionId("");
+
+            setTimeout(() => {
+                setAddMessage("");
+            }, 3000);
+        } catch (err) {
+            setAddError(err.message);
+        } finally {
+            setIsAddingToCollection(false);
+        }
+    }
 
     if (!pokemon) return null;
 
@@ -116,6 +168,36 @@ export default function PokemonDetail({ pokemon, onClose }) {
                                     )}
                                 </div>
                             ))}
+                        </div>
+                    </div>
+                )}
+
+                {isAuthenticated() && collections.length > 0 && (
+                    <div className="add-to-collection-section">
+                        <strong>Add to Collection:</strong>
+                        {addError && <p className="add-error">{addError}</p>}
+                        {addMessage && <p className="add-success">{addMessage}</p>}
+                        <div className="collection-selector">
+                            <select
+                                value={selectedCollectionId}
+                                onChange={(e) => setSelectedCollectionId(e.target.value)}
+                                disabled={isAddingToCollection}
+                                className="collection-dropdown"
+                            >
+                                <option value="">Select a collection...</option>
+                                {collections.map((collection) => (
+                                    <option key={collection.id} value={collection.id}>
+                                        {collection.name}
+                                    </option>
+                                ))}
+                            </select>
+                            <button
+                                className="add-collection-btn"
+                                onClick={handleAddToCollection}
+                                disabled={isAddingToCollection || !selectedCollectionId}
+                            >
+                                {isAddingToCollection ? "Adding..." : "Add to Collection"}
+                            </button>
                         </div>
                     </div>
                 )}

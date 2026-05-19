@@ -21,4 +21,6 @@ public class User
     public int RoleId { get; set; } = 1;
 
     public Role Role { get; set; } = null!;
+
+    public List<Collection> Collections { get; set; } = new();
 }
