@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PokeInfo.Data;
 
@@ -11,9 +12,11 @@ using PokeInfo.Data;
 namespace PokeInfo.Migrations
 {
     [DbContext(typeof(PokeInfoDbContext))]
-    partial class PokeInfoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260519103759_RemoveShowRankingsProperty")]
+    partial class RemoveShowRankingsProperty
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -158,14 +161,6 @@ namespace PokeInfo.Migrations
 
                     b.Property<int>("RoleId")
                         .HasColumnType("int");
-
-                    b.Property<string>("SwitchFC")
-                        .HasMaxLength(12)
-                        .HasColumnType("varchar(12)");
-
-                    b.Property<string>("ThreedsFC")
-                        .HasMaxLength(12)
-                        .HasColumnType("varchar(12)");
 
                     b.Property<string>("Username")
                         .IsRequired()

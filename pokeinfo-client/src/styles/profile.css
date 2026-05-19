@@ -16,18 +16,64 @@
     align-items: center;
 }
 
-.profile-info h1 {
+.profile-info {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex: 1;
+}
+
+.profile-picture {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #667eea;
+}
+
+.profile-text h1 {
     font-size: 28px;
     color: #333;
-    margin-bottom: 12px;
+    margin: 0 0 4px 0;
 }
 
-.profile-info p {
+.profile-username {
     font-size: 14px;
-    color: #666;
-    margin: 8px 0;
+    color: #999;
+    margin: 0;
 }
 
+.profile-friend-codes {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 6px;
+}
+
+.profile-fc {
+    font-size: 13px;
+    color: #666;
+    margin: 0;
+    font-family: 'Monaco', 'Courier New', monospace;
+    background: #f5f5f5;
+    padding: 4px 8px;
+    border-radius: 3px;
+    display: inline-block;
+}
+
+.profile-role {
+    font-size: 13px;
+    color: #667eea;
+    font-weight: 600;
+    margin: 4px 0 0 0;
+}
+
+.profile-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.settings-button,
 .logout-button {
     padding: 10px 20px;
     background: #667eea;
@@ -40,11 +86,68 @@
     transition: background 0.3s;
 }
 
+.settings-button:hover,
 .logout-button:hover {
     background: #764ba2;
 }
 
-.rankings-section,
+.rankings-section {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    margin-bottom: 30px;
+}
+
+.rankings-header {
+    margin-bottom: 20px;
+}
+
+.rankings-header h2 {
+    font-size: 22px;
+    color: #333;
+    margin: 0;
+}
+
+.rankings-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.ranking-group {
+    background: #f9f9f9;
+    padding: 16px;
+    border-radius: 8px;
+    border-left: 4px solid #667eea;
+}
+
+.ranking-group h3 {
+    font-size: 12px;
+    text-transform: uppercase;
+    color: #999;
+    margin: 0 0 12px 0;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.ranking-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.ranking-item,
+.ranking-value {
+    background: #667eea;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    display: inline-block;
+}
+
 .moderator-section {
     background: white;
     border-radius: 8px;

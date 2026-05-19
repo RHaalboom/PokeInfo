@@ -3,6 +3,7 @@ import HomePage from "./pages/HomePage";
 import RegisterPage from "./pages/RegisterPage";
 import LoginPage from "./pages/LoginPage";
 import ProfilePage from "./pages/ProfilePage";
+import SettingsPage from "./pages/SettingsPage";
 import CollectionDetailsPage from "./pages/CollectionDetailsPage";
 import { useAuth } from "./hooks/useAuth";
 import { logout as logoutService } from "./services/authService";
@@ -26,6 +27,7 @@ function App() {
                 {isAuthenticated ? (
                     <>
                         <Link to="/profile">Profile</Link>
+                        <Link to="/settings">Settings</Link>
                         <button onClick={handleLogout} className="logout-nav-btn">
                             Logout
                         </button>
@@ -43,6 +45,7 @@ function App() {
                 <Route path="/register" element={<RegisterPage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
+                <Route path="/settings" element={<SettingsPage />} />
                 <Route path="/collections/:id" element={<CollectionDetailsPage />} />
             </Routes>
         </>

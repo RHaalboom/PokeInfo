@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PokeInfo.Data;
 
@@ -11,9 +12,11 @@ using PokeInfo.Data;
 namespace PokeInfo.Migrations
 {
     [DbContext(typeof(PokeInfoDbContext))]
-    partial class PokeInfoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260519105145_AddFriendCodeFields")]
+    partial class AddFriendCodeFields
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

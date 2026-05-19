@@ -18,6 +18,17 @@ public class User
     [Required]
     public string PasswordHash { get; set; } = string.Empty;
 
+    [MaxLength(100)]
+    public string? DisplayName { get; set; }
+
+    public string? ProfilePictureUrl { get; set; }
+
+    [StringLength(12, MinimumLength = 12)]
+    public string? ThreedsFC { get; set; }
+
+    [StringLength(12, MinimumLength = 12)]
+    public string? SwitchFC { get; set; }
+
     public int RoleId { get; set; } = 1;
 
     public Role Role { get; set; } = null!;

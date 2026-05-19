@@ -13,6 +13,17 @@ export default function ProfilePage() {
     const navigate = useNavigate();
     const { logout } = useAuth();
 
+    // Helper function to format friend codes with dashes
+    const formatFriendCode = (code) => {
+        if (!code) return "";
+        // Remove any existing dashes and format as XXXX-XXXX-XXXX
+        const cleaned = code.replace(/\D/g, "").slice(0, 12);
+        if (cleaned.length === 12) {
+            return `${cleaned.slice(0, 4)}-${cleaned.slice(4, 8)}-${cleaned.slice(8, 12)}`;
+        }
+        return cleaned;
+    };
+
     useEffect(() => {
         if (!isAuthenticated()) {
             navigate("/login");
@@ -55,19 +66,69 @@ export default function ProfilePage() {
         <main className="profile-page">
             <section className="profile-header">
                 <div className="profile-info">
-                    <h1>Welcome, {user?.username}!</h1>
-                    <p>Email: {user?.email}</p>
-                    <p>Role: {user?.roleName}</p>
+                    {user?.profilePictureUrl && (
+                        <img 
+                            src={user.profilePictureUrl} 
+                            alt={user.displayName || user.username}
+                            className="profile-picture"
+                        />
+                    )}
+                    <div className="profile-text">
+                        <h1>{user?.displayName || user?.username}</h1>
+                        <div className="profile-friend-codes">
+                            <p className="profile-fc">3DS FC: {formatFriendCode(user?.threedsFC) || "XXXX-XXXX-XXXX"}</p>
+                            <p className="profile-fc">Switch FC: {formatFriendCode(user?.switchFC) || "XXXX-XXXX-XXXX"}</p>
+                        </div>
+                    </div>
                 </div>
-                <button className="logout-button" onClick={handleLogout}>
-                    Logout
-                </button>
+                <div className="profile-actions">
+                    <button 
+                        className="settings-button" 
+                        onClick={() => navigate("/settings")}
+                    >
+                        ⚙️ Settings
+                    </button>
+                    <button className="logout-button" onClick={handleLogout}>
+                        Logout
+                    </button>
+                </div>
             </section>
 
-            {user?.roleName === "RankedUser" && (
+            {/* Rankings Section - shown if user has ShowRankings enabled */}
+            {user?.showRankings && (
                 <section className="rankings-section">
-                    <h2>Your Rankings</h2>
-                    <p>Ranking data would be displayed here</p>
+                    <div className="rankings-header">
+                        <h2>Ranking Information</h2>
+                    </div>
+                    <div className="rankings-content">
+                        <div className="ranking-group">
+                            <h3>LEVELS</h3>
+                            <div className="ranking-items">
+                                <div className="ranking-item">Level 100</div>
+                            </div>
+                        </div>
+
+                        <div className="ranking-group">
+                            <h3>ACHIEVEMENTS</h3>
+                            <div className="ranking-items">
+                                <span className="ranking-value">12635 Points</span>
+                            </div>
+                        </div>
+
+                        <div className="ranking-group">
+                            <h3>MINIONS</h3>
+                            <div className="ranking-items">
+                                <span className="ranking-value">200</span>
+                            </div>
+                        </div>
+
+                        <div className="ranking-group">
+                            <h3>MOUNTS</h3>
+                            <div className="ranking-items">
+                                <span className="ranking-value">118</span>
+                            </div>
+                        </div>
+                    </div>
                 </section>
             )}
 
