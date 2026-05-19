@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getCurrentUser, isAuthenticated } from "../services/authService";
 import { updateProfile, changePassword, updateAccount } from "../services/userService";
+import "../styles/colorPalette.css";
 import "../styles/settings.css";
 
 export default function SettingsPage() {

@@ -1,5 +1,6 @@
 ﻿import { Routes, Route, Link, useNavigate } from "react-router-dom";
 import HomePage from "./pages/HomePage";
+import PokédexPage from "./pages/PokédexPage";
 import RegisterPage from "./pages/RegisterPage";
 import LoginPage from "./pages/LoginPage";
 import ProfilePage from "./pages/ProfilePage";
@@ -7,6 +8,7 @@ import SettingsPage from "./pages/SettingsPage";
 import CollectionDetailsPage from "./pages/CollectionDetailsPage";
 import { useAuth } from "./hooks/useAuth";
 import { logout as logoutService } from "./services/authService";
+import pokeInfoLogo from "./img/Poké-info_logo.png";
 import "./styles/navigation.css";
 
 function App() {
@@ -22,26 +24,35 @@ function App() {
     return (
         <>
             <nav className="main-nav">
-                <Link to="/">Home</Link>
+                <div className="nav-brand">
+                    <Link to="/" className="nav-logo">
+                        <img src={pokeInfoLogo} alt="Poké-info" className="logo-img" />
+                        <span>Poké-info</span>
+                    </Link>
+                    <Link to="/pokedex" className="nav-pokedex">Pokédex</Link>
+                </div>
 
-                {isAuthenticated ? (
-                    <>
-                        <Link to="/profile">Profile</Link>
-                        <Link to="/settings">Settings</Link>
-                        <button onClick={handleLogout} className="logout-nav-btn">
-                            Logout
-                        </button>
-                    </>
-                ) : (
-                    <>
-                        <Link to="/login">Login</Link>
-                        <Link to="/register">Register</Link>
-                    </>
-                )}
+                <div className="nav-links">
+                    {isAuthenticated ? (
+                        <>
+                            <Link to="/profile">Profile</Link>
+                            <Link to="/settings">Settings</Link>
+                            <button onClick={handleLogout} className="logout-nav-btn">
+                                Logout
+                            </button>
+                        </>
+                    ) : (
+                        <>
+                            <Link to="/login">Login</Link>
+                            <Link to="/register">Register</Link>
+                        </>
+                    )}
+                </div>
             </nav>
 
             <Routes>
                 <Route path="/" element={<HomePage />} />
+                <Route path="/pokedex" element={<PokédexPage />} />
                 <Route path="/register" element={<RegisterPage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/profile" element={<ProfilePage />} />

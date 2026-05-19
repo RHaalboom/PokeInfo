@@ -1,3 +1,4 @@
+import "../styles/colorPalette.css";
 import "../styles/pokemonCard.css";
 
 export default function PokemonCard({ pokemon, onSelect }) {

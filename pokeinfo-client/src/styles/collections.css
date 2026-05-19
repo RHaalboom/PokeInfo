@@ -1,9 +1,10 @@
 .collections-section {
-    background: white;
+    background: var(--slate);
     border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     padding: 30px;
     margin-bottom: 30px;
+    border: 1px solid var(--border);
 }
 
 .collections-header {
@@ -15,13 +16,13 @@
 
 .collections-header h2 {
     font-size: 22px;
-    color: #333;
+    color: var(--text-primary);
     margin: 0;
 }
 
 .create-collection-button {
     padding: 10px 16px;
-    background: #667eea;
+    background: var(--primary-red);
     color: white;
     border: none;
     border-radius: 4px;
@@ -32,31 +33,32 @@
 }
 
 .create-collection-button:hover {
-    background: #764ba2;
+    background: var(--deep-red);
 }
 
 .collections-error {
-    background-color: #fee;
-    color: #c00;
+    background-color: rgba(239, 68, 68, 0.1);
+    color: var(--error-red);
     padding: 12px;
     border-radius: 4px;
     font-size: 14px;
     margin-bottom: 20px;
+    border: 1px solid var(--error-red);
 }
 
 .collections-loading {
     text-align: center;
     padding: 20px;
-    color: #666;
+    color: var(--text-secondary);
     font-size: 14px;
 }
 
 .create-collection-form {
-    background: #f9f9f9;
+    background: var(--soft-dark);
     padding: 20px;
     border-radius: 6px;
     margin-bottom: 25px;
-    border: 1px solid #eee;
+    border: 1px solid var(--border);
 }
 
 .form-group {
@@ -70,7 +72,7 @@
 .form-group label {
     display: block;
     font-weight: 600;
-    color: #333;
+    color: var(--text-primary);
     margin-bottom: 6px;
     font-size: 14px;
 }
@@ -79,18 +81,20 @@
 .form-group textarea {
     width: 100%;
     padding: 10px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border);
     border-radius: 4px;
     font-size: 14px;
     font-family: inherit;
     box-sizing: border-box;
+    background-color: var(--soft-dark);
+    color: var(--text-primary);
 }
 
 .form-group input:focus,
 .form-group textarea:focus {
     outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    border-color: var(--primary-red);
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
 }
 
 .form-group textarea {
@@ -101,7 +105,7 @@
 .submit-button {
     margin-top: 15px;
     padding: 10px 20px;
-    background: #667eea;
+    background: var(--primary-red);
     color: white;
     border: none;
     border-radius: 4px;
@@ -112,7 +116,7 @@
 }
 
 .submit-button:hover:not(:disabled) {
-    background: #764ba2;
+    background: var(--deep-red);
 }
 
 .submit-button:disabled {
@@ -123,7 +127,7 @@
 .no-collections {
     text-align: center;
     padding: 40px 20px;
-    color: #999;
+    color: var(--text-secondary);
 }
 
 .no-collections p {
@@ -137,16 +141,16 @@
 }
 
 .collection-card {
-    border: 1px solid #eee;
+    border: 1px solid var(--border);
     border-radius: 6px;
     padding: 20px;
-    background: #fafafa;
+    background: var(--soft-dark);
     transition: all 0.3s;
 }
 
 .collection-card:hover {
-    border-color: #ddd;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-color: var(--primary-red);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .collection-card-header {
@@ -164,19 +168,19 @@
 .collection-info-section h3 {
     font-size: 18px;
     font-weight: 600;
-    color: #333;
+    color: var(--text-primary);
     margin: 0 0 6px 0;
 }
 
 .collection-count {
     font-size: 13px;
-    color: #999;
+    color: var(--text-secondary);
     margin: 0 0 8px 0;
 }
 
 .collection-preview {
     font-size: 14px;
-    color: #666;
+    color: var(--text-secondary);
     margin: 0;
     line-height: 1.4;
     display: -webkit-box;
@@ -192,7 +196,7 @@
 }
 
 .view-button {
-    background: #667eea;
+    background: var(--primary-red);
     color: white;
     border: none;
     border-radius: 4px;
@@ -206,32 +210,32 @@
 }
 
 .view-button:hover {
-    background: #764ba2;
+    background: var(--deep-red);
 }
 
 .delete-button {
-    background: #fee;
-    color: #c00;
-    border: none;
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--error-red);
+    border: 1px solid var(--error-red);
     border-radius: 4px;
     cursor: pointer;
     font-size: 14px;
     padding: 8px 10px;
-    transition: background 0.3s;
+    transition: all 0.3s;
     min-width: 38px;
     text-align: center;
 }
 
 .delete-button:hover {
-    background: #fdd;
+    background: rgba(239, 68, 68, 0.2);
 }
 
 .collection-meta {
     font-size: 12px;
-    color: #999;
+    color: var(--text-secondary);
     margin-top: 12px;
     padding-top: 12px;
-    border-top: 1px solid #eee;
+    border-top: 1px solid var(--border);
 }
 
 .meta-text {

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { getCurrentUser, logout as logoutService, isAuthenticated, getAllUsers } from "../services/authService";
 import { useAuth } from "../hooks/useAuth";
 import CollectionsSection from "../components/CollectionsSection";
+import "../styles/colorPalette.css";
 import "../styles/profile.css";
 
 export default function ProfilePage() {

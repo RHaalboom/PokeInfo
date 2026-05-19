@@ -1,0 +1,142 @@
+/* Landing Page Styles */
+
+.landing-page {
+    min-height: calc(100vh - 70px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--dark-slate);
+    padding: 24px;
+    margin-top: 56px;
+}
+
+.landing-container {
+    max-width: 600px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+}
+
+.logo-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+}
+
+.logo {
+    width: 160px;
+    height: 160px;
+    object-fit: contain;
+}
+
+.logo-section h1 {
+    font-size: 48px;
+    color: var(--primary-red);
+    margin: 0;
+    font-weight: 700;
+}
+
+.tagline {
+    font-size: 18px;
+    color: var(--text-secondary);
+    margin: 0;
+    line-height: 1.6;
+}
+
+.cta-section {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: center;
+}
+
+.cta-buttons-group {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.cta-button {
+    padding: 12px 32px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.cta-button.primary {
+    background-color: var(--primary-red);
+    color: white;
+}
+
+.cta-button.primary:hover {
+    background-color: var(--deep-red);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.cta-button.secondary {
+    background-color: transparent;
+    color: var(--primary-red);
+    border-color: var(--primary-red);
+}
+
+.cta-button.secondary:hover {
+    background-color: var(--primary-red);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.explore-link {
+    font-size: 14px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color 0.3s ease;
+    margin-top: 8px;
+}
+
+.explore-link:hover {
+    color: var(--primary-red);
+    text-decoration: underline;
+}
+
+@media (max-width: 640px) {
+    .landing-page {
+        min-height: calc(100vh - 60px);
+    }
+
+    .landing-container {
+        gap: 32px;
+    }
+
+    .logo {
+        width: 120px;
+        height: 120px;
+    }
+
+    .logo-section h1 {
+        font-size: 36px;
+    }
+
+    .tagline {
+        font-size: 16px;
+    }
+
+    .cta-buttons-group {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .cta-button {
+        width: 100%;
+    }
+}

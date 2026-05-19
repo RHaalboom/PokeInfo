@@ -1,4 +1,5 @@
-﻿import "../styles/pokemonDetail.css";
+﻿import "../styles/colorPalette.css";
+import "../styles/pokemonDetail.css";
 import { useState, useEffect } from "react";
 import { getPokemonByName } from "../services/pokemonService";
 import { getCollections, addPokemonToCollection } from "../services/collectionService";

@@ -4,6 +4,7 @@ import { getCollection, updateCollection, deleteCollection, removePokemonFromCol
 import { getPokemonByName } from "../services/pokemonService";
 import { isAuthenticated } from "../services/authService";
 import PokemonDetail from "../components/PokemonDetail";
+import "../styles/colorPalette.css";
 import "../styles/collectionDetails.css";
 
 export default function CollectionDetailsPage() {

@@ -1,9 +1,10 @@
 .pokemon-detail {
     margin-top: 32px;
-    background: white;
+    background: var(--slate);
     border-radius: 16px;
     padding: 24px;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--border);
 }
 
     .pokemon-detail img {
@@ -19,7 +20,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.8);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -28,7 +29,7 @@
 
 /* Popup zelf */
 .modal-content {
-    background: white;
+    background: var(--slate);
     padding: 24px;
     border-radius: 16px;
     width: 400px;
@@ -36,17 +37,18 @@
     overflow-y: auto;
     text-align: center;
     position: relative;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
     animation: fadeIn 0.2s ease;
-    color: #000;
+    color: var(--text-primary);
+    border: 1px solid var(--border);
 }
 
 .modal-content h2 {
-    color: #000;
+    color: var(--text-primary);
 }
 
 .modal-content p {
-    color: #000;
+    color: var(--text-secondary);
 }
 
 @keyframes fadeIn {
@@ -67,11 +69,16 @@
     top: 10px;
     right: 10px;
     border: none;
-    background: #d62828;
+    background: var(--primary-red);
     color: white;
     padding: 6px 10px;
     border-radius: 8px;
     cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.close-button:hover {
+    background-color: var(--deep-red);
 }
 
 /* Variants Section */

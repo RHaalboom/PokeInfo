@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getCollections, createCollection, deleteCollection } from "../services/collectionService";
+import "../styles/colorPalette.css";
 import "../styles/collections.css";
 
 export default function CollectionsSection() {
