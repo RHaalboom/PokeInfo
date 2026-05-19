@@ -33,12 +33,28 @@ public class PokemonService : IPokemonService
                 {
                     Id = index,
                     Name = name,
-                    ImageUrl = $"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/{index}.png"
+                    ImageUrl = $"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/{index}.png",
+                    Generation = GetGenerationFromId(index)
                 });
             }
 
             return result;
         }) ?? new List<PokemonListItemDto>();
+    }
+
+    private int GetGenerationFromId(int pokemonId)
+    {
+        // Generation ranges based on Pokémon ID
+        if (pokemonId <= 151) return 1;        // Gen 1: 1-151
+        if (pokemonId <= 251) return 2;        // Gen 2: 152-251
+        if (pokemonId <= 386) return 3;        // Gen 3: 252-386
+        if (pokemonId <= 493) return 4;        // Gen 4: 387-493
+        if (pokemonId <= 649) return 5;        // Gen 5: 494-649
+        if (pokemonId <= 721) return 6;        // Gen 6: 650-721
+        if (pokemonId <= 809) return 7;        // Gen 7: 722-809
+        if (pokemonId <= 905) return 8;        // Gen 8: 810-905
+        if (pokemonId <= 1025) return 9;       // Gen 9: 906-1025
+        return 1;                               // Default to Gen 1
     }
 
     public async Task<PokemonDetailDto?> GetPokemonByNameAsync(string name)
