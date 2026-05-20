@@ -1,7 +1,9 @@
 ﻿import { Link } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
+import PokeInfoBrand from "../components/PokeInfoBrand";
 import pokeInfoLogo from "../img/Poké-info_logo.png";
 import "../styles/colorPalette.css";
+import "../styles/pokeInfoBrand.css";
 import "../styles/landingPage.css";
 
 export default function HomePage() {
@@ -12,8 +14,8 @@ export default function HomePage() {
             <div className="landing-container">
                 <div className="logo-section">
                     <img src={pokeInfoLogo} alt="Poké-info Logo" className="logo" />
-                    <h1>Poké-info</h1>
-                    <p className="tagline">A central place for your Pokémon-information and maintaining your own collection!</p>
+                    <h1><PokeInfoBrand /></h1>
+                    <p className="tagline">A central place for your Pokémon-information and maintaining your own collections!</p>
                 </div>
 
                 <div className="cta-section">

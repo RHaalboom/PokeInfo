@@ -8,7 +8,9 @@ import SettingsPage from "./pages/SettingsPage";
 import CollectionDetailsPage from "./pages/CollectionDetailsPage";
 import { useAuth } from "./hooks/useAuth";
 import { logout as logoutService } from "./services/authService";
+import PokeInfoBrand from "./components/PokeInfoBrand";
 import pokeInfoLogo from "./img/Poké-info_logo.png";
+import "./styles/pokeInfoBrand.css";
 import "./styles/navigation.css";
 
 function App() {
@@ -27,7 +29,7 @@ function App() {
                 <div className="nav-brand">
                     <Link to="/" className="nav-logo">
                         <img src={pokeInfoLogo} alt="Poké-info" className="logo-img" />
-                        <span>Poké-info</span>
+                        <PokeInfoBrand />
                     </Link>
                     <Link to="/pokedex" className="nav-pokedex">Pokédex</Link>
                 </div>
