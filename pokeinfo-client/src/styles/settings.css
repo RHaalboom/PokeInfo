@@ -2,6 +2,7 @@
     min-height: 100vh;
     background: var(--dark-slate);
     padding: 20px;
+    padding-top: calc(20px + 56px);
 }
 
 .settings-container {

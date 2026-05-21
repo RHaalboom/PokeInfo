@@ -11,8 +11,8 @@ body {
     justify-content: center;
     align-items: center;
     padding: 24px;
+    padding-top: calc(24px + 56px);
     background-color: var(--dark-slate);
-    margin-top: 56px;
 }
 
 .register-card {
