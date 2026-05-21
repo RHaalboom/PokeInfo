@@ -1,19 +1,21 @@
 .profile-page {
     min-height: 100vh;
-    background: #f5f5f5;
+    background: var(--dark-slate);
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
     padding: 20px;
+    padding-top: calc(20px + 56px);
 }
 
 .profile-header {
-    background: white;
+    background: var(--slate);
     border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     padding: 30px;
     margin-bottom: 30px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    border: 1px solid var(--border);
 }
 
 .profile-info {
@@ -28,18 +30,26 @@
     height: 120px;
     border-radius: 50%;
     object-fit: cover;
-    border: 3px solid #667eea;
+    border: 3px solid var(--primary-red);
+    flex-shrink: 0;
+}
+
+.profile-text {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    text-align: left;
 }
 
 .profile-text h1 {
     font-size: 28px;
-    color: #333;
-    margin: 0 0 4px 0;
+    color: var(--text-primary);
+    margin: 0;
 }
 
 .profile-username {
     font-size: 14px;
-    color: #999;
+    color: var(--text-secondary);
     margin: 0;
 }
 
@@ -52,10 +62,10 @@
 
 .profile-fc {
     font-size: 13px;
-    color: #666;
+    color: var(--text-secondary);
     margin: 0;
     font-family: 'Monaco', 'Courier New', monospace;
-    background: #f5f5f5;
+    background: var(--soft-dark);
     padding: 4px 8px;
     border-radius: 3px;
     display: inline-block;
@@ -63,7 +73,7 @@
 
 .profile-role {
     font-size: 13px;
-    color: #667eea;
+    color: var(--primary-red);
     font-weight: 600;
     margin: 4px 0 0 0;
 }
@@ -76,7 +86,7 @@
 .settings-button,
 .logout-button {
     padding: 10px 20px;
-    background: #667eea;
+    background: var(--primary-red);
     color: white;
     border: none;
     border-radius: 4px;
@@ -88,15 +98,16 @@
 
 .settings-button:hover,
 .logout-button:hover {
-    background: #764ba2;
+    background: var(--deep-red);
 }
 
 .rankings-section {
-    background: white;
+    background: var(--slate);
     border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     padding: 30px;
     margin-bottom: 30px;
+    border: 1px solid var(--border);
 }
 
 .rankings-header {
@@ -105,61 +116,31 @@
 
 .rankings-header h2 {
     font-size: 22px;
-    color: #333;
+    color: var(--text-primary);
     margin: 0;
+    text-align: left;
 }
 
 .rankings-content {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px;
-}
-
-.ranking-group {
-    background: #f9f9f9;
-    padding: 16px;
-    border-radius: 8px;
-    border-left: 4px solid #667eea;
-}
-
-.ranking-group h3 {
-    font-size: 12px;
-    text-transform: uppercase;
-    color: #999;
-    margin: 0 0 12px 0;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-}
-
-.ranking-items {
     display: flex;
+    gap: 16px;
+    align-items: center;
     flex-wrap: wrap;
-    gap: 8px;
-}
-
-.ranking-item,
-.ranking-value {
-    background: #667eea;
-    color: white;
-    padding: 8px 12px;
-    border-radius: 6px;
-    font-size: 13px;
-    font-weight: 600;
-    display: inline-block;
 }
 
 .moderator-section {
-    background: white;
+    background: var(--slate);
     border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     padding: 30px;
     margin-bottom: 30px;
+    border: 1px solid var(--border);
 }
 
 .rankings-section h2,
 .moderator-section h2 {
     font-size: 22px;
-    color: #333;
+    color: var(--text-primary);
     margin-bottom: 20px;
 }
 
@@ -169,32 +150,32 @@
 }
 
 .users-table thead {
-    background: #f9f9f9;
-    border-bottom: 2px solid #ddd;
+    background: var(--soft-dark);
+    border-bottom: 2px solid var(--border);
 }
 
 .users-table th {
     padding: 12px;
     text-align: left;
     font-weight: 600;
-    color: #333;
+    color: var(--text-primary);
     font-size: 14px;
 }
 
 .users-table td {
     padding: 12px;
-    border-bottom: 1px solid #eee;
-    color: #666;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-secondary);
     font-size: 14px;
 }
 
 .users-table tbody tr:hover {
-    background: #f9f9f9;
+    background: var(--soft-dark);
 }
 
 .error-message {
-    background-color: #fee;
-    color: #c00;
+    background-color: rgba(239, 68, 68, 0.1);
+    color: var(--error-red);
     padding: 12px;
     border-radius: 4px;
     font-size: 14px;

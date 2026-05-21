@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginUser, getCurrentUser } from "../services/authService";
 import { useAuth } from "../hooks/useAuth";
+import "../styles/colorPalette.css";
 import "../styles/login.css";
 
 export default function LoginPage() {
@@ -46,15 +47,15 @@ export default function LoginPage() {
         <main className="login-page">
             <section className="login-card">
                 <h1>Login</h1>
-                <p>Sign in to your account</p>
 
                 <form onSubmit={handleSubmit} className="login-form">
                     <div className="form-group">
-                        <label htmlFor="usernameOrEmail">Username or Email</label>
+                        <label htmlFor="usernameOrEmail">Username or Email <span className="required">*</span></label>
                         <input
                             id="usernameOrEmail"
                             name="usernameOrEmail"
                             type="text"
+                            placeholder="ashketchum"
                             value={formData.usernameOrEmail}
                             onChange={handleChange}
                             required
@@ -62,11 +63,12 @@ export default function LoginPage() {
                     </div>
 
                     <div className="form-group">
-                        <label htmlFor="password">Password</label>
+                        <label htmlFor="password">Password <span className="required">*</span></label>
                         <input
                             id="password"
                             name="password"
                             type="password"
+                            placeholder="••••••••••"
                             value={formData.password}
                             onChange={handleChange}
                             required

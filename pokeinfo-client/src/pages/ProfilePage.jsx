@@ -3,13 +3,21 @@ import { useNavigate } from "react-router-dom";
 import { getCurrentUser, logout as logoutService, isAuthenticated, getAllUsers } from "../services/authService";
 import { useAuth } from "../hooks/useAuth";
 import CollectionsSection from "../components/CollectionsSection";
+import CircularProgress from "../components/CircularProgress";
+import { calculatePokedexProgress } from "../utils/pokedexProgress";
+import { getCollections } from "../services/collectionService";
+import "../styles/colorPalette.css";
 import "../styles/profile.css";
+
+const POKEDEX_LIST = ['KANTO', 'JOHTO', 'HOENN', 'SINNOH', 'UNOVA', 'KALOS', 'ALOLA', 'GALAR', 'HISUI', 'PALDEA'];
 
 export default function ProfilePage() {
     const [user, setUser] = useState(null);
     const [users, setUsers] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [pokedexProgress, setPokedexProgress] = useState({});
+    const [collections, setCollections] = useState([]);
     const navigate = useNavigate();
     const { logout } = useAuth();
 
@@ -33,6 +41,9 @@ export default function ProfilePage() {
         const currentUser = getCurrentUser();
         setUser(currentUser);
 
+        // Fetch collections for Pokédex progress
+        fetchCollectionsAndProgress();
+
         // Fetch all users if moderator
         if (currentUser?.roleName === "Moderator") {
             fetchUsers();
@@ -40,6 +51,24 @@ export default function ProfilePage() {
             setLoading(false);
         }
     }, [navigate]);
+
+    async function fetchCollectionsAndProgress() {
+        try {
+            const data = await getCollections();
+            setCollections(data);
+            const progress = calculatePokedexProgress(data);
+            setPokedexProgress(progress);
+        } catch (err) {
+            console.error("Error fetching collections:", err);
+            // If there's an error, just set empty progress
+            setPokedexProgress(
+                POKEDEX_LIST.reduce((acc, pokedex) => {
+                    acc[pokedex] = 0;
+                    return acc;
+                }, {})
+            );
+        }
+    }
 
     async function fetchUsers() {
         try {
@@ -101,33 +130,13 @@ export default function ProfilePage() {
                         <h2>Ranking Information</h2>
                     </div>
                     <div className="rankings-content">
-                        <div className="ranking-group">
-                            <h3>LEVELS</h3>
-                            <div className="ranking-items">
-                                <div className="ranking-item">Level 100</div>
-                            </div>
-                        </div>
-
-                        <div className="ranking-group">
-                            <h3>ACHIEVEMENTS</h3>
-                            <div className="ranking-items">
-                                <span className="ranking-value">12635 Points</span>
-                            </div>
-                        </div>
-
-                        <div className="ranking-group">
-                            <h3>MINIONS</h3>
-                            <div className="ranking-items">
-                                <span className="ranking-value">200</span>
-                            </div>
-                        </div>
-
-                        <div className="ranking-group">
-                            <h3>MOUNTS</h3>
-                            <div className="ranking-items">
-                                <span className="ranking-value">118</span>
-                            </div>
-                        </div>
+                        {POKEDEX_LIST.map((pokedex) => (
+                            <CircularProgress
+                                key={pokedex}
+                                percentage={pokedexProgress[pokedex] || 0}
+                                pokedexName={pokedex}
+                            />
+                        ))}
                     </div>
                 </section>
             )}
