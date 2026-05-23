@@ -3,7 +3,7 @@ using PokeInfo.Entities;
 
 namespace PokeInfo.Data;
 
-public class PokeInfoDbContext : DbContext
+public class PokeInfoDbContext : DbContext, IPokeInfoDbContext
 {
     public PokeInfoDbContext(DbContextOptions<PokeInfoDbContext> options)
         : base(options)
