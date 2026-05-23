@@ -107,7 +107,7 @@ body {
     }
 
     .nav-brand {
-        gap: 16px;
+        gap: 12px;
     }
 
     .logo-img {
@@ -115,39 +115,8 @@ body {
         height: 48px;
     }
 
-    .nav-links {
-        gap: 12px;
-    }
-
-    .main-nav a,
-    .logout-nav-btn {
-        font-size: 13px;
-        padding: 6px 12px;
-    }
-
     .nav-pokedex {
-        font-size: 13px;
-    }
-}
-
-@media (max-width: 480px) {
-    .main-nav {
-        padding: 12px 12px;
-        gap: 8px;
-    }
-
-    .nav-brand {
-        gap: 12px;
-    }
-
-    .nav-logo {
-        font-size: 14px;
-        gap: 8px;
-    }
-
-    .logo-img {
-        width: 40px;
-        height: 40px;
+        display: none;
     }
 
     .nav-links {
@@ -161,7 +130,75 @@ body {
     }
 
     .nav-pokedex {
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 480px) {
+    .main-nav {
+        padding: 10px 12px;
+        gap: 6px;
+    }
+
+    .nav-brand {
+        gap: 8px;
+        flex: 1;
+    }
+
+    .nav-logo {
+        font-size: 13px;
+        gap: 6px;
+    }
+
+    .logo-img {
+        width: 36px;
+        height: 36px;
+    }
+
+    .nav-links {
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+
+    .main-nav a,
+    .logout-nav-btn {
+        font-size: 11px;
+        padding: 5px 8px;
+    }
+
+    .nav-pokedex {
         font-size: 12px;
+    }
+}
+
+@media (max-width: 360px) {
+    .main-nav {
+        padding: 8px 10px;
+        gap: 4px;
+    }
+
+    .nav-brand {
+        gap: 6px;
+    }
+
+    .nav-logo {
+        font-size: 12px;
+        gap: 4px;
+    }
+
+    .logo-img {
+        width: 32px;
+        height: 32px;
+    }
+
+    .nav-links {
+        gap: 4px;
+    }
+
+    .main-nav a,
+    .logout-nav-btn {
+        font-size: 10px;
+        padding: 4px 6px;
     }
 }
 

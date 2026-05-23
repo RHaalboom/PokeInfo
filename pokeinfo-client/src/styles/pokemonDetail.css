@@ -43,6 +43,14 @@
     border: 1px solid var(--border);
 }
 
+@media (max-width: 768px) {
+    .modal-content {
+        width: 95%;
+        max-width: 100%;
+        padding: 24px;
+    }
+}
+
 .pokemon-detail-modal {
     scrollbar-width: thin;
     scrollbar-color: var(--primary-red) var(--soft-dark);
@@ -93,9 +101,43 @@
 /* Pokemon Detail Header */
 .pokemon-detail-header {
     display: flex;
-    gap: 48px;
+    flex-direction: column;
+    gap: 24px;
     align-items: flex-start;
     margin-bottom: 32px;
+}
+
+@media (min-width: 769px) {
+    .pokemon-detail-header {
+        flex-direction: row;
+        gap: 48px;
+        align-items: flex-start;
+    }
+}
+
+.pokemon-name-id-container {
+    order: 1;
+    width: 100%;
+}
+
+@media (min-width: 769px) {
+    .pokemon-name-id-container {
+        display: none;
+    }
+}
+
+.pokemon-name-id-container h2 {
+    font-size: 36px;
+    margin: 0 0 12px 0;
+    color: var(--text-primary);
+    font-weight: 700;
+    text-align: left;
+}
+
+@media (max-width: 768px) {
+    .pokemon-name-id-container h2 {
+        font-size: 28px;
+    }
 }
 
 .pokemon-image-container {
@@ -103,6 +145,14 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    order: 2;
+}
+
+@media (min-width: 769px) {
+    .pokemon-image-container {
+        order: 1;
+        flex-shrink: 0;
+    }
 }
 
 .pokemon-image {
@@ -111,8 +161,61 @@
     object-fit: contain;
 }
 
+@media (max-width: 768px) {
+    .pokemon-image {
+        width: 180px;
+        height: 180px;
+    }
+}
+
 .pokemon-info-section {
     flex: 1;
+    width: 100%;
+    order: 3;
+}
+
+@media (min-width: 769px) {
+    .pokemon-info-section {
+        order: 2;
+    }
+}
+
+.pokemon-info-header {
+    display: none;
+}
+
+@media (min-width: 769px) {
+    .pokemon-info-header {
+        display: block;
+    }
+}
+
+.pokemon-info-header h2 {
+    font-size: 36px;
+    margin: 0 0 20px 0;
+    color: var(--text-primary);
+    font-weight: 700;
+    text-align: left;
+}
+
+/* ID and Variants Row */
+.id-variants-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.id-variants-row .pokemon-id {
+    margin: 0;
+    flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+    .id-variants-row .pokemon-id {
+        display: none;
+    }
 }
 
 .pokemon-info-section h2 {
@@ -121,6 +224,12 @@
     color: var(--text-primary);
     font-weight: 700;
     text-align: left;
+}
+
+@media (max-width: 768px) {
+    .pokemon-info-section h2 {
+        display: none;
+    }
 }
 
 .pokemon-id {
@@ -134,11 +243,79 @@
     width: fit-content;
 }
 
+/* Variants Section */
+.variants-section {
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    border-radius: 0;
+    border: none;
+    display: contents;
+}
+
+.id-variants-row .variants-section {
+    flex: 1;
+    min-width: 0;
+}
+
+.variants-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: flex-start;
+}
+
+.variant-btn {
+    padding: 0;
+    border: none;
+    background: transparent;
+    border-radius: 0;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.2s ease;
+    color: var(--text-primary);
+    font-weight: 600;
+    height: fit-content;
+}
+
+.variant-btn:hover {
+    color: var(--primary-red);
+}
+
+.variant-btn.active {
+    color: var(--primary-red);
+    font-weight: 700;
+}
+
 /* Detail Sections */
 .detail-section {
     margin-bottom: 24px;
     padding-top: 20px;
     border-top: 1px solid var(--border);
+}
+
+.pokemon-info-section .detail-section {
+    margin-bottom: 0;
+    border-top: 1px solid var(--border);
+}
+
+.subsection {
+    margin-bottom: 0;
+}
+
+.subsection:first-child {
+    margin-bottom: 24px;
+}
+
+@media (max-width: 768px) {
+    .detail-section {
+        margin-bottom: 20px;
+        padding-top: 16px;
+    }
+
+    .subsection:first-child {
+        margin-bottom: 20px;
+    }
 }
 
 .section-header {
@@ -170,31 +347,41 @@
 
 /* Variants Section */
 .variants-section {
-    margin: 16px 0;
+    margin-bottom: 20px;
+    padding: 16px;
+    background: var(--soft-dark);
+    border-radius: 8px;
+    border: 1px solid var(--border);
 }
 
 .variants-container {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
-    justify-content: center;
-    margin-top: 8px;
+    justify-content: flex-start;
 }
 
 .variant-btn {
     padding: 8px 12px;
-    border: 2px solid #cbd5e1;
-    background: white;
+    border: 1px solid var(--border);
+    background: transparent;
     border-radius: 6px;
     cursor: pointer;
-    font-size: 0.85rem;
+    font-size: 12px;
     transition: all 0.2s ease;
-    color: #000;
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.variant-btn:hover {
+    background: var(--primary-red);
+    border-color: var(--primary-red);
+    color: white;
 }
 
 .variant-btn.active {
-    background: #3b82f6;
-    border-color: #3b82f6;
+    background: var(--primary-red);
+    border-color: var(--primary-red);
     color: white;
 }
 
@@ -503,13 +690,168 @@
 }
 
 .game-badge {
-    display: inline-block;
-    padding: 8px 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 120px;
+    padding: 8px 12px;
     border-radius: 8px;
     background: var(--soft-dark);
     color: var(--text-primary);
-    font-size: 14px;
+    font-size: 12px;
     border: 1px solid var(--border);
+    border-left: 4px solid var(--border);
+    gap: 8px;
+    text-align: left;
+}
+
+@media (max-width: 768px) {
+    .game-badge {
+        width: 100px;
+        font-size: 11px;
+        padding: 8px 10px;
+    }
+}
+
+/* Game-specific left border colors */
+.game-badge.game-red {
+    border-left-color: #ef4444;
+}
+
+.game-badge.game-blue {
+    border-left-color: #3b82f6;
+}
+
+.game-badge.game-yellow {
+    border-left-color: #eab308;
+}
+
+.game-badge.game-gold {
+    border-left-color: #d97706;
+}
+
+.game-badge.game-silver {
+    border-left-color: #9ca3af;
+}
+
+.game-badge.game-crystal {
+    border-left-color: #06b6d4;
+}
+
+.game-badge.game-ruby {
+    border-left-color: #dc2626;
+}
+
+.game-badge.game-sapphire {
+    border-left-color: #2563eb;
+}
+
+.game-badge.game-emerald {
+    border-left-color: #10b981;
+}
+
+.game-badge.game-fire-red {
+    border-left-color: #f97316;
+}
+
+.game-badge.game-leaf-green {
+    border-left-color: #22c55e;
+}
+
+.game-badge.game-diamond {
+    border-left-color: #a78bfa;
+}
+
+.game-badge.game-pearl {
+    border-left-color: #f472b6;
+}
+
+.game-badge.game-platinum {
+    border-left-color: #60a5fa;
+}
+
+.game-badge.game-heart-gold {
+    border-left-color: #f59e0b;
+}
+
+.game-badge.game-soul-silver {
+    border-left-color: #8b5cf6;
+}
+
+.game-badge.game-black {
+    border-left-color: #1f2937;
+}
+
+.game-badge.game-white {
+    border-left-color: #f3f4f6;
+}
+
+.game-badge.game-black-2 {
+    border-left-color: #374151;
+}
+
+.game-badge.game-white-2 {
+    border-left-color: #e5e7eb;
+}
+
+.game-badge.game-x {
+    border-left-color: #0891b2;
+}
+
+.game-badge.game-y {
+    border-left-color: #fbbf24;
+}
+
+.game-badge.game-omega-ruby {
+    border-left-color: #dc2626;
+}
+
+.game-badge.game-alpha-sapphire {
+    border-left-color: #0ea5e9;
+}
+
+.game-badge.game-sun {
+    border-left-color: #f97316;
+}
+
+.game-badge.game-moon {
+    border-left-color: #6366f1;
+}
+
+.game-badge.game-ultra-sun {
+    border-left-color: #fbbf24;
+}
+
+.game-badge.game-ultra-moon {
+    border-left-color: #8b5cf6;
+}
+
+.game-badge.game-sword {
+    border-left-color: #3b82f6;
+}
+
+.game-badge.game-shield {
+    border-left-color: #ef4444;
+}
+
+.game-badge.game-legends-arceus {
+    border-left-color: #84cc16;
+}
+
+.game-badge.game-brilliant-diamond {
+    border-left-color: #ec4899;
+}
+
+.game-badge.game-shining-pearl {
+    border-left-color: #f472b6;
+}
+
+.game-badge.game-scarlet {
+    border-left-color: #dc2626;
+}
+
+.game-badge.game-violet {
+    border-left-color: #a855f7;
 }
 
 .game-icon {
@@ -517,9 +859,16 @@
 }
 
 .game-name {
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 600;
     color: var(--text-primary);
+}
+
+.game-icon-img {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    flex-shrink: 0;
 }
 
 /* Evolution Chain */
@@ -531,40 +880,79 @@
     padding: 16px 0;
 }
 
+@media (max-width: 768px) {
+    .evolution-chain-container {
+        gap: 12px;
+    }
+}
+
 .evolution-stage-wrapper {
     display: flex;
     align-items: center;
     gap: 20px;
 }
 
+@media (max-width: 768px) {
+    .evolution-stage-wrapper {
+        gap: 12px;
+    }
+}
+
 .evolution-stage-detail {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 12px;
-    padding: 20px;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px;
     background: var(--soft-dark);
     border-radius: 12px;
     border: 1px solid var(--border);
-    min-width: 150px;
+    width: 180px;
+    height: 180px;
+}
+
+@media (max-width: 768px) {
+    .evolution-stage-detail {
+        width: 140px;
+        height: 140px;
+        padding: 10px;
+        gap: 6px;
+    }
 }
 
 .evolution-image {
     width: 100px;
     height: 100px;
     object-fit: contain;
+    flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+    .evolution-image {
+        width: 80px;
+        height: 80px;
+    }
 }
 
 .evolution-info-text {
     text-align: center;
     width: 100%;
+    flex-shrink: 0;
 }
 
 .evolution-name {
     font-weight: 600;
     margin: 0;
-    font-size: 13px;
+    font-size: 12px;
     color: var(--text-primary);
+    word-break: break-word;
+}
+
+@media (max-width: 768px) {
+    .evolution-name {
+        font-size: 11px;
+    }
 }
 
 .evolution-id {
@@ -573,20 +961,44 @@
     margin: 2px 0 0 0;
 }
 
+@media (max-width: 768px) {
+    .evolution-id {
+        font-size: 11px;
+    }
+}
+
 .evolution-types {
     display: flex;
     flex-wrap: wrap;
-    gap: 6px;
+    gap: 4px;
     justify-content: center;
     width: 100%;
+    max-width: 140px;
+    flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+    .evolution-types {
+        max-width: 108px;
+        gap: 3px;
+    }
 }
 
 .evolution-type {
-    font-size: 11px;
-    padding: 4px 10px;
+    font-size: 10px;
+    padding: 3px 6px;
     border-radius: 4px;
     font-weight: 600;
     border: 1px solid;
+    flex: 0 1 auto;
+    white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+    .evolution-type {
+        font-size: 9px;
+        padding: 2px 4px;
+    }
 }
 
 .evolution-type-icon {
@@ -600,6 +1012,12 @@
     font-weight: bold;
     color: var(--text-secondary);
     flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+    .evolution-arrow {
+        font-size: 18px;
+    }
 }
 
 /* Evolution Type Colors */

@@ -6,6 +6,7 @@ import { getCollections, addPokemonToCollection } from "../services/collectionSe
 import { isAuthenticated } from "../services/authService";
 import { getTypeIcon } from "../utils/typeIcons";
 import { getSectionIcon } from "../utils/sectionIcons";
+import { getGameIcon, formatGameName, getGameClass } from "../utils/gameIcons";
 
 const formatPokemonName = (name) => {
     return name
@@ -18,9 +19,25 @@ const capitalize = (str) => {
     return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 };
 
+const getVariantLabel = (variantName, basePokemonName) => {
+    // Remove the base pokemon name from the variant name to show only the unique part
+    const lowerVariant = variantName.toLowerCase();
+    const lowerBase = basePokemonName.toLowerCase();
+
+    // Check if the variant contains the base name
+    if (lowerVariant.includes(lowerBase)) {
+        // Remove the base name and any extra hyphens
+        let label = lowerVariant.replace(lowerBase, '').replace(/^-+|-+$/g, '');
+        return label ? capitalize(label) : 'Default';
+    }
+
+    return formatPokemonName(variantName);
+};
+
 export default function PokemonDetail({ pokemon, onClose }) {
     const [selectedVariant, setSelectedVariant] = useState(null);
     const [displayedPokemon, setDisplayedPokemon] = useState(pokemon);
+    const [basePokemonName] = useState(pokemon.name); // Store the original base name
     const [collections, setCollections] = useState([]);
     const [selectedCollectionId, setSelectedCollectionId] = useState("");
     const [isAddingToCollection, setIsAddingToCollection] = useState(false);
@@ -31,6 +48,16 @@ export default function PokemonDetail({ pokemon, onClose }) {
         if (isAuthenticated()) {
             fetchCollections();
         }
+    }, []);
+
+    useEffect(() => {
+        // Prevent body scroll when modal is open
+        document.body.style.overflow = 'hidden';
+
+        return () => {
+            // Re-enable body scroll when modal closes
+            document.body.style.overflow = 'unset';
+        };
     }, []);
 
     async function fetchCollections() {
@@ -102,44 +129,79 @@ export default function PokemonDetail({ pokemon, onClose }) {
                 </button>
 
                 <div className="pokemon-detail-header">
+                    <div className="pokemon-name-id-container">
+                        <h2>{formatPokemonName(displayedPokemon.name)}</h2>
+                        <p className="pokemon-id">{formattedId}</p>
+                    </div>
                     <div className="pokemon-image-container">
                         <img src={displayedPokemon.imageUrl} alt={displayedPokemon.name} className="pokemon-image" />
                     </div>
                     <div className="pokemon-info-section">
-                        <h2>{formatPokemonName(displayedPokemon.name)}</h2>
-                        <p className="pokemon-id">ID: {formattedId}</p>
-
-                        {/* Types Section */}
-                        <div className="detail-section">
-                            <div className="section-header">
-                                <img src={getSectionIcon('typing')} alt="Types" className="section-icon" />
-                                <h3>Types</h3>
-                            </div>
-                            <div className="types-container">
-                                {displayedPokemon.types.map((type) => {
-                                    const iconSrc = getTypeIcon(type);
-                                    return (
-                                        <span key={type} className={`type-badge type-${type.toLowerCase()}`}>
-                                            <img src={iconSrc} alt={type} className="type-icon" />
-                                            {capitalize(type)}
-                                        </span>
-                                    );
-                                })}
-                            </div>
+                        <div className="pokemon-info-header">
+                            <h2>{formatPokemonName(displayedPokemon.name)}</h2>
                         </div>
 
-                        {/* Abilities Section */}
+                        {/* ID and Variants Row */}
+                        <div className="id-variants-row">
+                            <p className="pokemon-id">{formattedId}</p>
+                            {displayedPokemon.variants && displayedPokemon.variants.length > 0 && (
+                                <div className="variants-section">
+                                    <div className="variants-container">
+                                        {displayedPokemon.variants.map((variant) => (
+                                            <button
+                                                key={variant.name}
+                                                className={`variant-btn ${selectedVariant?.name === variant.name ? 'active' : ''}`}
+                                                onClick={() => {
+                                                    // If clicking the same variant, toggle back to default
+                                                    if (selectedVariant?.name === variant.name) {
+                                                        handleDefaultClick();
+                                                    } else {
+                                                        handleVariantClick(variant);
+                                                    }
+                                                }}
+                                            >
+                                                {getVariantLabel(variant.name, basePokemonName)}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Types and Abilities Block */}
                         <div className="detail-section">
-                            <div className="section-header">
-                                <img src={getSectionIcon('ability')} alt="Abilities" className="section-icon" />
-                                <h3>Abilities</h3>
+                            {/* Types Section */}
+                            <div className="subsection">
+                                <div className="section-header">
+                                    <img src={getSectionIcon('typing')} alt="Types" className="section-icon" />
+                                    <h3>Types</h3>
+                                </div>
+                                <div className="types-container">
+                                    {displayedPokemon.types.map((type) => {
+                                        const iconSrc = getTypeIcon(type);
+                                        return (
+                                            <span key={type} className={`type-badge type-${type.toLowerCase()}`}>
+                                                <img src={iconSrc} alt={type} className="type-icon" />
+                                                {capitalize(type)}
+                                            </span>
+                                        );
+                                    })}
+                                </div>
                             </div>
-                            <div className="abilities-container">
-                                {displayedPokemon.abilities.map((ability) => (
-                                    <span key={ability.id} className="ability-badge">
-                                        {capitalize(ability.name)}
-                                    </span>
-                                ))}
+
+                            {/* Abilities Section */}
+                            <div className="subsection">
+                                <div className="section-header">
+                                    <img src={getSectionIcon('ability')} alt="Abilities" className="section-icon" />
+                                    <h3>Abilities</h3>
+                                </div>
+                                <div className="abilities-container">
+                                    {displayedPokemon.abilities.map((ability) => (
+                                        <span key={ability.id} className="ability-badge">
+                                            {capitalize(ability.name)}
+                                        </span>
+                                    ))}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -152,11 +214,17 @@ export default function PokemonDetail({ pokemon, onClose }) {
                         <h3>Games</h3>
                     </div>
                     <div className="games-container">
-                        {displayedPokemon.games.map((game) => (
-                            <span key={game} className="game-badge">
-                                {capitalize(game)}
-                            </span>
-                        ))}
+                        {displayedPokemon.games.map((game) => {
+                            const iconSrc = getGameIcon(game);
+                            const formattedGameName = formatGameName(game);
+                            const gameClass = getGameClass(game);
+                            return (
+                                <span key={game} className={`game-badge ${gameClass}`}>
+                                    {iconSrc && <img src={iconSrc} alt={formattedGameName} className="game-icon-img" />}
+                                    {formattedGameName}
+                                </span>
+                            );
+                        })}
                     </div>
                 </div>
 
@@ -176,7 +244,6 @@ export default function PokemonDetail({ pokemon, onClose }) {
                                         )}
                                         <div className="evolution-info-text">
                                             <p className="evolution-name">{formatPokemonName(stage.pokemonName)}</p>
-                                            <p className="evolution-id">#{stage.pokemonName === displayedPokemon.name ? displayedPokemon.id : ''}</p>
                                         </div>
                                         <div className="evolution-types">
                                             {displayedPokemon.types.map((type) => (
