@@ -2,6 +2,7 @@ using Moq;
 using Xunit;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using Microsoft.Extensions.Configuration;
 using PokeInfo.Services;
 using PokeInfo.Entities;
 
@@ -22,8 +23,7 @@ public class JwtServiceTests
 
         // Setup JWT configuration
         var jwtSettings = new Mock<IConfigurationSection>();
-        jwtSettings.Setup(x => x["Key"]).Returns("this-is-a-very-long-secret-key-for-jwt-testing-purposes-that-is-long-enough");
-        jwtSettings.Setup(x => x["ExpirationMinutes"]).Returns("60");
+        jwtSettings.Setup(x => x[It.IsAny<string>()]).Returns("this-is-a-very-long-secret-key-for-jwt-testing-purposes-that-is-long-enough");
 
         _mockConfiguration.Setup(x => x.GetSection("JwtSettings"))
             .Returns(jwtSettings.Object);

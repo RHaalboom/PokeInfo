@@ -1,4 +1,5 @@
 using Moq;
+using Moq.Protected;
 using Xunit;
 using Microsoft.Extensions.Caching.Memory;
 using PokeInfo.Models;
@@ -6,7 +7,6 @@ using PokeInfo.Services;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
-using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 
 namespace PokeInfo.Tests;
@@ -45,8 +45,8 @@ public class PokemonServiceTests
             .Protected()
             .Setup<Task<HttpResponseMessage>>(
                 "SendAsync",
-                ItExpr.IsAny<HttpRequestMessage>(),
-                ItExpr.IsAny<CancellationToken>())
+                It.IsAny<HttpRequestMessage>(),
+                It.IsAny<CancellationToken>())
             .ReturnsAsync(mockResponse);
 
         var httpClient = new HttpClient(handlerMock.Object)
@@ -103,8 +103,8 @@ public class PokemonServiceTests
             .Protected()
             .Setup<Task<HttpResponseMessage>>(
                 "SendAsync",
-                ItExpr.IsAny<HttpRequestMessage>(),
-                ItExpr.IsAny<CancellationToken>())
+                It.IsAny<HttpRequestMessage>(),
+                It.IsAny<CancellationToken>())
             .ReturnsAsync(mockResponse);
 
         var httpClient = new HttpClient(handlerMock.Object)
@@ -124,8 +124,8 @@ public class PokemonServiceTests
         handlerMock.Protected().Verify(
             "SendAsync",
             Times.Once(),
-            ItExpr.IsAny<HttpRequestMessage>(),
-            ItExpr.IsAny<CancellationToken>());
+            It.IsAny<HttpRequestMessage>(),
+            It.IsAny<CancellationToken>());
     }
 
     /// <summary>
@@ -143,8 +143,8 @@ public class PokemonServiceTests
             .Protected()
             .Setup<Task<HttpResponseMessage>>(
                 "SendAsync",
-                ItExpr.IsAny<HttpRequestMessage>(),
-                ItExpr.IsAny<CancellationToken>())
+                It.IsAny<HttpRequestMessage>(),
+                It.IsAny<CancellationToken>())
             .ReturnsAsync(mockResponse);
 
         var httpClient = new HttpClient(handlerMock.Object)
@@ -183,8 +183,8 @@ public class PokemonServiceTests
             .Protected()
             .Setup<Task<HttpResponseMessage>>(
                 "SendAsync",
-                ItExpr.IsAny<HttpRequestMessage>(),
-                ItExpr.IsAny<CancellationToken>())
+                It.IsAny<HttpRequestMessage>(),
+                It.IsAny<CancellationToken>())
             .ReturnsAsync(mockResponse);
 
         var httpClient = new HttpClient(handlerMock.Object)
@@ -217,8 +217,8 @@ public class PokemonServiceTests
             .Protected()
             .Setup<Task<HttpResponseMessage>>(
                 "SendAsync",
-                ItExpr.IsAny<HttpRequestMessage>(),
-                ItExpr.IsAny<CancellationToken>())
+                It.IsAny<HttpRequestMessage>(),
+                It.IsAny<CancellationToken>())
             .ReturnsAsync(mockResponse);
 
         var httpClient = new HttpClient(handlerMock.Object)
@@ -273,8 +273,8 @@ public class PokemonServiceTests
             .Protected()
             .Setup<Task<HttpResponseMessage>>(
                 "SendAsync",
-                ItExpr.IsAny<HttpRequestMessage>(),
-                ItExpr.IsAny<CancellationToken>())
+                It.IsAny<HttpRequestMessage>(),
+                It.IsAny<CancellationToken>())
             .ReturnsAsync(mockResponse);
 
         var httpClient = new HttpClient(handlerMock.Object)
@@ -296,8 +296,8 @@ public class PokemonServiceTests
         handlerMock.Protected().Verify(
             "SendAsync",
             Times.Once(),
-            ItExpr.IsAny<HttpRequestMessage>(),
-            ItExpr.IsAny<CancellationToken>());
+            It.IsAny<HttpRequestMessage>(),
+            It.IsAny<CancellationToken>());
     }
 
     /// <summary>
@@ -315,8 +315,8 @@ public class PokemonServiceTests
             .Protected()
             .Setup<Task<HttpResponseMessage>>(
                 "SendAsync",
-                ItExpr.IsAny<HttpRequestMessage>(),
-                ItExpr.IsAny<CancellationToken>())
+                It.IsAny<HttpRequestMessage>(),
+                It.IsAny<CancellationToken>())
             .ReturnsAsync(mockResponse);
 
         var httpClient = new HttpClient(handlerMock.Object)

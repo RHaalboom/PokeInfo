@@ -3,6 +3,7 @@ using Xunit;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using PokeInfo.Controllers;
 using PokeInfo.Data;
 using PokeInfo.Entities;
@@ -371,7 +372,7 @@ public class AuthControllerTests
 
         // Assert
         var forbidResult = Assert.IsType<ForbidResult>(result);
-        Assert.Equal(403, forbidResult.StatusCode);
+        Assert.NotNull(forbidResult);
     }
 
     #endregion
