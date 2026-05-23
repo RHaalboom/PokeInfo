@@ -17,7 +17,6 @@ export default function ProfilePage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [pokedexProgress, setPokedexProgress] = useState({});
-    const [collections, setCollections] = useState([]);
     const navigate = useNavigate();
     const { logout } = useAuth();
 
@@ -55,7 +54,6 @@ export default function ProfilePage() {
     async function fetchCollectionsAndProgress() {
         try {
             const data = await getCollections();
-            setCollections(data);
             const progress = calculatePokedexProgress(data);
             setPokedexProgress(progress);
         } catch (err) {
