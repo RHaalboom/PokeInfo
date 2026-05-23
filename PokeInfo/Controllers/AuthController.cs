@@ -13,11 +13,11 @@ namespace PokeInfo.Controllers;
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
 {
-    private readonly PokeInfoDbContext _context;
+    private readonly IPokeInfoDbContext _context;
     private readonly PasswordHasher<User> _passwordHasher;
     private readonly JwtService _jwtService;
 
-    public AuthController(PokeInfoDbContext context, JwtService jwtService)
+    public AuthController(IPokeInfoDbContext context, JwtService jwtService)
     {
         _context = context;
         _passwordHasher = new PasswordHasher<User>();

@@ -51,6 +51,9 @@ builder.Services.AddDbContext<PokeInfoDbContext>(options =>
     );
 });
 
+// Register IPokeInfoDbContext for dependency injection
+builder.Services.AddScoped<IPokeInfoDbContext>(provider => provider.GetRequiredService<PokeInfoDbContext>());
+
 builder.Services.AddScoped<JwtService>();
 
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
