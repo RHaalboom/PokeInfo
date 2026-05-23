@@ -36,7 +36,7 @@ jobs:
       run: dotnet build --configuration Release --no-restore
 
     - name: Run unit tests
-      run: dotnet test --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=test-results.trx"
+      run: dotnet test --configuration Release --no-build --verbosity normal --logger "console;verbosity=detailed" --logger "trx;LogFileName=test-results.trx"
       continue-on-error: true
 
     - name: Upload test results
