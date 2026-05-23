@@ -1,4 +1,4 @@
-﻿import { Routes, Route, Link, useNavigate } from "react-router-dom";
+﻿import { Routes, Route, Link } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import PokédexPage from "./pages/PokédexPage";
 import RegisterPage from "./pages/RegisterPage";
@@ -7,21 +7,14 @@ import ProfilePage from "./pages/ProfilePage";
 import SettingsPage from "./pages/SettingsPage";
 import CollectionDetailsPage from "./pages/CollectionDetailsPage";
 import { useAuth } from "./hooks/useAuth";
-import { logout as logoutService } from "./services/authService";
 import PokeInfoBrand from "./components/PokeInfoBrand";
+import UserMenu from "./components/UserMenu";
 import pokeInfoLogo from "./img/Poké-info_logo.png";
 import "./styles/pokeInfoBrand.css";
 import "./styles/navigation.css";
 
 function App() {
     const { isAuthenticated, logout } = useAuth();
-    const navigate = useNavigate();
-
-    function handleLogout() {
-        logoutService();
-        logout();
-        navigate("/");
-    }
 
     return (
         <>
@@ -36,13 +29,7 @@ function App() {
 
                 <div className="nav-links">
                     {isAuthenticated ? (
-                        <>
-                            <Link to="/profile">Profile</Link>
-                            <Link to="/settings">Settings</Link>
-                            <button onClick={handleLogout} className="logout-nav-btn">
-                                Logout
-                            </button>
-                        </>
+                        <UserMenu onLogout={logout} />
                     ) : (
                         <>
                             <Link to="/login">Login</Link>

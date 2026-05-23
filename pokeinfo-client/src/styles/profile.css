@@ -190,3 +190,166 @@
     font-size: 18px;
     color: #666;
 }
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+    .profile-page {
+        padding: 16px;
+        padding-top: calc(16px + 56px);
+    }
+
+    .profile-header {
+        padding: 20px;
+        margin-bottom: 20px;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .profile-info {
+        gap: 16px;
+        flex-direction: column;
+        text-align: center;
+        width: 100%;
+    }
+
+    .profile-picture {
+        width: 100px;
+        height: 100px;
+    }
+
+    .profile-text {
+        gap: 6px;
+        text-align: center;
+        width: 100%;
+    }
+
+    .profile-text h1 {
+        font-size: 22px;
+    }
+
+    .profile-actions {
+        width: 100%;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .settings-button,
+    .logout-button {
+        flex: 1;
+        min-width: 120px;
+        padding: 8px 16px;
+        font-size: 13px;
+    }
+
+    .rankings-section,
+    .moderator-section {
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    .rankings-header h2,
+    .moderator-section h2 {
+        font-size: 18px;
+        margin-bottom: 16px;
+    }
+
+    .rankings-content {
+        gap: 12px;
+        justify-content: center;
+    }
+
+    .users-table th,
+    .users-table td {
+        padding: 10px 8px;
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-page {
+        padding: 12px;
+        padding-top: calc(12px + 56px);
+    }
+
+    .profile-header {
+        padding: 16px;
+        margin-bottom: 16px;
+    }
+
+    .profile-picture {
+        width: 80px;
+        height: 80px;
+    }
+
+    .profile-text h1 {
+        font-size: 18px;
+    }
+
+    .profile-username {
+        font-size: 12px;
+    }
+
+    .profile-fc {
+        font-size: 11px;
+        padding: 3px 6px;
+    }
+
+    .profile-role {
+        font-size: 11px;
+    }
+
+    .settings-button,
+    .logout-button {
+        padding: 6px 12px;
+        font-size: 11px;
+    }
+
+    .rankings-section,
+    .moderator-section {
+        padding: 16px;
+        margin-bottom: 16px;
+    }
+
+    .rankings-header h2,
+    .moderator-section h2 {
+        font-size: 16px;
+        margin-bottom: 12px;
+    }
+
+    .rankings-content {
+        gap: 8px;
+    }
+
+    .users-table th,
+    .users-table td {
+        padding: 8px 6px;
+        font-size: 11px;
+    }
+}
+
+@media (max-width: 360px) {
+    .profile-header {
+        padding: 12px;
+    }
+
+    .profile-picture {
+        width: 70px;
+        height: 70px;
+    }
+
+    .profile-text h1 {
+        font-size: 16px;
+    }
+
+    .profile-actions {
+        gap: 6px;
+    }
+
+    .settings-button,
+    .logout-button {
+        padding: 5px 10px;
+        font-size: 10px;
+        min-width: auto;
+    }
+}
