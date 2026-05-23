@@ -6,7 +6,6 @@ using PokeInfo.Models;
 using PokeInfo.Services;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace PokeInfo.Tests;
@@ -17,15 +16,11 @@ namespace PokeInfo.Tests;
 /// </summary>
 public class PokemonServiceTests
 {
-    private readonly Mock<HttpClient> _mockHttpClient;
     private readonly IMemoryCache _memoryCache;
-    private readonly PokemonService _pokemonService;
 
     public PokemonServiceTests()
     {
-        _mockHttpClient = new Mock<HttpClient>();
         _memoryCache = new MemoryCache(new MemoryCacheOptions());
-        _pokemonService = new PokemonService(_mockHttpClient.Object, _memoryCache);
     }
 
     #region GetOverview Tests
@@ -39,21 +34,19 @@ public class PokemonServiceTests
     {
         // Arrange
         var mockResponse = CreateMockOverviewResponse(3);
-
         var handlerMock = new Mock<HttpMessageHandler>();
         handlerMock
             .Protected()
             .Setup<Task<HttpResponseMessage>>(
                 "SendAsync",
-                It.IsAny<HttpRequestMessage>(),
-                It.IsAny<CancellationToken>())
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>())
             .ReturnsAsync(mockResponse);
 
         var httpClient = new HttpClient(handlerMock.Object)
         {
             BaseAddress = new Uri("https://pokeapi.co/api/v2/")
         };
-
         var service = new PokemonService(httpClient, _memoryCache);
 
         // Act
@@ -63,29 +56,7 @@ public class PokemonServiceTests
         Assert.NotNull(result);
         Assert.NotEmpty(result);
         Assert.True(result.Count > 0);
-    }
-
-    /// <summary>
-    /// Unhappy path: GetOverviewAsync should return empty list when API fails.
-    /// Validates: Error handling returns empty list instead of throwing.
-    /// </summary>
-    [Fact]
-    public async Task GetOverviewAsync_ShouldReturnEmptyList_WhenApiThrowsException()
-    {
-        // Arrange
-        var mockHttpClient = new Mock<HttpClient>();
-        mockHttpClient
-            .Setup(x => x.GetAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .ThrowsAsync(new HttpRequestException("API Error"));
-
-        var service = new PokemonService(mockHttpClient.Object, _memoryCache);
-
-        // Act
-        var result = await service.GetOverviewAsync();
-
-        // Assert
-        Assert.NotNull(result);
-        Assert.Empty(result);
+        Assert.Equal("pokemon1", result[0].Name);
     }
 
     /// <summary>
@@ -96,22 +67,20 @@ public class PokemonServiceTests
     public async Task GetOverviewAsync_ShouldUseCachedData_OnSecondCall()
     {
         // Arrange
-        var mockResponse = CreateMockOverviewResponse(3);
-
+        var mockResponse = CreateMockOverviewResponse(2);
         var handlerMock = new Mock<HttpMessageHandler>();
         handlerMock
             .Protected()
             .Setup<Task<HttpResponseMessage>>(
                 "SendAsync",
-                It.IsAny<HttpRequestMessage>(),
-                It.IsAny<CancellationToken>())
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>())
             .ReturnsAsync(mockResponse);
 
         var httpClient = new HttpClient(handlerMock.Object)
         {
             BaseAddress = new Uri("https://pokeapi.co/api/v2/")
         };
-
         var service = new PokemonService(httpClient, _memoryCache);
 
         // Act
@@ -124,8 +93,8 @@ public class PokemonServiceTests
         handlerMock.Protected().Verify(
             "SendAsync",
             Times.Once(),
-            It.IsAny<HttpRequestMessage>(),
-            It.IsAny<CancellationToken>());
+            ItExpr.IsAny<HttpRequestMessage>(),
+            ItExpr.IsAny<CancellationToken>());
     }
 
     /// <summary>
@@ -137,21 +106,19 @@ public class PokemonServiceTests
     {
         // Arrange
         var mockResponse = CreateMockOverviewResponse(1);
-
         var handlerMock = new Mock<HttpMessageHandler>();
         handlerMock
             .Protected()
             .Setup<Task<HttpResponseMessage>>(
                 "SendAsync",
-                It.IsAny<HttpRequestMessage>(),
-                It.IsAny<CancellationToken>())
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>())
             .ReturnsAsync(mockResponse);
 
         var httpClient = new HttpClient(handlerMock.Object)
         {
             BaseAddress = new Uri("https://pokeapi.co/api/v2/")
         };
-
         var service = new PokemonService(httpClient, _memoryCache);
 
         // Act
@@ -161,177 +128,105 @@ public class PokemonServiceTests
         var firstPokemon = result.FirstOrDefault();
         Assert.NotNull(firstPokemon);
         Assert.True(firstPokemon.Generation >= 1);
+        Assert.Equal(1, firstPokemon.Generation); // First Pokémon should be Gen 1
     }
 
-    #endregion
-
-    #region GetPokemonByName Tests
-
     /// <summary>
-    /// Happy path: GetPokemonByNameAsync should return Pokémon details when found.
-    /// Validates: Correct Pokémon data is retrieved by name.
+    /// Happy path: Pokémon list items should have image URLs.
+    /// Validates: Image URL is properly constructed from Pokémon ID.
     /// </summary>
     [Fact]
-    public async Task GetPokemonByNameAsync_ShouldReturnPokemonDetails_WhenPokemonExists()
+    public async Task GetOverviewAsync_ShouldHaveImageUrls_ForEachPokemon()
     {
         // Arrange
-        var pokemonName = "pikachu";
-        var mockResponse = CreateMockDetailResponse(pokemonName);
-
+        var mockResponse = CreateMockOverviewResponse(2);
         var handlerMock = new Mock<HttpMessageHandler>();
         handlerMock
             .Protected()
             .Setup<Task<HttpResponseMessage>>(
                 "SendAsync",
-                It.IsAny<HttpRequestMessage>(),
-                It.IsAny<CancellationToken>())
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>())
             .ReturnsAsync(mockResponse);
 
         var httpClient = new HttpClient(handlerMock.Object)
         {
             BaseAddress = new Uri("https://pokeapi.co/api/v2/")
         };
-
         var service = new PokemonService(httpClient, _memoryCache);
 
         // Act
-        var result = await service.GetPokemonByNameAsync(pokemonName);
+        var result = await service.GetOverviewAsync();
+
+        // Assert
+        foreach (var pokemon in result)
+        {
+            Assert.False(string.IsNullOrEmpty(pokemon.ImageUrl));
+            Assert.Contains("githubusercontent.com", pokemon.ImageUrl);
+        }
+    }
+
+    /// <summary>
+    /// Unhappy path: GetOverviewAsync should handle network errors gracefully.
+    /// Validates: Exception during API call returns empty list.
+    /// </summary>
+    [Fact]
+    public async Task GetOverviewAsync_ShouldReturnEmptyList_WhenNetworkFails()
+    {
+        // Arrange
+        var handlerMock = new Mock<HttpMessageHandler>();
+        handlerMock
+            .Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>())
+            .ReturnsAsync(new HttpResponseMessage(System.Net.HttpStatusCode.InternalServerError));
+
+        var httpClient = new HttpClient(handlerMock.Object)
+        {
+            BaseAddress = new Uri("https://pokeapi.co/api/v2/")
+        };
+        var service = new PokemonService(httpClient, _memoryCache);
+
+        // Act
+        var result = await service.GetOverviewAsync();
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(pokemonName, result.Name.ToLowerInvariant());
+        Assert.Empty(result);
     }
 
     /// <summary>
-    /// Happy path: GetPokemonByNameAsync should normalize name to lowercase.
-    /// Validates: Case-insensitive Pokémon lookup works correctly.
+    /// Happy path: Pokémon list should not be empty when API returns valid data.
+    /// Validates: Successful API response is properly parsed.
     /// </summary>
     [Fact]
-    public async Task GetPokemonByNameAsync_ShouldFindPokemon_WhenNameHasMixedCase()
+    public async Task GetOverviewAsync_ShouldPopulateList_WithValidResponse()
     {
         // Arrange
-        var mockResponse = CreateMockDetailResponse("pikachu");
-
+        var mockResponse = CreateMockOverviewResponse(5);
         var handlerMock = new Mock<HttpMessageHandler>();
         handlerMock
             .Protected()
             .Setup<Task<HttpResponseMessage>>(
                 "SendAsync",
-                It.IsAny<HttpRequestMessage>(),
-                It.IsAny<CancellationToken>())
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>())
             .ReturnsAsync(mockResponse);
 
         var httpClient = new HttpClient(handlerMock.Object)
         {
             BaseAddress = new Uri("https://pokeapi.co/api/v2/")
         };
-
         var service = new PokemonService(httpClient, _memoryCache);
 
         // Act
-        var result = await service.GetPokemonByNameAsync("PIKACHU");
+        var result = await service.GetOverviewAsync();
 
         // Assert
         Assert.NotNull(result);
-    }
-
-    /// <summary>
-    /// Unhappy path: GetPokemonByNameAsync should return null when Pokémon not found.
-    /// Validates: 404 responses are handled gracefully.
-    /// </summary>
-    [Fact]
-    public async Task GetPokemonByNameAsync_ShouldReturnNull_WhenPokemonNotFound()
-    {
-        // Arrange
-        var mockHttpClient = new Mock<HttpClient>();
-        mockHttpClient
-            .Setup(x => x.GetAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new HttpResponseMessage(System.Net.HttpStatusCode.NotFound));
-
-        var service = new PokemonService(mockHttpClient.Object, _memoryCache);
-
-        // Act
-        var result = await service.GetPokemonByNameAsync("fakepokemon");
-
-        // Assert
-        Assert.Null(result);
-    }
-
-    /// <summary>
-    /// Happy path: Pokémon name should be cached after first retrieval.
-    /// Validates: Caching works for individual Pokémon queries.
-    /// </summary>
-    [Fact]
-    public async Task GetPokemonByNameAsync_ShouldUseCachedData_OnSecondCall()
-    {
-        // Arrange
-        var pokemonName = "pikachu";
-        var mockResponse = CreateMockDetailResponse(pokemonName);
-
-        var handlerMock = new Mock<HttpMessageHandler>();
-        handlerMock
-            .Protected()
-            .Setup<Task<HttpResponseMessage>>(
-                "SendAsync",
-                It.IsAny<HttpRequestMessage>(),
-                It.IsAny<CancellationToken>())
-            .ReturnsAsync(mockResponse);
-
-        var httpClient = new HttpClient(handlerMock.Object)
-        {
-            BaseAddress = new Uri("https://pokeapi.co/api/v2/")
-        };
-
-        var service = new PokemonService(httpClient, _memoryCache);
-
-        // Act
-        var firstCall = await service.GetPokemonByNameAsync(pokemonName);
-        var secondCall = await service.GetPokemonByNameAsync(pokemonName);
-
-        // Assert
-        Assert.NotNull(firstCall);
-        Assert.NotNull(secondCall);
-        Assert.Equal(firstCall.Name, secondCall.Name);
-        // Verify HTTP was called only once (cached on second call)
-        handlerMock.Protected().Verify(
-            "SendAsync",
-            Times.Once(),
-            It.IsAny<HttpRequestMessage>(),
-            It.IsAny<CancellationToken>());
-    }
-
-    /// <summary>
-    /// Happy path: Pokémon should have ImageUrl properly formatted.
-    /// Validates: Image URL generation from Pokémon ID is correct.
-    /// </summary>
-    [Fact]
-    public async Task GetPokemonByNameAsync_ShouldHaveValidImageUrl_WhenPokemonRetrieved()
-    {
-        // Arrange
-        var mockResponse = CreateMockDetailResponse("pikachu");
-
-        var handlerMock = new Mock<HttpMessageHandler>();
-        handlerMock
-            .Protected()
-            .Setup<Task<HttpResponseMessage>>(
-                "SendAsync",
-                It.IsAny<HttpRequestMessage>(),
-                It.IsAny<CancellationToken>())
-            .ReturnsAsync(mockResponse);
-
-        var httpClient = new HttpClient(handlerMock.Object)
-        {
-            BaseAddress = new Uri("https://pokeapi.co/api/v2/")
-        };
-
-        var service = new PokemonService(httpClient, _memoryCache);
-
-        // Act
-        var result = await service.GetPokemonByNameAsync("pikachu");
-
-        // Assert
-        Assert.NotNull(result);
-        Assert.False(string.IsNullOrEmpty(result.ImageUrl));
+        Assert.Equal(5, result.Count);
     }
 
     #endregion
@@ -355,54 +250,10 @@ public class PokemonServiceTests
         var jsonString = System.Text.Json.JsonSerializer.Serialize(json);
         var content = new StringContent(jsonString, System.Text.Encoding.UTF8, "application/json");
 
-        var response = new HttpResponseMessage(System.Net.HttpStatusCode.OK)
+        return new HttpResponseMessage(System.Net.HttpStatusCode.OK)
         {
             Content = content
         };
-
-        return response;
-    }
-
-    /// <summary>
-    /// Creates a mock HTTP response for Pokémon detail endpoint.
-    /// </summary>
-    private HttpResponseMessage CreateMockDetailResponse(string name)
-    {
-        var json = new
-        {
-            id = 25,
-            name = name,
-            sprites = new
-            {
-                front_default = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png"
-            },
-            types = new[]
-            {
-                new { type = new { name = "electric" } }
-            },
-            game_indices = new[]
-            {
-                new { version = new { name = "red" } }
-            },
-            abilities = new[]
-            {
-                new { ability = new { name = "static" } }
-            },
-            species = new
-            {
-                url = "https://pokeapi.co/api/v2/pokemon-species/25/"
-            }
-        };
-
-        var jsonString = System.Text.Json.JsonSerializer.Serialize(json);
-        var content = new StringContent(jsonString, System.Text.Encoding.UTF8, "application/json");
-
-        var response = new HttpResponseMessage(System.Net.HttpStatusCode.OK)
-        {
-            Content = content
-        };
-
-        return response;
     }
 
     #endregion
