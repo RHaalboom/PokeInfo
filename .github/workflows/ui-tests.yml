@@ -38,24 +38,37 @@ jobs:
         run: npm run lint
 
       - name: Start development server
-        run: npm run dev > /tmp/vite.log 2>&1 &
+        run: |
+          npm run dev > /tmp/vite.log 2>&1 &
+          echo $! > /tmp/vite.pid
         shell: bash
         env:
           VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL || 'http://localhost:3000' }}
 
       - name: Wait for dev server
         run: |
-          for i in {1..120}; do
-            if curl -f http://localhost:5173 > /dev/null 2>&1; then
-              echo "Dev server is ready!"
+          for i in {1..30}; do
+            if curl -s http://localhost:5173 > /dev/null 2>&1; then
+              echo "✅ Dev server is ready!"
               exit 0
             fi
-            echo "Waiting for dev server... ($i/120)"
+            echo "⏳ Waiting for dev server... ($i/120)"
             sleep 1
           done
-          echo "Dev server failed to start"
+          echo "❌ Dev server failed to start"
+          echo "--- Vite Log Output ---"
           cat /tmp/vite.log
+          kill $(cat /tmp/vite.pid) 2>/dev/null || true
           exit 1
+        shell: bash
+
+      - name: Verify dev server and dependencies
+        run: |
+          echo "✅ Checking if server is accessible..."
+          curl -v http://localhost:5173 || true
+          echo ""
+          echo "✅ Server process status:"
+          ps aux | grep -E '[v]ite|[n]ode' || true
         shell: bash
 
       - name: Run Cypress tests
@@ -65,6 +78,15 @@ jobs:
           browser: chrome
           command: npm run e2e:run
           install: false
+
+      - name: Cleanup dev server
+        if: always()
+        run: |
+          if [ -f /tmp/vite.pid ]; then
+            kill $(cat /tmp/vite.pid) 2>/dev/null || true
+          fi
+          pkill -f "vite" || true
+        shell: bash
 
       - name: Upload screenshots on failure
         uses: actions/upload-artifact@v4
