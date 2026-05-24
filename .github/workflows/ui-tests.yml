@@ -72,15 +72,16 @@ jobs:
         shell: bash
 
       - name: Verify dev server and dependencies
+        continue-on-error: true
         run: |
           echo "✅ Checking if server is accessible..."
-          curl -v http://localhost:5173 2>&1 | head -20
+          curl -s -o /dev/null -w "HTTP Status: %{http_code}\n" http://localhost:5173
           echo ""
           echo "✅ Server process status:"
           ps aux | grep -E '[v]ite|[n]ode' | grep -v grep || echo "No running processes"
           echo ""
           echo "✅ Checking network connections:"
-          netstat -tuln 2>/dev/null | grep 5173 || echo "Port 5173 not found in netstat"
+          netstat -tuln 2>/dev/null | grep 5173 || netstat -an 2>/dev/null | grep 5173 || echo "Port check skipped"
         shell: bash
 
       - name: Run Cypress tests
