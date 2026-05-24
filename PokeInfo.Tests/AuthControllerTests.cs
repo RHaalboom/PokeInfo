@@ -43,7 +43,7 @@ public class AuthControllerTests
     private JwtService CreateJwtService()
     {
         var config = new ConfigurationBuilder()
-            .AddInMemoryCollection(new Dictionary<string, string>
+            .AddInMemoryCollection(new Dictionary<string, string?>
             {
                 { "JwtSettings:Key", "SuperSecretKeyThatIsAtLeast32CharactersLongForHS256" },
                 { "JwtSettings:ExpirationMinutes", "60" }
