@@ -17,9 +17,18 @@ export default function RegisterPage() {
         collectionName: ""
     });
 
+    const [fieldErrors, setFieldErrors] = useState({
+        username: "",
+        email: "",
+        password: "",
+        threedsFC: "",
+        switchFC: "",
+        collectionName: ""
+    });
+
     const [successMessage, setSuccessMessage] = useState("");
-    const [errorMessage, setErrorMessage] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [formSubmitted, setFormSubmitted] = useState(false);
     const navigate = useNavigate();
     const { login } = useAuth();
 
@@ -30,13 +39,120 @@ export default function RegisterPage() {
             ...previousData,
             [name]: value
         }));
+
+        // Only validate if the form has been submitted
+        if (!formSubmitted) {
+            return;
+        }
+
+        // Validate field on change and clear error if valid
+        if (name === "username" && value.trim()) {
+            if (value.trim().length < 3) {
+                setFieldErrors((prev) => ({
+                    ...prev,
+                    username: "Username must be at least 3 characters long"
+                }));
+            } else {
+                setFieldErrors((prev) => ({
+                    ...prev,
+                    username: ""
+                }));
+            }
+        } else if (name === "username" && !value.trim()) {
+            setFieldErrors((prev) => ({
+                ...prev,
+                username: ""
+            }));
+        }
+
+        if (name === "email" && value.trim()) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(value)) {
+                setFieldErrors((prev) => ({
+                    ...prev,
+                    email: "Please enter a valid email address"
+                }));
+            } else {
+                setFieldErrors((prev) => ({
+                    ...prev,
+                    email: ""
+                }));
+            }
+        } else if (name === "email" && !value.trim()) {
+            setFieldErrors((prev) => ({
+                ...prev,
+                email: ""
+            }));
+        }
+
+        if (name === "password" && value) {
+            if (value.length < 6) {
+                setFieldErrors((prev) => ({
+                    ...prev,
+                    password: "Password must be at least 6 characters long"
+                }));
+            } else {
+                setFieldErrors((prev) => ({
+                    ...prev,
+                    password: ""
+                }));
+            }
+        } else if (name === "password" && !value) {
+            setFieldErrors((prev) => ({
+                ...prev,
+                password: ""
+            }));
+        }
+    }
+
+    function validateForm() {
+        const errors = {
+            username: "",
+            email: "",
+            password: "",
+            threedsFC: "",
+            switchFC: "",
+            collectionName: ""
+        };
+
+        // Validate required fields
+        if (!formData.username.trim()) {
+            errors.username = "Username is required";
+        } else if (formData.username.trim().length < 3) {
+            errors.username = "Username must be at least 3 characters long";
+        }
+
+        if (!formData.email.trim()) {
+            errors.email = "Email is required";
+        } else {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(formData.email)) {
+                errors.email = "Please enter a valid email address";
+            }
+        }
+
+        if (!formData.password) {
+            errors.password = "Password is required";
+        } else if (formData.password.length < 6) {
+            errors.password = "Password must be at least 6 characters long";
+        }
+
+        setFieldErrors(errors);
+        return !errors.username && !errors.email && !errors.password;
     }
 
     async function handleSubmit(event) {
         event.preventDefault();
 
+        // Mark form as submitted so errors show
+        setFormSubmitted(true);
+
+        // Validate form before submission
+        if (!validateForm()) {
+            return;
+        }
+
         setSuccessMessage("");
-        setErrorMessage("");
         setIsSubmitting(true);
 
         try {
@@ -48,7 +164,7 @@ export default function RegisterPage() {
             };
 
             const result = await registerUser(registerData);
-            setSuccessMessage(result.message || "Account successfully created.");
+            setSuccessMessage(result.message || "Account successfully created!");
 
             // Auto-login after successful registration
             await loginUser({ usernameOrEmail: formData.username, password: formData.password });
@@ -76,7 +192,7 @@ export default function RegisterPage() {
             // Navigate to profile after everything is set up
             setTimeout(() => {
                 navigate("/profile");
-            }, 500);
+            }, 2000);
 
             setFormData({
                 username: "",
@@ -87,7 +203,39 @@ export default function RegisterPage() {
                 collectionName: ""
             });
         } catch (error) {
-            setErrorMessage(error.message);
+            // Parse error message and associate with fields
+            const errorMessage = error.message || "Registration failed. Please try again.";
+
+            // Map common error messages to fields
+            const newFieldErrors = {
+                username: "",
+                email: "",
+                password: "",
+                threedsFC: "",
+                switchFC: "",
+                collectionName: ""
+            };
+
+            if (errorMessage.toLowerCase().includes("username")) {
+                newFieldErrors.username = errorMessage;
+            } else if (errorMessage.toLowerCase().includes("email")) {
+                newFieldErrors.email = errorMessage;
+            } else if (errorMessage.toLowerCase().includes("password")) {
+                newFieldErrors.password = errorMessage;
+            } else {
+                // If we can't determine which field, show on the first empty required field
+                if (!formData.username) {
+                    newFieldErrors.username = errorMessage;
+                } else if (!formData.email) {
+                    newFieldErrors.email = errorMessage;
+                } else if (!formData.password) {
+                    newFieldErrors.password = errorMessage;
+                } else {
+                    newFieldErrors.email = errorMessage;
+                }
+            }
+
+            setFieldErrors(newFieldErrors);
         } finally {
             setIsSubmitting(false);
         }
@@ -119,7 +267,7 @@ export default function RegisterPage() {
             <section className="register-card">
                 <h1>Register</h1>
 
-                <form onSubmit={handleSubmit} className="register-form">
+                <form onSubmit={handleSubmit} className="register-form" noValidate>
                     <div className="form-group">
                         <label htmlFor="username">Username <span className="required">*</span></label>
                         <input
@@ -129,9 +277,13 @@ export default function RegisterPage() {
                             placeholder="ashketchum"
                             value={formData.username}
                             onChange={handleChange}
-                            required
                             maxLength="50"
+                            data-cy="register-username"
+                            className={formSubmitted && fieldErrors.username ? "input-error" : ""}
                         />
+                        {formSubmitted && fieldErrors.username && (
+                            <span className="field-error-message" data-cy="register-username-error" data-cy="register-error-message">{fieldErrors.username}</span>
+                        )}
                     </div>
 
                     <div className="form-group">
@@ -143,9 +295,13 @@ export default function RegisterPage() {
                             placeholder="ashketchum@example.com"
                             value={formData.email}
                             onChange={handleChange}
-                            required
                             maxLength="100"
+                            data-cy="register-email"
+                            className={formSubmitted && fieldErrors.email ? "input-error" : ""}
                         />
+                        {formSubmitted && fieldErrors.email && (
+                            <span className="field-error-message" data-cy="register-email-error" data-cy="register-error-message">{fieldErrors.email}</span>
+                        )}
                     </div>
 
                     <div className="form-group">
@@ -157,9 +313,12 @@ export default function RegisterPage() {
                             placeholder="••••••••••"
                             value={formData.password}
                             onChange={handleChange}
-                            required
-                            minLength="6"
+                            data-cy="register-password"
+                            className={formSubmitted && fieldErrors.password ? "input-error" : ""}
                         />
+                        {formSubmitted && fieldErrors.password && (
+                            <span className="field-error-message" data-cy="register-password-error" data-cy="register-error-message">{fieldErrors.password}</span>
+                        )}
                     </div>
 
                     <div className="form-divider"></div>
@@ -174,6 +333,7 @@ export default function RegisterPage() {
                             value={formData.threedsFC}
                             onChange={handleFriendCodeChange}
                             maxLength="14"
+                            data-cy="register-threedsFC"
                         />
                     </div>
 
@@ -187,6 +347,7 @@ export default function RegisterPage() {
                             value={formData.switchFC}
                             onChange={handleFriendCodeChange}
                             maxLength="14"
+                            data-cy="register-switchFC"
                         />
                     </div>
 
@@ -200,20 +361,17 @@ export default function RegisterPage() {
                             value={formData.collectionName}
                             onChange={handleChange}
                             maxLength="100"
+                            data-cy="register-collectionName"
                         />
                     </div>
 
-                    <button type="submit" disabled={isSubmitting}>
+                    <button type="submit" disabled={isSubmitting} data-cy="register-submit">
                         {isSubmitting ? "Creating account..." : "Create account"}
                     </button>
                 </form>
 
                 {successMessage && (
-                    <p className="success-message">{successMessage}</p>
-                )}
-
-                {errorMessage && (
-                    <p className="error-message">{errorMessage}</p>
+                    <p className="success-message" data-cy="register-success-message">{successMessage}</p>
                 )}
             </section>
         </main>

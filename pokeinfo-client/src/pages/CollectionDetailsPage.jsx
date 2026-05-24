@@ -169,9 +169,9 @@ export default function CollectionDetailsPage() {
     }
 
     return (
-        <main className="collection-details-page">
+        <main className="collection-details-page" data-cy="collection-details-page">
             <div className="collection-details-container">
-                <button className="back-button" onClick={() => navigate("/profile")}>
+                <button className="back-button" onClick={() => navigate("/profile")} data-cy="collection-back-button">
                     ← Back to Profile
                 </button>
 
@@ -189,6 +189,7 @@ export default function CollectionDetailsPage() {
                                     onChange={(e) => setEditName(e.target.value)}
                                     disabled={isSaving}
                                     maxLength="100"
+                                    data-cy="collection-edit-name"
                                 />
                             </div>
                             <div className="form-group">
@@ -200,6 +201,7 @@ export default function CollectionDetailsPage() {
                                     disabled={isSaving}
                                     maxLength="500"
                                     rows="4"
+                                    data-cy="collection-edit-description"
                                 />
                             </div>
                             <div className="edit-actions">
@@ -207,6 +209,7 @@ export default function CollectionDetailsPage() {
                                     className="save-button"
                                     onClick={handleSaveChanges}
                                     disabled={isSaving}
+                                    data-cy="collection-save-button"
                                 >
                                     {isSaving ? "Saving..." : "Save Changes"}
                                 </button>
@@ -218,6 +221,7 @@ export default function CollectionDetailsPage() {
                                         setEditDescription(collection.description);
                                     }}
                                     disabled={isSaving}
+                                    data-cy="collection-cancel-button"
                                 >
                                     Cancel
                                 </button>
@@ -243,12 +247,14 @@ export default function CollectionDetailsPage() {
                                 <button
                                     className="edit-button"
                                     onClick={() => setIsEditing(true)}
+                                    data-cy="collection-edit-button"
                                 >
                                     Edit
                                 </button>
                                 <button
                                     className="delete-button"
                                     onClick={handleDeleteCollection}
+                                    data-cy="collection-delete-button"
                                 >
                                     Delete
                                 </button>
@@ -257,7 +263,7 @@ export default function CollectionDetailsPage() {
                     )}
                 </div>
 
-                <section className="collection-pokemons-section">
+                <section className="collection-pokemons-section" data-cy="collection-pokemons-section">
                     <h2>Pokémon in Collection</h2>
                     {collection.pokemons.length === 0 ? (
                         <div className="empty-pokemons">

@@ -11,7 +11,8 @@ export default function LoginPage() {
         password: ""
     });
 
-    const [errorMessage, setErrorMessage] = useState("");
+    const [successMessage, setSuccessMessage] = useState("");
+    const [formError, setFormError] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const navigate = useNavigate();
     const { login } = useAuth();
@@ -23,32 +24,42 @@ export default function LoginPage() {
             ...previousData,
             [name]: value
         }));
+
+        // Clear form error when user starts typing
+        setFormError("");
     }
 
     async function handleSubmit(event) {
         event.preventDefault();
 
-        setErrorMessage("");
+        setSuccessMessage("");
+        setFormError("");
         setIsSubmitting(true);
 
         try {
             await loginUser(formData);
             const currentUser = getCurrentUser();
             login(currentUser);
-            navigate("/profile");
-        } catch (error) {
-            setErrorMessage(error.message);
+
+            setSuccessMessage("Login successful! Redirecting...");
+
+            setTimeout(() => {
+                navigate("/profile");
+            }, 500);
+        } catch {
+            // For login, show a single error message above the button
+            setFormError("Username/email or password is incorrect");
         } finally {
             setIsSubmitting(false);
         }
     }
 
     return (
-        <main className="login-page">
+        <main className="login-page" data-cy="login-page">
             <section className="login-card">
                 <h1>Login</h1>
 
-                <form onSubmit={handleSubmit} className="login-form">
+                <form onSubmit={handleSubmit} className="login-form" noValidate>
                     <div className="form-group">
                         <label htmlFor="usernameOrEmail">Username or Email <span className="required">*</span></label>
                         <input
@@ -58,7 +69,7 @@ export default function LoginPage() {
                             placeholder="ashketchum"
                             value={formData.usernameOrEmail}
                             onChange={handleChange}
-                            required
+                            data-cy="login-email"
                         />
                     </div>
 
@@ -71,22 +82,25 @@ export default function LoginPage() {
                             placeholder="••••••••••"
                             value={formData.password}
                             onChange={handleChange}
-                            required
-                            minLength="6"
+                            data-cy="login-password"
                         />
                     </div>
 
-                    <button type="submit" disabled={isSubmitting}>
+                    {formError && (
+                        <p className="form-error-message" data-cy="login-error-message">{formError}</p>
+                    )}
+
+                    <button type="submit" disabled={isSubmitting} data-cy="login-submit">
                         {isSubmitting ? "Signing in..." : "Sign In"}
                     </button>
                 </form>
 
-                {errorMessage && (
-                    <p className="error-message">{errorMessage}</p>
+                {successMessage && (
+                    <p className="success-message" data-cy="login-success-message">{successMessage}</p>
                 )}
 
                 <p className="register-link">
-                    Don't have an account? <a href="/register">Register here</a>
+                    Don't have an account? <a href="/register" data-cy="login-register-link">Register here</a>
                 </p>
             </section>
         </main>

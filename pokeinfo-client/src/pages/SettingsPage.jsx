@@ -180,13 +180,14 @@ export default function SettingsPage() {
     }
 
     return (
-        <main className="settings-page">
+        <main className="settings-page" data-cy="settings-page">
             <div className="settings-container">
                 <header className="settings-header">
                     <h1>Settings</h1>
                     <button 
                         className="back-button" 
                         onClick={() => navigate("/profile")}
+                        data-cy="settings-back-button"
                     >
                         ← Back to Profile
                     </button>
@@ -199,25 +200,28 @@ export default function SettingsPage() {
                     <button
                         className={`tab-button ${activeTab === "profile" ? "active" : ""}`}
                         onClick={() => setActiveTab("profile")}
+                        data-cy="settings-profile-tab"
                     >
                         Profile
                     </button>
                     <button
                         className={`tab-button ${activeTab === "account" ? "active" : ""}`}
                         onClick={() => setActiveTab("account")}
+                        data-cy="settings-account-tab"
                     >
                         Account
                     </button>
                     <button
                         className={`tab-button ${activeTab === "password" ? "active" : ""}`}
                         onClick={() => setActiveTab("password")}
+                        data-cy="settings-password-tab"
                     >
                         Password
                     </button>
                 </div>
 
                 {activeTab === "profile" && (
-                    <form className="settings-form profile-form" onSubmit={handleSaveProfile}>
+                    <form className="settings-form profile-form" onSubmit={handleSaveProfile} data-cy="settings-profile-form">
                         <h2>Profile Settings</h2>
 
                         <div className="form-group">
@@ -229,6 +233,7 @@ export default function SettingsPage() {
                                 onChange={(e) => setDisplayName(e.target.value)}
                                 placeholder="Enter your display name"
                                 maxLength="100"
+                                data-cy="settings-displayName"
                             />
                             <small>This is the name shown on your profile page</small>
                         </div>
@@ -241,6 +246,7 @@ export default function SettingsPage() {
                                 value={profilePictureUrl}
                                 onChange={(e) => setProfilePictureUrl(e.target.value)}
                                 placeholder="https://example.com/picture.jpg"
+                                data-cy="settings-profilePictureUrl"
                             />
                             {profilePictureUrl && (
                                 <div className="preview-image">
@@ -258,6 +264,7 @@ export default function SettingsPage() {
                                 onChange={(e) => setThreedsFC(formatFriendCodeInput(e.target.value))}
                                 placeholder="XXXX-XXXX-XXXX"
                                 maxLength="14"
+                                data-cy="settings-threedsFC"
                             />
                             <small>12 digits (e.g., 1234-5678-9012)</small>
                         </div>
@@ -271,6 +278,7 @@ export default function SettingsPage() {
                                 onChange={(e) => setSwitchFC(formatFriendCodeInput(e.target.value))}
                                 placeholder="XXXX-XXXX-XXXX"
                                 maxLength="14"
+                                data-cy="settings-switchFC"
                             />
                             <small>12 digits (e.g., 1234-5678-9012)</small>
                         </div>
@@ -282,6 +290,7 @@ export default function SettingsPage() {
                                     type="checkbox"
                                     checked={showRankings}
                                     onChange={(e) => setShowRankings(e.target.checked)}
+                                    data-cy="settings-showRankings"
                                 />
                                 Show rankings on my profile
                             </label>
@@ -292,6 +301,7 @@ export default function SettingsPage() {
                             type="submit" 
                             className="save-button"
                             disabled={isSavingProfile}
+                            data-cy="settings-save-profile-button"
                         >
                             {isSavingProfile ? "Saving..." : "Save Profile"}
                         </button>
@@ -299,7 +309,7 @@ export default function SettingsPage() {
                 )}
 
                 {activeTab === "password" && (
-                    <form className="settings-form password-form" onSubmit={handleChangePassword}>
+                    <form className="settings-form password-form" onSubmit={handleChangePassword} data-cy="settings-password-form">
                         <h2>Change Password</h2>
 
                         <div className="form-group">
@@ -311,6 +321,7 @@ export default function SettingsPage() {
                                 onChange={(e) => setCurrentPassword(e.target.value)}
                                 placeholder="Enter your current password"
                                 required
+                                data-cy="settings-currentPassword"
                             />
                         </div>
 
@@ -324,6 +335,7 @@ export default function SettingsPage() {
                                 placeholder="Enter your new password"
                                 required
                                 minLength="6"
+                                data-cy="settings-newPassword"
                             />
                             <small>At least 6 characters</small>
                         </div>
@@ -338,6 +350,7 @@ export default function SettingsPage() {
                                 placeholder="Confirm your new password"
                                 required
                                 minLength="6"
+                                data-cy="settings-confirmPassword"
                             />
                         </div>
 
@@ -345,6 +358,7 @@ export default function SettingsPage() {
                             type="submit" 
                             className="save-button"
                             disabled={isChangingPassword}
+                            data-cy="settings-change-password-button"
                         >
                             {isChangingPassword ? "Changing..." : "Change Password"}
                         </button>
@@ -390,6 +404,7 @@ export default function SettingsPage() {
                                 onChange={(e) => setAccountPassword(e.target.value)}
                                 placeholder="Enter your password to confirm changes"
                                 required
+                                data-cy="settings-accountPassword"
                             />
                             <small>Password is required to change your account information</small>
                         </div>
@@ -398,6 +413,7 @@ export default function SettingsPage() {
                             type="submit" 
                             className="save-button"
                             disabled={isUpdatingAccount}
+                            data-cy="settings-update-account-button"
                         >
                             {isUpdatingAccount ? "Updating..." : "Update Account"}
                         </button>

@@ -123,8 +123,9 @@ export default function PokemonDetail({ pokemon, onClose }) {
             <div
                 className="modal-content pokemon-detail-modal"
                 onClick={(e) => e.stopPropagation()}
+                data-cy="pokemon-detail-modal"
             >
-                <button className="close-button" onClick={onClose}>
+                <button className="close-button" onClick={onClose} data-cy="back-button">
                     ✕
                 </button>
 

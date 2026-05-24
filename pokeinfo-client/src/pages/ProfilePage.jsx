@@ -90,7 +90,7 @@ export default function ProfilePage() {
     }
 
     return (
-        <main className="profile-page">
+        <main className="profile-page" data-cy="profile-page">
             <section className="profile-header">
                 <div className="profile-info">
                     {user?.profilePictureUrl && (
@@ -115,7 +115,7 @@ export default function ProfilePage() {
                     >
                         ⚙️ Settings
                     </button>
-                    <button className="logout-button" onClick={handleLogout}>
+                    <button className="logout-button" data-cy="logout-button" onClick={handleLogout}>
                         Logout
                     </button>
                 </div>

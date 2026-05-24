@@ -70,12 +70,13 @@ export default function CollectionsSection() {
     }
 
     return (
-        <section className="collections-section">
+        <section className="collections-section" data-cy="collections-section">
             <div className="collections-header">
                 <h2>My Collections</h2>
                 <button
                     className="create-collection-button"
                     onClick={() => setShowCreateForm(!showCreateForm)}
+                    data-cy="create-collection-button"
                 >
                     {showCreateForm ? "Cancel" : "+ Create Collection"}
                 </button>
@@ -84,7 +85,7 @@ export default function CollectionsSection() {
             {error && <div className="collections-error">{error}</div>}
 
             {showCreateForm && (
-                <form className="create-collection-form" onSubmit={handleCreateCollection}>
+                <form className="create-collection-form" onSubmit={handleCreateCollection} data-cy="create-collection-form">
                     <div className="form-group">
                         <label htmlFor="name">Collection Name *</label>
                         <input
@@ -95,6 +96,7 @@ export default function CollectionsSection() {
                             onChange={(e) => setNewCollectionName(e.target.value)}
                             disabled={creatingCollection}
                             maxLength="100"
+                            data-cy="create-collection-name"
                         />
                     </div>
                     <div className="form-group">
@@ -107,12 +109,14 @@ export default function CollectionsSection() {
                             disabled={creatingCollection}
                             maxLength="500"
                             rows="3"
+                            data-cy="create-collection-description"
                         />
                     </div>
                     <button
                         type="submit"
                         className="submit-button"
                         disabled={creatingCollection}
+                        data-cy="create-collection-submit"
                     >
                         {creatingCollection ? "Creating..." : "Create Collection"}
                     </button>
@@ -126,7 +130,7 @@ export default function CollectionsSection() {
             ) : (
                 <div className="collections-list">
                     {collections.map((collection) => (
-                        <div key={collection.id} className="collection-card">
+                        <div key={collection.id} className="collection-card" data-cy="collection-card">
                             <div className="collection-card-header">
                                 <div className="collection-info-section">
                                     <h3>{collection.name}</h3>
@@ -141,6 +145,7 @@ export default function CollectionsSection() {
                                     <Link
                                         to={`/collections/${collection.id}`}
                                         className="view-button"
+                                        data-cy="collection-view-button"
                                     >
                                         View Details
                                     </Link>
@@ -148,6 +153,7 @@ export default function CollectionsSection() {
                                         className="delete-button"
                                         onClick={() => handleDeleteCollection(collection.id)}
                                         title="Delete collection"
+                                        data-cy="collection-card-delete-button"
                                     >
                                         ✕
                                     </button>

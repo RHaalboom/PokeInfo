@@ -160,18 +160,20 @@ export default function PokédexPage() {
                     placeholder="Search..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
+                    data-cy="pokemon-search"
                 />
                 <button 
                     className="filter-button"
                     onClick={() => setFilterOpen(!filterOpen)}
                     title="Toggle filters"
+                    data-cy="pokemon-filter-button"
                 >
                     <img src={filterIcon} alt="Filter" />
                 </button>
             </section>
 
             {filterOpen && (
-                <section className="filter-panel">
+                <section className="filter-panel" data-cy="pokemon-filter-panel">
                     <div className="filter-content">
                         {/* Generation filters */}
                         <div className="filter-section-left">
@@ -205,7 +207,7 @@ export default function PokédexPage() {
                 <>
                     {selectedGeneration === 0 ? (
                         // Show all generations grouped
-                        <div className="generations-container">
+                        <div className="generations-container" data-cy="pokemon-generations-container">
                             {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((gen) => {
                                 const pokemonInGen = groupedByGeneration()[gen] || [];
                                 if (pokemonInGen.length === 0) return null;
@@ -225,7 +227,7 @@ export default function PokédexPage() {
                                                 </span>
                                             </div>
                                         </div>
-                                        <div className="pokemon-grid">
+                                        <div className="pokemon-grid" data-cy="pokemon-overview">
                                             {pokemonInGen.map((pokemon) => (
                                                 <PokemonCard
                                                     key={pokemon.id}
@@ -258,7 +260,7 @@ export default function PokédexPage() {
                                                 </span>
                                             </div>
                                         </div>
-                                        <div className="pokemon-grid">
+                                        <div className="pokemon-grid" data-cy="pokemon-overview">
                                             {filteredPokemon.map((pokemon) => (
                                                 <PokemonCard
                                                     key={pokemon.id}

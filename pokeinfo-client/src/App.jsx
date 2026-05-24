@@ -18,13 +18,13 @@ function App() {
 
     return (
         <>
-            <nav className="main-nav">
+            <nav className="main-nav" data-cy="main-nav">
                 <div className="nav-brand">
-                    <Link to="/" className="nav-logo">
+                    <Link to="/" className="nav-logo" data-cy="nav-logo">
                         <img src={pokeInfoLogo} alt="Poké-info" className="logo-img" />
                         <PokeInfoBrand />
                     </Link>
-                    <Link to="/pokedex" className="nav-pokedex">Pokédex</Link>
+                    <Link to="/pokedex" className="nav-pokedex" data-cy="nav-pokedex">Pokédex</Link>
                 </div>
 
                 <div className="nav-links">
@@ -32,8 +32,8 @@ function App() {
                         <UserMenu onLogout={logout} />
                     ) : (
                         <>
-                            <Link to="/login">Login</Link>
-                            <Link to="/register">Register</Link>
+                            <Link to="/login" data-cy="nav-login">Login</Link>
+                            <Link to="/register" data-cy="nav-register">Register</Link>
                         </>
                     )}
                 </div>
