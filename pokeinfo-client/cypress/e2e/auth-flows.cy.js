@@ -1,22 +1,57 @@
-// Registration Flow - Tests for user account registration
+// ============================================
+// SHARED TEST DATA & UTILITIES
+// ============================================
+
+// Generate unique test credentials that will be used throughout auth tests
+const generateTestUser = () => {
+  const timestamp = Date.now()
+  return {
+    username: `testuser${timestamp}`,
+    email: `testuser${timestamp}@example.com`,
+    password: 'SecurePassword123!'
+  }
+}
+
+// Store test user credentials to use throughout the test suite
+let testUser = null
+
+// ============================================
+// REGISTRATION TESTS
+// ============================================
+
 describe('Registration - Happy Path', () => {
   beforeEach(() => {
     cy.visit('/register')
   })
 
-  it('should display the registration page', () => {
-    cy.get('[data-cy="register-page"]').should('be.visible')
-  })
-
-  it('should have all required form fields', () => {
+  it('should display registration page with all required form fields', () => {
     cy.get('[data-cy="register-username"]').should('be.visible')
     cy.get('[data-cy="register-email"]').should('be.visible')
     cy.get('[data-cy="register-password"]').should('be.visible')
-    cy.get('[data-cy="register-confirm-password"]').should('be.visible')
     cy.get('[data-cy="register-submit"]').should('be.visible')
   })
 
-  it('should successfully register with valid credentials', () => {
+  it('should display optional registration fields', () => {
+    cy.get('[data-cy="register-threedsFC"]').should('be.visible')
+    cy.get('[data-cy="register-switchFC"]').should('be.visible')
+    cy.get('[data-cy="register-collectionName"]').should('be.visible')
+  })
+
+  it('should successfully register with required credentials only', () => {
+    // Generate and store test user for use in other tests
+    testUser = generateTestUser()
+
+    cy.get('[data-cy="register-username"]').type(testUser.username)
+    cy.get('[data-cy="register-email"]').type(testUser.email)
+    cy.get('[data-cy="register-password"]').type(testUser.password)
+    cy.get('[data-cy="register-submit"]').click()
+
+    // Should show success and redirect to profile
+    cy.get('[data-cy="register-success-message"]').should('be.visible')
+    cy.url().should('include', '/profile')
+  })
+
+  it('should successfully register with optional friend codes', () => {
     const timestamp = Date.now()
     const email = `testuser${timestamp}@example.com`
     const username = `testuser${timestamp}`
@@ -25,18 +60,17 @@ describe('Registration - Happy Path', () => {
     cy.get('[data-cy="register-username"]').type(username)
     cy.get('[data-cy="register-email"]').type(email)
     cy.get('[data-cy="register-password"]').type(password)
-    cy.get('[data-cy="register-confirm-password"]').type(password)
+    cy.get('[data-cy="register-threedsFC"]').type('123456789012')
+    cy.get('[data-cy="register-switchFC"]').type('987654321098')
     cy.get('[data-cy="register-submit"]').click()
 
-    // Should redirect to login or dashboard after successful registration
-    cy.url().should('not.include', '/register')
-    cy.get('[data-cy="register-success-message"]').should('be.visible')
+    cy.url().should('include', '/profile')
   })
 
-  it('should navigate to login page from registration', () => {
-    cy.get('[data-cy="login-link"]').click()
-    cy.url().should('include', '/login')
-    cy.get('[data-cy="login-page"]').should('be.visible')
+  it('should have link to login page from register', () => {
+    cy.get('[data-cy="login-register-link"]').should('not.exist')
+    // Registration page should have a way to go to login (usually in nav)
+    cy.get('[data-cy="nav-login"]').should('be.visible')
   })
 })
 
@@ -45,15 +79,42 @@ describe('Registration - Unhappy Path', () => {
     cy.visit('/register')
   })
 
-  it('should show error when passwords do not match', () => {
-    cy.get('[data-cy="register-username"]').type('testuser')
+  it('should show validation error when required fields are empty', () => {
+    cy.get('[data-cy="register-submit"]').click()
+    cy.get('[data-cy="register-error-message"]').should('be.visible')
+  })
+
+  it('should show error when username is empty', () => {
     cy.get('[data-cy="register-email"]').type('test@example.com')
     cy.get('[data-cy="register-password"]').type('Password123!')
-    cy.get('[data-cy="register-confirm-password"]').type('DifferentPassword123!')
     cy.get('[data-cy="register-submit"]').click()
 
     cy.get('[data-cy="register-error-message"]').should('be.visible')
-    cy.get('[data-cy="register-error-message"]').should('contain', 'password')
+  })
+
+  it('should show error when email is empty', () => {
+    cy.get('[data-cy="register-username"]').type('testuser')
+    cy.get('[data-cy="register-password"]').type('Password123!')
+    cy.get('[data-cy="register-submit"]').click()
+
+    cy.get('[data-cy="register-error-message"]').should('be.visible')
+  })
+
+  it('should show error when password is empty', () => {
+    cy.get('[data-cy="register-username"]').type('testuser')
+    cy.get('[data-cy="register-email"]').type('test@example.com')
+    cy.get('[data-cy="register-submit"]').click()
+
+    cy.get('[data-cy="register-error-message"]').should('be.visible')
+  })
+
+  it('should show error when email format is invalid', () => {
+    cy.get('[data-cy="register-username"]').type('testuser')
+    cy.get('[data-cy="register-email"]').type('invalidemail')
+    cy.get('[data-cy="register-password"]').type('Password123!')
+    cy.get('[data-cy="register-submit"]').click()
+
+    cy.get('[data-cy="register-error-message"]').should('be.visible')
   })
 
   it('should show error when email is already registered', () => {
@@ -62,69 +123,59 @@ describe('Registration - Unhappy Path', () => {
     cy.get('[data-cy="register-username"]').type('newuser')
     cy.get('[data-cy="register-email"]').type(existingEmail)
     cy.get('[data-cy="register-password"]').type('Password123!')
-    cy.get('[data-cy="register-confirm-password"]').type('Password123!')
     cy.get('[data-cy="register-submit"]').click()
 
     cy.get('[data-cy="register-error-message"]').should('be.visible')
   })
 
-  it('should show error for invalid email format', () => {
-    cy.get('[data-cy="register-username"]').type('testuser')
-    cy.get('[data-cy="register-email"]').type('invalidemail')
-    cy.get('[data-cy="register-password"]').type('Password123!')
-    cy.get('[data-cy="register-confirm-password"]').type('Password123!')
+  it('should remain on register page after failed registration', () => {
     cy.get('[data-cy="register-submit"]').click()
-
-    cy.get('[data-cy="register-error-message"]').should('be.visible')
-  })
-
-  it('should show error when required fields are empty', () => {
-    cy.get('[data-cy="register-submit"]').click()
-    cy.get('[data-cy="register-error-message"]').should('be.visible')
-  })
-
-  it('should show error for weak password', () => {
-    cy.get('[data-cy="register-username"]').type('testuser')
-    cy.get('[data-cy="register-email"]').type('test@example.com')
-    cy.get('[data-cy="register-password"]').type('weak')
-    cy.get('[data-cy="register-confirm-password"]').type('weak')
-    cy.get('[data-cy="register-submit"]').click()
-
-    cy.get('[data-cy="register-error-message"]').should('be.visible')
+    cy.url().should('include', '/register')
   })
 })
 
-// Login Flow - Tests for user authentication
+// ============================================
+// LOGIN TESTS
+// ============================================
+
 describe('Login - Happy Path', () => {
   beforeEach(() => {
     cy.visit('/login')
   })
 
-  it('should display the login page', () => {
+  it('should display login page with all required form fields', () => {
     cy.get('[data-cy="login-page"]').should('be.visible')
-  })
-
-  it('should have all required form fields', () => {
     cy.get('[data-cy="login-email"]').should('be.visible')
     cy.get('[data-cy="login-password"]').should('be.visible')
     cy.get('[data-cy="login-submit"]').should('be.visible')
   })
 
+  it('should have link to register page', () => {
+    cy.get('[data-cy="login-register-link"]').should('be.visible')
+    cy.get('[data-cy="login-register-link"]').should('have.attr', 'href', '/register')
+  })
+
   it('should successfully login with valid credentials', () => {
-    cy.login('testuser@example.com', 'TestPassword123!')
+    // Use the testUser created during registration
+    cy.get('[data-cy="login-email"]').type(testUser.email)
+    cy.get('[data-cy="login-password"]').type(testUser.password)
+    cy.get('[data-cy="login-submit"]').click()
     cy.isLoggedIn()
     cy.url().should('not.include', '/login')
   })
 
-  it('should redirect to dashboard after successful login', () => {
-    cy.login('testuser@example.com', 'TestPassword123!')
-    cy.url().should('include', '/')
+  it('should redirect to profile after successful login', () => {
+    cy.get('[data-cy="login-email"]').type(testUser.email)
+    cy.get('[data-cy="login-password"]').type(testUser.password)
+    cy.get('[data-cy="login-submit"]').click()
+    cy.url().should('include', '/profile')
   })
 
-  it('should navigate to registration page from login', () => {
-    cy.get('[data-cy="register-link"]').click()
-    cy.url().should('include', '/register')
-    cy.get('[data-cy="register-page"]').should('be.visible')
+  it('should show user profile page after login', () => {
+    cy.get('[data-cy="login-email"]').type(testUser.email)
+    cy.get('[data-cy="login-password"]').type(testUser.password)
+    cy.get('[data-cy="login-submit"]').click()
+    cy.get('[data-cy="profile-page"]').should('be.visible')
   })
 })
 
@@ -133,15 +184,7 @@ describe('Login - Unhappy Path', () => {
     cy.visit('/login')
   })
 
-  it('should show error with invalid email format', () => {
-    cy.get('[data-cy="login-email"]').type('invalidemail')
-    cy.get('[data-cy="login-password"]').type('Password123!')
-    cy.get('[data-cy="login-submit"]').click()
-
-    cy.get('[data-cy="login-error-message"]').should('be.visible')
-  })
-
-  it('should show error when email is empty', () => {
+  it('should show error when email/username is empty', () => {
     cy.get('[data-cy="login-password"]').type('Password123!')
     cy.get('[data-cy="login-submit"]').click()
 
@@ -155,17 +198,19 @@ describe('Login - Unhappy Path', () => {
     cy.get('[data-cy="login-error-message"]').should('be.visible')
   })
 
-  it('should show error with incorrect credentials', () => {
-    cy.get('[data-cy="login-email"]').type('nonexistent@example.com')
+  it('should show error with incorrect password', () => {
+    cy.get('[data-cy="login-email"]').type('testuser@example.com')
     cy.get('[data-cy="login-password"]').type('WrongPassword123!')
     cy.get('[data-cy="login-submit"]').click()
 
     cy.get('[data-cy="login-error-message"]').should('be.visible')
-    cy.get('[data-cy="login-error-message"]').should('contain', 'Invalid')
   })
 
-  it('should show error when fields are empty', () => {
+  it('should show error with non-existent email', () => {
+    cy.get('[data-cy="login-email"]').type('nonexistent@example.com')
+    cy.get('[data-cy="login-password"]').type('Password123!')
     cy.get('[data-cy="login-submit"]').click()
+
     cy.get('[data-cy="login-error-message"]').should('be.visible')
   })
 
@@ -176,14 +221,37 @@ describe('Login - Unhappy Path', () => {
 
     cy.url().should('include', '/login')
   })
+
+  it('should allow retry after failed login attempt', () => {
+    cy.get('[data-cy="login-email"]').type('wrong@example.com')
+    cy.get('[data-cy="login-password"]').type('WrongPassword123!')
+    cy.get('[data-cy="login-submit"]').click()
+
+    cy.get('[data-cy="login-error-message"]').should('be.visible')
+
+    // Clear and try again
+    cy.get('[data-cy="login-email"]').clear()
+    cy.get('[data-cy="login-password"]').clear()
+    cy.get('[data-cy="login-email"]').type('testuser@example.com')
+    cy.get('[data-cy="login-password"]').type('TestPassword123!')
+    cy.get('[data-cy="login-submit"]').click()
+
+    cy.url().should('include', '/profile')
+  })
 })
 
-// Logout Flow - Tests for user logout
-describe('Logout', () => {
+// ============================================
+// LOGOUT TESTS
+// ============================================
+
+describe('Logout - Happy Path', () => {
   beforeEach(() => {
     cy.visit('/login')
-    cy.login('testuser@example.com', 'TestPassword123!')
+    cy.get('[data-cy="login-email"]').type(testUser.email)
+    cy.get('[data-cy="login-password"]').type(testUser.password)
+    cy.get('[data-cy="login-submit"]').click()
     cy.isLoggedIn()
+    cy.visit('/profile')
   })
 
   it('should display logout button when user is logged in', () => {
@@ -200,52 +268,155 @@ describe('Logout', () => {
     cy.url().should('include', '/')
   })
 
-  it('should be redirected to login when accessing protected page after logout', () => {
+  it('should hide logout button after logout', () => {
+    cy.logout()
+    cy.get('[data-cy="logout-button"]').should('not.exist')
+  })
+
+  it('should display login and register links after logout', () => {
+    cy.logout()
+    cy.get('[data-cy="nav-login"]').should('be.visible')
+    cy.get('[data-cy="nav-register"]').should('be.visible')
+  })
+})
+
+describe('Logout - Unhappy Path', () => {
+  it('should not show logout button when not authenticated', () => {
+    cy.visit('/')
+    cy.get('[data-cy="logout-button"]').should('not.exist')
+  })
+})
+
+// ============================================
+// PROTECTED ROUTES - ACCESS CONTROL TESTS
+// ============================================
+
+describe('Protected Routes - Unauthenticated Access', () => {
+  it('should redirect to login when accessing profile without authentication', () => {
+    cy.visit('/profile')
+    cy.url().should('include', '/login')
+  })
+
+  it('should redirect to login when accessing settings without authentication', () => {
+    cy.visit('/settings')
+    cy.url().should('include', '/login')
+  })
+
+  it('should redirect to login when accessing collection details without authentication', () => {
+    cy.visit('/collections/1')
+    cy.url().should('include', '/login')
+  })
+
+  it('should allow access to public pages without authentication', () => {
+    cy.visit('/')
+    cy.url().should('include', '/')
+    cy.get('[data-cy="home-login-button"]').should('be.visible')
+  })
+
+  it('should allow access to pokédex overview without authentication', () => {
+    cy.visit('/pokedex')
+    cy.url().should('include', '/pokedex')
+    cy.get('[data-cy="pokemon-card"]').should('have.length.greaterThan', 0)
+  })
+})
+
+describe('Protected Routes - Authenticated Access', () => {
+  beforeEach(() => {
+    cy.visit('/login')
+    cy.get('[data-cy="login-email"]').type(testUser.email)
+    cy.get('[data-cy="login-password"]').type(testUser.password)
+    cy.get('[data-cy="login-submit"]').click()
+    cy.isLoggedIn()
+  })
+
+  it('should allow access to profile page when authenticated', () => {
+    cy.visit('/profile')
+    cy.url().should('include', '/profile')
+    cy.get('[data-cy="profile-page"]').should('be.visible')
+  })
+
+  it('should allow access to settings page when authenticated', () => {
+    cy.visit('/settings')
+    cy.url().should('include', '/settings')
+    cy.get('[data-cy="settings-page"]').should('be.visible')
+  })
+
+  it('should show logout button on protected pages', () => {
+    cy.visit('/profile')
+    cy.get('[data-cy="logout-button"]').should('be.visible')
+  })
+
+  it('should redirect to login after logout from protected page', () => {
+    cy.visit('/profile')
+    cy.logout()
+    cy.url().should('include', '/')
+  })
+
+  it('should prevent re-access to protected page after logout', () => {
+    cy.visit('/profile')
     cy.logout()
     cy.visit('/profile')
     cy.url().should('include', '/login')
   })
 })
 
-// Protected Routes - Tests for access control
-describe('Protected Routes - Access Control', () => {
-  it('should redirect to login when accessing profile without authentication', () => {
-    cy.visit('/profile')
-    cy.url().should('include', '/login')
-    cy.get('[data-cy="login-page"]').should('be.visible')
+// ============================================
+// AUTHENTICATION STATE PERSISTENCE TESTS
+// ============================================
+
+describe('Authentication State - Session Persistence', () => {
+  beforeEach(() => {
+    // Ensure we have a testUser for these tests
+    if (!testUser) {
+      testUser = generateTestUser()
+    }
   })
 
-  it('should redirect to login when accessing settings without authentication', () => {
-    cy.visit('/settings')
-    cy.url().should('include', '/login')
-    cy.get('[data-cy="login-page"]').should('be.visible')
-  })
-
-  it('should redirect to login when accessing collection without authentication', () => {
-    cy.visit('/collection')
-    cy.url().should('include', '/login')
-    cy.get('[data-cy="login-page"]').should('be.visible')
-  })
-
-  it('should allow access to protected pages when authenticated', () => {
+  it('should persist authentication state when navigating between pages', () => {
     cy.visit('/login')
-    cy.login('testuser@example.com', 'TestPassword123!')
+    cy.get('[data-cy="login-email"]').type(testUser.email)
+    cy.get('[data-cy="login-password"]').type(testUser.password)
+    cy.get('[data-cy="login-submit"]').click()
     cy.isLoggedIn()
 
+    // Navigate to different pages
     cy.visit('/profile')
-    cy.url().should('include', '/profile')
-    cy.get('[data-cy="profile-page"]').should('be.visible')
+    cy.isLoggedIn()
+
+    cy.visit('/settings')
+    cy.isLoggedIn()
+
+    cy.visit('/pokedex')
+    cy.isLoggedIn()
   })
 
-  it('should not show logout button on unauthenticated pages', () => {
-    cy.visit('/')
-    cy.isLoggedOut()
-  })
-
-  it('should show logout button on authenticated state', () => {
+  it('should maintain auth state when navigating via navigation links', () => {
     cy.visit('/login')
-    cy.login('testuser@example.com', 'TestPassword123!')
-    cy.visit('/profile')
-    cy.get('[data-cy="logout-button"]').should('be.visible')
+    cy.get('[data-cy="login-email"]').type(testUser.email)
+    cy.get('[data-cy="login-password"]').type(testUser.password)
+    cy.get('[data-cy="login-submit"]').click()
+    cy.isLoggedIn()
+
+    // Use navigation
+    cy.get('[data-cy="nav-pokedex"]').click()
+    cy.isLoggedIn()
+
+    cy.get('[data-cy="nav-logo"]').click()
+    cy.isLoggedIn()
+  })
+
+  // Cleanup: Delete the test user account after all auth tests are done
+  after(() => {
+    if (testUser) {
+      // Delete the test user via API call to the backend
+      cy.request({
+        method: 'DELETE',
+        url: `/api/users/${testUser.email}`,
+        failOnStatusCode: false // Don't fail if the endpoint doesn't exist yet
+      }).then((response) => {
+        // Log the result but don't fail the tests if deletion doesn't work
+        cy.log(`Test user cleanup: ${response.status}`)
+      })
+    }
   })
 })

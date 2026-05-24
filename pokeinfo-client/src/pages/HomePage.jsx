@@ -20,20 +20,20 @@ export default function HomePage() {
 
                 <div className="cta-section">
                     {isAuthenticated ? (
-                        <Link to="/pokedex" className="cta-button primary">
+                        <Link to="/pokedex" className="cta-button primary" data-cy="home-explore-pokedex">
                             Explore Pokédex
                         </Link>
                     ) : (
                         <>
                             <div className="cta-buttons-group">
-                                <Link to="/login" className="cta-button primary">
+                                <Link to="/login" className="cta-button primary" data-cy="home-login-button">
                                     Login
                                 </Link>
-                                <Link to="/register" className="cta-button secondary">
+                                <Link to="/register" className="cta-button secondary" data-cy="home-register-button">
                                     Register
                                 </Link>
                             </div>
-                            <Link to="/pokedex" className="explore-link">
+                            <Link to="/pokedex" className="explore-link" data-cy="home-explore-link">
                                 Or explore the Pokédex
                             </Link>
                         </>

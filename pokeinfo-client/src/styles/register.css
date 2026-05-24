@@ -80,6 +80,16 @@ body {
     transition: border-color 0.3s, box-shadow 0.3s;
 }
 
+.form-group input.input-error {
+    border-color: var(--primary-red);
+    background-color: rgba(239, 68, 68, 0.05);
+}
+
+.form-group input.input-error:focus {
+    border-color: var(--primary-red);
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+}
+
 .form-group input::placeholder {
     color: var(--text-secondary);
 }
@@ -131,5 +141,13 @@ body {
     border: 1px solid var(--error-red);
     font-size: 14px;
     margin-top: 10px;
+}
+
+.field-error-message {
+    display: block;
+    color: var(--primary-red);
+    font-size: 12px;
+    margin-top: 4px;
+    font-weight: 500;
 }
 
