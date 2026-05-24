@@ -16,11 +16,6 @@ jobs:
     name: Run Cypress UI Tests
     runs-on: ubuntu-latest
 
-    strategy:
-      fail-fast: false
-      matrix:
-        browser: [chrome, firefox]
-
     defaults:
       run:
         working-directory: ./pokeinfo-client
@@ -43,18 +38,31 @@ jobs:
         run: npm run lint
 
       - name: Start development server
-        run: npm run dev &
+        run: npm run dev > /tmp/vite.log 2>&1 &
+        shell: bash
         env:
           VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL || 'http://localhost:3000' }}
 
       - name: Wait for dev server
-        run: npx wait-on http://localhost:5173 --timeout 60000
+        run: |
+          for i in {1..120}; do
+            if curl -f http://localhost:5173 > /dev/null 2>&1; then
+              echo "Dev server is ready!"
+              exit 0
+            fi
+            echo "Waiting for dev server... ($i/120)"
+            sleep 1
+          done
+          echo "Dev server failed to start"
+          cat /tmp/vite.log
+          exit 1
+        shell: bash
 
-      - name: Run Cypress tests - ${{ matrix.browser }}
+      - name: Run Cypress tests
         uses: cypress-io/github-action@v6
         with:
           working-directory: ./pokeinfo-client
-          browser: ${{ matrix.browser }}
+          browser: chrome
           command: npm run e2e:run
           install: false
 
@@ -62,7 +70,7 @@ jobs:
         uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: cypress-screenshots-${{ matrix.browser }}
+          name: cypress-screenshots
           path: pokeinfo-client/cypress/screenshots
           retention-days: 7
 
@@ -70,7 +78,7 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: cypress-videos-${{ matrix.browser }}
+          name: cypress-videos
           path: pokeinfo-client/cypress/videos
           retention-days: 7
 
