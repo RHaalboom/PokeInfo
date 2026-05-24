@@ -3,7 +3,7 @@ using PokeInfo.Entities;
 
 namespace PokeInfo.Data;
 
-public class PokeInfoDbContext : DbContext
+public class PokeInfoDbContext : DbContext, IPokeInfoDbContext
 {
     public PokeInfoDbContext(DbContextOptions<PokeInfoDbContext> options)
         : base(options)
@@ -12,6 +12,8 @@ public class PokeInfoDbContext : DbContext
 
     public DbSet<User> Users => Set<User>();
     public DbSet<Role> Roles => Set<Role>();
+    public DbSet<Collection> Collections => Set<Collection>();
+    public DbSet<CollectionPokemon> CollectionPokemons => Set<CollectionPokemon>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -30,5 +32,17 @@ public class PokeInfoDbContext : DbContext
             .WithMany(r => r.Users)
             .HasForeignKey(u => u.RoleId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<Collection>()
+            .HasOne(c => c.User)
+            .WithMany(u => u.Collections)
+            .HasForeignKey(c => c.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<CollectionPokemon>()
+            .HasOne(cp => cp.Collection)
+            .WithMany(c => c.CollectionPokemons)
+            .HasForeignKey(cp => cp.CollectionId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

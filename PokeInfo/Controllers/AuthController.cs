@@ -13,11 +13,11 @@ namespace PokeInfo.Controllers;
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
 {
-    private readonly PokeInfoDbContext _context;
+    private readonly IPokeInfoDbContext _context;
     private readonly PasswordHasher<User> _passwordHasher;
     private readonly JwtService _jwtService;
 
-    public AuthController(PokeInfoDbContext context, JwtService jwtService)
+    public AuthController(IPokeInfoDbContext context, JwtService jwtService)
     {
         _context = context;
         _passwordHasher = new PasswordHasher<User>();
@@ -92,6 +92,11 @@ public class AuthController : ControllerBase
                 Id = user.Id,
                 Username = user.Username,
                 Email = user.Email,
+                DisplayName = user.DisplayName,
+                ProfilePictureUrl = user.ProfilePictureUrl,
+                ThreedsFC = user.ThreedsFC,
+                SwitchFC = user.SwitchFC,
+                ShowRankings = user.RoleId == RoleService.RankedUserRoleId,
                 RoleName = user.Role.Name
             }
         };
@@ -159,5 +164,183 @@ public class AuthController : ControllerBase
     {
         var roles = await _context.Roles.ToListAsync();
         return Ok(roles);
+    }
+
+    [HttpPut("profile")]
+    [Authorize]
+    public async Task<IActionResult> UpdateProfile(UpdateProfileDto request)
+    {
+        var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+        if (!int.TryParse(userIdClaim?.Value, out var userId))
+        {
+            return Unauthorized();
+        }
+
+        var user = await _context.Users.FindAsync(userId);
+        if (user == null)
+        {
+            return NotFound(new { message = "User not found." });
+        }
+
+        if (!string.IsNullOrWhiteSpace(request.DisplayName) && request.DisplayName != user.DisplayName)
+        {
+            var displayNameTaken = await _context.Users.AnyAsync(u => u.DisplayName == request.DisplayName);
+            if (displayNameTaken)
+            {
+                return BadRequest(new { message = "This display name is already in use." });
+            }
+            user.DisplayName = request.DisplayName;
+        }
+
+        if (!string.IsNullOrWhiteSpace(request.ProfilePictureUrl))
+        {
+            user.ProfilePictureUrl = request.ProfilePictureUrl;
+        }
+
+        if (!string.IsNullOrWhiteSpace(request.ThreedsFC))
+        {
+            if (request.ThreedsFC.Length != 12)
+            {
+                return BadRequest(new { message = "3DS Friend Code must be exactly 12 digits." });
+            }
+            user.ThreedsFC = request.ThreedsFC;
+        }
+
+        if (!string.IsNullOrWhiteSpace(request.SwitchFC))
+        {
+            if (request.SwitchFC.Length != 12)
+            {
+                return BadRequest(new { message = "Switch Friend Code must be exactly 12 digits." });
+            }
+            user.SwitchFC = request.SwitchFC;
+        }
+
+        if (request.ShowRankings.HasValue)
+        {
+            user.RoleId = request.ShowRankings.Value ? RoleService.RankedUserRoleId : RoleService.UserRoleId;
+        }
+
+        _context.Users.Update(user);
+        await _context.SaveChangesAsync();
+
+        user = await _context.Users.Include(u => u.Role).FirstOrDefaultAsync(u => u.Id == userId);
+
+        var response = new UserResponseDto
+        {
+            Id = user.Id,
+            Username = user.Username,
+            Email = user.Email,
+            DisplayName = user.DisplayName,
+            ProfilePictureUrl = user.ProfilePictureUrl,
+            ThreedsFC = user.ThreedsFC,
+            SwitchFC = user.SwitchFC,
+            ShowRankings = user.RoleId == RoleService.RankedUserRoleId,
+            RoleName = user.Role?.Name ?? "User"
+        };
+
+        return Ok(response);
+    }
+
+    [HttpPut("change-password")]
+    [Authorize]
+    public async Task<IActionResult> ChangePassword(ChangePasswordDto request)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        if (request.NewPassword != request.ConfirmPassword)
+        {
+            return BadRequest(new { message = "New passwords do not match." });
+        }
+
+        var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+        if (!int.TryParse(userIdClaim?.Value, out var userId))
+        {
+            return Unauthorized();
+        }
+
+        var user = await _context.Users.FindAsync(userId);
+        if (user == null)
+        {
+            return NotFound(new { message = "User not found." });
+        }
+
+        var verifyResult = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, request.CurrentPassword);
+        if (verifyResult == PasswordVerificationResult.Failed)
+        {
+            return BadRequest(new { message = "Current password is incorrect." });
+        }
+
+        user.PasswordHash = _passwordHasher.HashPassword(user, request.NewPassword);
+        _context.Users.Update(user);
+        await _context.SaveChangesAsync();
+
+        return Ok(new { message = "Password successfully changed." });
+    }
+
+    [HttpPut("update-account")]
+    [Authorize]
+    public async Task<IActionResult> UpdateAccount(UpdateAccountDto request)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+        if (!int.TryParse(userIdClaim?.Value, out var userId))
+        {
+            return Unauthorized();
+        }
+
+        var user = await _context.Users.FindAsync(userId);
+        if (user == null)
+        {
+            return NotFound(new { message = "User not found." });
+        }
+
+        // Verify current password if updating sensitive fields
+        if (!string.IsNullOrWhiteSpace(request.Username) || !string.IsNullOrWhiteSpace(request.Email))
+        {
+            if (string.IsNullOrWhiteSpace(request.CurrentPassword))
+            {
+                return BadRequest(new { message = "Current password is required to change username or email." });
+            }
+
+            var verifyResult = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, request.CurrentPassword);
+            if (verifyResult == PasswordVerificationResult.Failed)
+            {
+                return BadRequest(new { message = "Current password is incorrect." });
+            }
+        }
+
+        // Check if new username is already in use
+        if (!string.IsNullOrWhiteSpace(request.Username) && request.Username != user.Username)
+        {
+            var usernameTaken = await _context.Users.AnyAsync(u => u.Username == request.Username);
+            if (usernameTaken)
+            {
+                return BadRequest(new { message = "This username is already in use." });
+            }
+            user.Username = request.Username;
+        }
+
+        // Check if new email is already in use
+        if (!string.IsNullOrWhiteSpace(request.Email) && request.Email != user.Email)
+        {
+            var emailTaken = await _context.Users.AnyAsync(u => u.Email == request.Email);
+            if (emailTaken)
+            {
+                return BadRequest(new { message = "This email address is already in use." });
+            }
+            user.Email = request.Email;
+        }
+
+        _context.Users.Update(user);
+        await _context.SaveChangesAsync();
+
+        return Ok(new { message = "Account updated successfully." });
     }
 }

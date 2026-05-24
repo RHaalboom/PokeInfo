@@ -2,15 +2,34 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getCurrentUser, logout as logoutService, isAuthenticated, getAllUsers } from "../services/authService";
 import { useAuth } from "../hooks/useAuth";
+import CollectionsSection from "../components/CollectionsSection";
+import CircularProgress from "../components/CircularProgress";
+import { calculatePokedexProgress } from "../utils/pokedexProgress";
+import { getCollections } from "../services/collectionService";
+import "../styles/colorPalette.css";
 import "../styles/profile.css";
+
+const POKEDEX_LIST = ['KANTO', 'JOHTO', 'HOENN', 'SINNOH', 'UNOVA', 'KALOS', 'ALOLA', 'GALAR', 'HISUI', 'PALDEA'];
 
 export default function ProfilePage() {
     const [user, setUser] = useState(null);
     const [users, setUsers] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [pokedexProgress, setPokedexProgress] = useState({});
     const navigate = useNavigate();
     const { logout } = useAuth();
+
+    // Helper function to format friend codes with dashes
+    const formatFriendCode = (code) => {
+        if (!code) return "";
+        // Remove any existing dashes and format as XXXX-XXXX-XXXX
+        const cleaned = code.replace(/\D/g, "").slice(0, 12);
+        if (cleaned.length === 12) {
+            return `${cleaned.slice(0, 4)}-${cleaned.slice(4, 8)}-${cleaned.slice(8, 12)}`;
+        }
+        return cleaned;
+    };
 
     useEffect(() => {
         if (!isAuthenticated()) {
@@ -21,6 +40,9 @@ export default function ProfilePage() {
         const currentUser = getCurrentUser();
         setUser(currentUser);
 
+        // Fetch collections for Pokédex progress
+        fetchCollectionsAndProgress();
+
         // Fetch all users if moderator
         if (currentUser?.roleName === "Moderator") {
             fetchUsers();
@@ -28,6 +50,23 @@ export default function ProfilePage() {
             setLoading(false);
         }
     }, [navigate]);
+
+    async function fetchCollectionsAndProgress() {
+        try {
+            const data = await getCollections();
+            const progress = calculatePokedexProgress(data);
+            setPokedexProgress(progress);
+        } catch (err) {
+            console.error("Error fetching collections:", err);
+            // If there's an error, just set empty progress
+            setPokedexProgress(
+                POKEDEX_LIST.reduce((acc, pokedex) => {
+                    acc[pokedex] = 0;
+                    return acc;
+                }, {})
+            );
+        }
+    }
 
     async function fetchUsers() {
         try {
@@ -51,22 +90,52 @@ export default function ProfilePage() {
     }
 
     return (
-        <main className="profile-page">
+        <main className="profile-page" data-cy="profile-page">
             <section className="profile-header">
                 <div className="profile-info">
-                    <h1>Welcome, {user?.username}!</h1>
-                    <p>Email: {user?.email}</p>
-                    <p>Role: {user?.roleName}</p>
+                    {user?.profilePictureUrl && (
+                        <img 
+                            src={user.profilePictureUrl} 
+                            alt={user.displayName || user.username}
+                            className="profile-picture"
+                        />
+                    )}
+                    <div className="profile-text">
+                        <h1>{user?.displayName || user?.username}</h1>
+                        <div className="profile-friend-codes">
+                            <p className="profile-fc">3DS FC: {formatFriendCode(user?.threedsFC) || "XXXX-XXXX-XXXX"}</p>
+                            <p className="profile-fc">Switch FC: {formatFriendCode(user?.switchFC) || "XXXX-XXXX-XXXX"}</p>
+                        </div>
+                    </div>
                 </div>
-                <button className="logout-button" onClick={handleLogout}>
-                    Logout
-                </button>
+                <div className="profile-actions">
+                    <button 
+                        className="settings-button" 
+                        onClick={() => navigate("/settings")}
+                    >
+                        ⚙️ Settings
+                    </button>
+                    <button className="logout-button" data-cy="logout-button" onClick={handleLogout}>
+                        Logout
+                    </button>
+                </div>
             </section>
 
-            {user?.roleName === "RankedUser" && (
+            {/* Rankings Section - shown if user has ShowRankings enabled */}
+            {user?.showRankings && (
                 <section className="rankings-section">
-                    <h2>Your Rankings</h2>
-                    <p>Ranking data would be displayed here</p>
+                    <div className="rankings-header">
+                        <h2>Ranking Information</h2>
+                    </div>
+                    <div className="rankings-content">
+                        {POKEDEX_LIST.map((pokedex) => (
+                            <CircularProgress
+                                key={pokedex}
+                                percentage={pokedexProgress[pokedex] || 0}
+                                pokedexName={pokedex}
+                            />
+                        ))}
+                    </div>
                 </section>
             )}
 
@@ -98,6 +167,8 @@ export default function ProfilePage() {
                     )}
                 </section>
             )}
+
+            <CollectionsSection />
         </main>
     );
 }

@@ -1,47 +1,52 @@
-﻿import { Routes, Route, Link, useNavigate } from "react-router-dom";
+﻿import { Routes, Route, Link } from "react-router-dom";
 import HomePage from "./pages/HomePage";
+import PokédexPage from "./pages/PokédexPage";
 import RegisterPage from "./pages/RegisterPage";
 import LoginPage from "./pages/LoginPage";
 import ProfilePage from "./pages/ProfilePage";
+import SettingsPage from "./pages/SettingsPage";
+import CollectionDetailsPage from "./pages/CollectionDetailsPage";
 import { useAuth } from "./hooks/useAuth";
-import { logout as logoutService } from "./services/authService";
+import PokeInfoBrand from "./components/PokeInfoBrand";
+import UserMenu from "./components/UserMenu";
+import pokeInfoLogo from "./img/Poké-info_logo.png";
+import "./styles/pokeInfoBrand.css";
 import "./styles/navigation.css";
 
 function App() {
     const { isAuthenticated, logout } = useAuth();
-    const navigate = useNavigate();
-
-    function handleLogout() {
-        logoutService();
-        logout();
-        navigate("/");
-    }
 
     return (
         <>
-            <nav className="main-nav">
-                <Link to="/">Home</Link>
+            <nav className="main-nav" data-cy="main-nav">
+                <div className="nav-brand">
+                    <Link to="/" className="nav-logo" data-cy="nav-logo">
+                        <img src={pokeInfoLogo} alt="Poké-info" className="logo-img" />
+                        <PokeInfoBrand />
+                    </Link>
+                    <Link to="/pokedex" className="nav-pokedex" data-cy="nav-pokedex">Pokédex</Link>
+                </div>
 
-                {isAuthenticated ? (
-                    <>
-                        <Link to="/profile">Profile</Link>
-                        <button onClick={handleLogout} className="logout-nav-btn">
-                            Logout
-                        </button>
-                    </>
-                ) : (
-                    <>
-                        <Link to="/login">Login</Link>
-                        <Link to="/register">Register</Link>
-                    </>
-                )}
+                <div className="nav-links">
+                    {isAuthenticated ? (
+                        <UserMenu onLogout={logout} />
+                    ) : (
+                        <>
+                            <Link to="/login" data-cy="nav-login">Login</Link>
+                            <Link to="/register" data-cy="nav-register">Register</Link>
+                        </>
+                    )}
+                </div>
             </nav>
 
             <Routes>
                 <Route path="/" element={<HomePage />} />
+                <Route path="/pokedex" element={<PokédexPage />} />
                 <Route path="/register" element={<RegisterPage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
+                <Route path="/settings" element={<SettingsPage />} />
+                <Route path="/collections/:id" element={<CollectionDetailsPage />} />
             </Routes>
         </>
     );

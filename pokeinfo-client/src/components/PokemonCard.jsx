@@ -1,3 +1,4 @@
+import "../styles/colorPalette.css";
 import "../styles/pokemonCard.css";
 
 export default function PokemonCard({ pokemon, onSelect }) {
@@ -5,7 +6,7 @@ export default function PokemonCard({ pokemon, onSelect }) {
     const formattedId = `#${pokemon.id.toString().padStart(4, '0')}`;
 
     return (
-        <article className="pokemon-card" onClick={() => onSelect(pokemon.name)}>
+        <article className="pokemon-card" onClick={() => onSelect(pokemon.name)} data-cy="pokemon-card">
             <h2>{capitalizedName}</h2>
             <img src={pokemon.imageUrl} alt={pokemon.name} />
             <p>{formattedId}</p>

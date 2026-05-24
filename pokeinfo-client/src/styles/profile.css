@@ -1,36 +1,92 @@
 .profile-page {
     min-height: 100vh;
-    background: #f5f5f5;
+    background: var(--dark-slate);
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
     padding: 20px;
+    padding-top: calc(20px + 56px);
 }
 
 .profile-header {
-    background: white;
+    background: var(--slate);
     border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     padding: 30px;
     margin-bottom: 30px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    border: 1px solid var(--border);
 }
 
-.profile-info h1 {
+.profile-info {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex: 1;
+}
+
+.profile-picture {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--primary-red);
+    flex-shrink: 0;
+}
+
+.profile-text {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    text-align: left;
+}
+
+.profile-text h1 {
     font-size: 28px;
-    color: #333;
-    margin-bottom: 12px;
+    color: var(--text-primary);
+    margin: 0;
 }
 
-.profile-info p {
+.profile-username {
     font-size: 14px;
-    color: #666;
-    margin: 8px 0;
+    color: var(--text-secondary);
+    margin: 0;
 }
 
+.profile-friend-codes {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 6px;
+}
+
+.profile-fc {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin: 0;
+    font-family: 'Monaco', 'Courier New', monospace;
+    background: var(--soft-dark);
+    padding: 4px 8px;
+    border-radius: 3px;
+    display: inline-block;
+}
+
+.profile-role {
+    font-size: 13px;
+    color: var(--primary-red);
+    font-weight: 600;
+    margin: 4px 0 0 0;
+}
+
+.profile-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.settings-button,
 .logout-button {
     padding: 10px 20px;
-    background: #667eea;
+    background: var(--primary-red);
     color: white;
     border: none;
     border-radius: 4px;
@@ -40,23 +96,51 @@
     transition: background 0.3s;
 }
 
+.settings-button:hover,
 .logout-button:hover {
-    background: #764ba2;
+    background: var(--deep-red);
 }
 
-.rankings-section,
-.moderator-section {
-    background: white;
+.rankings-section {
+    background: var(--slate);
     border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     padding: 30px;
     margin-bottom: 30px;
+    border: 1px solid var(--border);
+}
+
+.rankings-header {
+    margin-bottom: 20px;
+}
+
+.rankings-header h2 {
+    font-size: 22px;
+    color: var(--text-primary);
+    margin: 0;
+    text-align: left;
+}
+
+.rankings-content {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.moderator-section {
+    background: var(--slate);
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    padding: 30px;
+    margin-bottom: 30px;
+    border: 1px solid var(--border);
 }
 
 .rankings-section h2,
 .moderator-section h2 {
     font-size: 22px;
-    color: #333;
+    color: var(--text-primary);
     margin-bottom: 20px;
 }
 
@@ -66,32 +150,32 @@
 }
 
 .users-table thead {
-    background: #f9f9f9;
-    border-bottom: 2px solid #ddd;
+    background: var(--soft-dark);
+    border-bottom: 2px solid var(--border);
 }
 
 .users-table th {
     padding: 12px;
     text-align: left;
     font-weight: 600;
-    color: #333;
+    color: var(--text-primary);
     font-size: 14px;
 }
 
 .users-table td {
     padding: 12px;
-    border-bottom: 1px solid #eee;
-    color: #666;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-secondary);
     font-size: 14px;
 }
 
 .users-table tbody tr:hover {
-    background: #f9f9f9;
+    background: var(--soft-dark);
 }
 
 .error-message {
-    background-color: #fee;
-    color: #c00;
+    background-color: rgba(239, 68, 68, 0.1);
+    color: var(--error-red);
     padding: 12px;
     border-radius: 4px;
     font-size: 14px;
@@ -105,4 +189,167 @@
     min-height: 100vh;
     font-size: 18px;
     color: #666;
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+    .profile-page {
+        padding: 16px;
+        padding-top: calc(16px + 56px);
+    }
+
+    .profile-header {
+        padding: 20px;
+        margin-bottom: 20px;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .profile-info {
+        gap: 16px;
+        flex-direction: column;
+        text-align: center;
+        width: 100%;
+    }
+
+    .profile-picture {
+        width: 100px;
+        height: 100px;
+    }
+
+    .profile-text {
+        gap: 6px;
+        text-align: center;
+        width: 100%;
+    }
+
+    .profile-text h1 {
+        font-size: 22px;
+    }
+
+    .profile-actions {
+        width: 100%;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .settings-button,
+    .logout-button {
+        flex: 1;
+        min-width: 120px;
+        padding: 8px 16px;
+        font-size: 13px;
+    }
+
+    .rankings-section,
+    .moderator-section {
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    .rankings-header h2,
+    .moderator-section h2 {
+        font-size: 18px;
+        margin-bottom: 16px;
+    }
+
+    .rankings-content {
+        gap: 12px;
+        justify-content: center;
+    }
+
+    .users-table th,
+    .users-table td {
+        padding: 10px 8px;
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-page {
+        padding: 12px;
+        padding-top: calc(12px + 56px);
+    }
+
+    .profile-header {
+        padding: 16px;
+        margin-bottom: 16px;
+    }
+
+    .profile-picture {
+        width: 80px;
+        height: 80px;
+    }
+
+    .profile-text h1 {
+        font-size: 18px;
+    }
+
+    .profile-username {
+        font-size: 12px;
+    }
+
+    .profile-fc {
+        font-size: 11px;
+        padding: 3px 6px;
+    }
+
+    .profile-role {
+        font-size: 11px;
+    }
+
+    .settings-button,
+    .logout-button {
+        padding: 6px 12px;
+        font-size: 11px;
+    }
+
+    .rankings-section,
+    .moderator-section {
+        padding: 16px;
+        margin-bottom: 16px;
+    }
+
+    .rankings-header h2,
+    .moderator-section h2 {
+        font-size: 16px;
+        margin-bottom: 12px;
+    }
+
+    .rankings-content {
+        gap: 8px;
+    }
+
+    .users-table th,
+    .users-table td {
+        padding: 8px 6px;
+        font-size: 11px;
+    }
+}
+
+@media (max-width: 360px) {
+    .profile-header {
+        padding: 12px;
+    }
+
+    .profile-picture {
+        width: 70px;
+        height: 70px;
+    }
+
+    .profile-text h1 {
+        font-size: 16px;
+    }
+
+    .profile-actions {
+        gap: 6px;
+    }
+
+    .settings-button,
+    .logout-button {
+        padding: 5px 10px;
+        font-size: 10px;
+        min-width: auto;
+    }
 }

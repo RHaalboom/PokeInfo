@@ -1,112 +1,45 @@
-﻿import { useEffect, useState } from "react";
-import { getPokemonOverview, getPokemonByName } from "../services/pokemonService";
-import PokemonCard from "../components/PokemonCard";
-import PokemonDetail from "../components/PokemonDetail";
-import "../styles/home.css";
-import "../styles/pokemonCard.css";
-import "../styles/pokemonDetail.css";
+﻿import { Link } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
+import PokeInfoBrand from "../components/PokeInfoBrand";
+import pokeInfoLogo from "../img/Poké-info_logo.png";
+import "../styles/colorPalette.css";
+import "../styles/pokeInfoBrand.css";
+import "../styles/landingPage.css";
 
 export default function HomePage() {
-    const [pokemon, setPokemon] = useState([]);
-    const [filteredPokemon, setFilteredPokemon] = useState([]);
-    const [selectedPokemon, setSelectedPokemon] = useState(null);
-    const [searchTerm, setSearchTerm] = useState("");
-    const [loading, setLoading] = useState(true);
-    const [detailLoading, setDetailLoading] = useState(false);
-    const [error, setError] = useState("");
-
-    useEffect(() => {
-        loadPokemon();
-    }, []);
-
-    useEffect(() => {
-        const filtered = pokemon.filter((p) =>
-            p.name.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-        setFilteredPokemon(filtered);
-    }, [searchTerm, pokemon]);
-
-    useEffect(() => {
-        function handleKeyDown(e) {
-            if (e.key === "Escape") {
-                setSelectedPokemon(null);
-            }
-        }
-
-        window.addEventListener("keydown", handleKeyDown);
-        return () => window.removeEventListener("keydown", handleKeyDown);
-    }, []);
-    async function loadPokemon() {
-        try {
-            setLoading(true);
-            setError("");
-            const data = await getPokemonOverview();
-            setPokemon(data);
-            setFilteredPokemon(data);
-        } catch (err) {
-            setError("Fetching Pokémon failed.");
-        } finally {
-            setLoading(false);
-        }
-    }
-
-    async function handleSelectPokemon(name) {
-        try {
-            setDetailLoading(true);
-            const details = await getPokemonByName(name);
-            setSelectedPokemon(details);
-        } catch (err) {
-            setError("Fetching details failed.");
-        } finally {
-            setDetailLoading(false);
-        }
-    }
-
-    function handleCloseDetail() {
-        setSelectedPokemon(null);
-    }
+    const { isAuthenticated } = useAuth();
 
     return (
-        <main className="home-page">
-            <section className="hero">
-                <h1>Poké-info</h1>
-                <p>
-                    A cental place for your Pokémon-information and maintaining your own collection!
-                </p>
-            </section>
+        <main className="landing-page">
+            <div className="landing-container">
+                <div className="logo-section">
+                    <img src={pokeInfoLogo} alt="Poké-info Logo" className="logo" />
+                    <h1><PokeInfoBrand /></h1>
+                    <p className="tagline">A central place for your Pokémon-information and maintaining your own collections!</p>
+                </div>
 
-            <section className="search-section">
-                <label htmlFor="pokemonSearch" className="sr-only">
-                    Search for a Pokémon
-                </label>
-                <input
-                    id="pokemonSearch"
-                    type="text"
-                    placeholder="Search..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                />
-            </section>
-
-            {loading && <p>Loading...</p>}
-            {error && <p className="error-message">{error}</p>}
-            {detailLoading && <p>Loading...</p>}
-
-            {!loading && !error && (
-                <section className="pokemon-grid">
-                    {filteredPokemon.map((pokemon) => (
-                        <PokemonCard
-                            key={pokemon.id}
-                            pokemon={pokemon}
-                            onSelect={handleSelectPokemon}
-                        />
-                    ))}
-                </section>
-            )}
-
-            {selectedPokemon && (
-                <PokemonDetail pokemon={selectedPokemon} onClose={handleCloseDetail} />
-            )}
+                <div className="cta-section">
+                    {isAuthenticated ? (
+                        <Link to="/pokedex" className="cta-button primary" data-cy="home-explore-pokedex">
+                            Explore Pokédex
+                        </Link>
+                    ) : (
+                        <>
+                            <div className="cta-buttons-group">
+                                <Link to="/login" className="cta-button primary" data-cy="home-login-button">
+                                    Login
+                                </Link>
+                                <Link to="/register" className="cta-button secondary" data-cy="home-register-button">
+                                    Register
+                                </Link>
+                            </div>
+                            <Link to="/pokedex" className="explore-link" data-cy="home-explore-link">
+                                Or explore the Pokédex
+                            </Link>
+                        </>
+                    )}
+                </div>
+            </div>
         </main>
     );
 }

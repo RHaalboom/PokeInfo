@@ -1,0 +1,13 @@
+.poke-info-brand {
+    display: inline-block;
+    font-weight: 700;
+    font-size: inherit;
+}
+
+.poke-text {
+    color: var(--primary-red);
+}
+
+.info-text {
+    color: var(--text-primary);
+}
