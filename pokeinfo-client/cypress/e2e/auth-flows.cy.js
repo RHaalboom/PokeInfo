@@ -24,6 +24,7 @@ const createdUsers = []
 
 describe('Registration - Happy Path', () => {
   beforeEach(() => {
+    cy.clearAuthState()
     cy.visit('/register')
   })
 
@@ -81,6 +82,7 @@ describe('Registration - Happy Path', () => {
 
 describe('Registration - Unhappy Path', () => {
   beforeEach(() => {
+    cy.clearAuthState()
     cy.visit('/register')
   })
 
@@ -145,6 +147,7 @@ describe('Registration - Unhappy Path', () => {
 
 describe('Login - Happy Path', () => {
   beforeEach(() => {
+    cy.clearAuthState()
     cy.visit('/login')
   })
 
@@ -181,6 +184,7 @@ describe('Login - Happy Path', () => {
 
 describe('Login - Unhappy Path', () => {
   beforeEach(() => {
+    cy.clearAuthState()
     cy.visit('/login')
   })
 
@@ -246,6 +250,7 @@ describe('Login - Unhappy Path', () => {
 
 describe('Logout - Happy Path', () => {
   beforeEach(() => {
+    cy.clearAuthState()
     cy.visit('/login')
     cy.get('[data-cy="login-email"]').type(testUser.email)
     cy.get('[data-cy="login-password"]').type(testUser.password)
@@ -416,14 +421,12 @@ describe('Authentication State - Session Persistence', () => {
 
 after(() => {
   // Delete all users created during the test run
-  createdUsers.forEach((email) => {
-    cy.request({
-      method: 'DELETE',
-      url: `/api/users/${email}`,
-      failOnStatusCode: false // Don't fail if the endpoint doesn't exist yet
-    }).then((response) => {
-      // Log the result but don't fail the tests if deletion doesn't work
-      cy.log(`Cleaned up user ${email}: ${response.status}`)
+  if (createdUsers.length > 0) {
+    cy.log(`🧹 Cleaning up ${createdUsers.length} test user(s)...`)
+    createdUsers.forEach((email) => {
+      cy.deleteUser(email)
     })
-  })
+  } else {
+    cy.log('✅ No test users to clean up')
+  }
 })

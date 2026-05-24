@@ -19,3 +19,34 @@ Cypress.Commands.add('isLoggedIn', () => {
 Cypress.Commands.add('isLoggedOut', () => {
   cy.get('[data-cy="logout-button"]').should('not.exist')
 })
+
+// Clear all auth state and local storage for test isolation
+Cypress.Commands.add('clearAuthState', () => {
+  try {
+    cy.window().then((win) => {
+      try {
+        win.localStorage.clear()
+        win.sessionStorage.clear()
+      } catch (e) {
+        cy.log('⚠️ Could not clear storage: ' + e.message)
+      }
+    })
+    cy.clearCookies()
+    cy.log('✅ Auth state cleared for test isolation')
+  } catch (e) {
+    cy.log('⚠️ Error clearing auth state: ' + e.message)
+  }
+})
+
+// Delete a user via API (for cleanup)
+Cypress.Commands.add('deleteUser', (email) => {
+  cy.request({
+    method: 'DELETE',
+    url: `/api/users/${email}`,
+    failOnStatusCode: false,
+  }).then((response) => {
+    cy.log(`🗑️ User ${email} cleanup: ${response.status}`)
+  }).catch((error) => {
+    cy.log(`⚠️ Failed to delete user ${email}: ${error.message}`)
+  })
+})

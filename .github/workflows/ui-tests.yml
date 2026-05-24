@@ -41,23 +41,32 @@ jobs:
         run: |
           npm run dev > /tmp/vite.log 2>&1 &
           echo $! > /tmp/vite.pid
+          echo "Vite PID: $(cat /tmp/vite.pid)"
         shell: bash
         env:
           VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL || 'http://localhost:3000' }}
 
       - name: Wait for dev server
         run: |
-          for i in {1..30}; do
+          echo "⏳ Waiting for dev server on port 5173..."
+          for i in {1..60}; do
             if curl -s http://localhost:5173 > /dev/null 2>&1; then
-              echo "✅ Dev server is ready!"
+              echo "✅ Dev server is ready! (attempt $i)"
               exit 0
             fi
-            echo "⏳ Waiting for dev server... ($i/120)"
+            if [ $((i % 10)) -eq 0 ]; then
+              echo "  Still waiting... ($i/60)"
+            fi
             sleep 1
           done
-          echo "❌ Dev server failed to start"
+          echo "❌ Dev server failed to start after 60 seconds"
+          echo ""
           echo "--- Vite Log Output ---"
-          cat /tmp/vite.log
+          cat /tmp/vite.log || echo "No log file found"
+          echo ""
+          echo "--- Process Information ---"
+          ps aux | grep -E '[v]ite|[n]ode' || echo "No vite/node processes found"
+          echo ""
           kill $(cat /tmp/vite.pid) 2>/dev/null || true
           exit 1
         shell: bash
@@ -65,10 +74,13 @@ jobs:
       - name: Verify dev server and dependencies
         run: |
           echo "✅ Checking if server is accessible..."
-          curl -v http://localhost:5173 || true
+          curl -v http://localhost:5173 2>&1 | head -20
           echo ""
           echo "✅ Server process status:"
-          ps aux | grep -E '[v]ite|[n]ode' || true
+          ps aux | grep -E '[v]ite|[n]ode' | grep -v grep || echo "No running processes"
+          echo ""
+          echo "✅ Checking network connections:"
+          netstat -tuln 2>/dev/null | grep 5173 || echo "Port 5173 not found in netstat"
         shell: bash
 
       - name: Run Cypress tests
@@ -86,6 +98,23 @@ jobs:
             kill $(cat /tmp/vite.pid) 2>/dev/null || true
           fi
           pkill -f "vite" || true
+        shell: bash
+
+      - name: Collect server logs on failure
+        if: failure()
+        run: |
+          echo "❌ Tests failed. Collecting debug information..."
+          echo ""
+          echo "--- Vite Server Log ---"
+          cat /tmp/vite.log 2>/dev/null || echo "No vite log found"
+          echo ""
+          echo "--- Available ports ---"
+          netstat -tuln 2>/dev/null | grep LISTEN || echo "Could not list ports"
+          echo ""
+          echo "--- System info ---"
+          echo "Node version: $(node --version)"
+          echo "NPM version: $(npm --version)"
+          echo "Vite version: $(npm ls vite 2>/dev/null | head -1)"
         shell: bash
 
       - name: Upload screenshots on failure
