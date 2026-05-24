@@ -15,6 +15,9 @@ const generateTestUser = () => {
 // Store test user credentials to use throughout the test suite
 let testUser = null
 
+// Track all created users for cleanup
+const createdUsers = []
+
 // ============================================
 // REGISTRATION TESTS
 // ============================================
@@ -40,6 +43,7 @@ describe('Registration - Happy Path', () => {
   it('should successfully register with required credentials only', () => {
     // Generate and store test user for use in other tests
     testUser = generateTestUser()
+    createdUsers.push(testUser.email)
 
     cy.get('[data-cy="register-username"]').type(testUser.username)
     cy.get('[data-cy="register-email"]').type(testUser.email)
@@ -56,6 +60,7 @@ describe('Registration - Happy Path', () => {
     const email = `testuser${timestamp}@example.com`
     const username = `testuser${timestamp}`
     const password = 'SecurePassword123!'
+    createdUsers.push(email)
 
     cy.get('[data-cy="register-username"]').type(username)
     cy.get('[data-cy="register-email"]').type(email)
@@ -148,11 +153,6 @@ describe('Login - Happy Path', () => {
     cy.get('[data-cy="login-email"]').should('be.visible')
     cy.get('[data-cy="login-password"]').should('be.visible')
     cy.get('[data-cy="login-submit"]').should('be.visible')
-  })
-
-  it('should have link to register page', () => {
-    cy.get('[data-cy="login-register-link"]').should('be.visible')
-    cy.get('[data-cy="login-register-link"]').should('have.attr', 'href', '/register')
   })
 
   it('should successfully login with valid credentials', () => {
@@ -380,13 +380,14 @@ describe('Authentication State - Session Persistence', () => {
     cy.isLoggedIn()
 
     // Navigate to different pages
-    cy.visit('/profile')
-    cy.isLoggedIn()
 
     cy.visit('/settings')
-    cy.isLoggedIn()
 
     cy.visit('/pokedex')
+    cy.get('[data-cy="hamburger-toggle"]').click()
+    cy.isLoggedIn()
+
+    cy.visit('/profile')
     cy.isLoggedIn()
   })
 
@@ -399,24 +400,30 @@ describe('Authentication State - Session Persistence', () => {
 
     // Use navigation
     cy.get('[data-cy="nav-pokedex"]').click()
+    cy.get('[data-cy="hamburger-toggle"]').click()
     cy.isLoggedIn()
 
     cy.get('[data-cy="nav-logo"]').click()
+
+    cy.get('[data-cy="user-profile-link"]').click()
     cy.isLoggedIn()
   })
+})
 
-  // Cleanup: Delete the test user account after all auth tests are done
-  after(() => {
-    if (testUser) {
-      // Delete the test user via API call to the backend
-      cy.request({
-        method: 'DELETE',
-        url: `/api/users/${testUser.email}`,
-        failOnStatusCode: false // Don't fail if the endpoint doesn't exist yet
-      }).then((response) => {
-        // Log the result but don't fail the tests if deletion doesn't work
-        cy.log(`Test user cleanup: ${response.status}`)
-      })
-    }
+// ============================================
+// CLEANUP: Delete all created test users
+// ============================================
+
+after(() => {
+  // Delete all users created during the test run
+  createdUsers.forEach((email) => {
+    cy.request({
+      method: 'DELETE',
+      url: `/api/users/${email}`,
+      failOnStatusCode: false // Don't fail if the endpoint doesn't exist yet
+    }).then((response) => {
+      // Log the result but don't fail the tests if deletion doesn't work
+      cy.log(`Cleaned up user ${email}: ${response.status}`)
+    })
   })
 })

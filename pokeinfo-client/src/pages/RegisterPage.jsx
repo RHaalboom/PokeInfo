@@ -192,7 +192,7 @@ export default function RegisterPage() {
             // Navigate to profile after everything is set up
             setTimeout(() => {
                 navigate("/profile");
-            }, 500);
+            }, 2000);
 
             setFormData({
                 username: "",
@@ -282,7 +282,7 @@ export default function RegisterPage() {
                             className={formSubmitted && fieldErrors.username ? "input-error" : ""}
                         />
                         {formSubmitted && fieldErrors.username && (
-                            <span className="field-error-message" data-cy="register-username-error">{fieldErrors.username}</span>
+                            <span className="field-error-message" data-cy="register-username-error" data-cy="register-error-message">{fieldErrors.username}</span>
                         )}
                     </div>
 
@@ -300,7 +300,7 @@ export default function RegisterPage() {
                             className={formSubmitted && fieldErrors.email ? "input-error" : ""}
                         />
                         {formSubmitted && fieldErrors.email && (
-                            <span className="field-error-message" data-cy="register-email-error">{fieldErrors.email}</span>
+                            <span className="field-error-message" data-cy="register-email-error" data-cy="register-error-message">{fieldErrors.email}</span>
                         )}
                     </div>
 
@@ -317,7 +317,7 @@ export default function RegisterPage() {
                             className={formSubmitted && fieldErrors.password ? "input-error" : ""}
                         />
                         {formSubmitted && fieldErrors.password && (
-                            <span className="field-error-message" data-cy="register-password-error">{fieldErrors.password}</span>
+                            <span className="field-error-message" data-cy="register-password-error" data-cy="register-error-message">{fieldErrors.password}</span>
                         )}
                     </div>
 

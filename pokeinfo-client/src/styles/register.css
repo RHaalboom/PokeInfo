@@ -40,6 +40,10 @@ body {
     display: none;
 }
 
+.register-card p.success-message {
+    display: block;
+}
+
 .register-form {
     display: flex;
     flex-direction: column;
