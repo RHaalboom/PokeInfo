@@ -246,7 +246,6 @@ public class JwtServiceTests
         var handler = new JwtSecurityTokenHandler();
         var parsedToken = handler.ReadJwtToken(token);
 
-        Assert.NotNull(parsedToken.ValidTo);
         Assert.True(parsedToken.ValidTo > nowBefore.AddMinutes(59)); // Should be around 60 minutes
         Assert.True(parsedToken.ValidTo < nowAfter.AddMinutes(61));
     }
