@@ -1,82 +1,359 @@
-# Cypress E2E Tests - CI/CD Troubleshooting Guide
+# Cypress E2E Tests - README
 
-## Common Issues and Solutions
+## Overview
 
-### 1. Tests Pass Locally but Fail in CI
+This directory contains end-to-end (E2E) tests for the PokeInfo client application using Cypress. These tests automate user workflows to ensure the application works correctly across different scenarios.
 
-#### Symptoms
-- Tests run successfully on local machine
-- Same tests fail in GitHub Actions pipeline
-- Different error messages between local and CI environments
+### Current Test Coverage
 
-#### Common Causes and Solutions
+- **Authentication Flows** (`e2e/auth-flows.cy.js`)
+  - User registration with validation
+  - User login and logout
+  - Protected route access control
+  - Session persistence
+  - Test data cleanup
 
-**A. Timing Issues**
-- **Problem**: CI environments are slower; timeouts that work locally may fail in CI
-- **Solution**: Increased default timeouts from 4s to 8s, request timeouts to 10s
-- **Status**: ✅ IMPLEMENTED in cypress.config.js
+- **Pokemon Flows** (`e2e/pokemon-flows.cy.js`)
+  - Pokédex browsing
+  - Pokemon search and filtering
+  - Collection management
 
-**B. Test State Pollution**
-- **Problem**: Tests affect each other due to shared state (localStorage, sessionStorage, cookies)
-- **Solution**: Added `cy.clearAuthState()` command that clears all storage before each test
-- **Status**: ✅ IMPLEMENTED in all test describe blocks
+## Quick Start
 
-**C. API Dependency**
-- **Problem**: Tests depend on backend API that may not be running in CI
-- **Workaround**: Currently tests assume API is available at `${{ secrets.VITE_API_BASE_URL }}`
-- **TODO**: Consider mocking API responses or documenting API setup requirements
+### Prerequisites
 
-**D. Development Server Not Ready**
-- **Problem**: Tests start before Vite dev server is fully ready
-- **Solution**: Increased wait time from 30s to 60s, improved health checks
-- **Status**: ✅ IMPLEMENTED in ui-tests.yml
+- Node.js 20+ installed
+- npm or yarn package manager
+- Development server running (or ability to start it)
 
-**E. Chrome Headless Mode Differences**
-- **Problem**: Headless Chrome behaves differently than normal Chrome
-- **Workaround**: Tests configured for headless Chrome specifically
-- **Note**: Monitor for rendering or timing differences
+### Installation
 
-### 2. Environment Variables
+```bash
+cd pokeinfo-client
+npm install
+```
 
-The workflow sets:
-- `VITE_API_BASE_URL`: Backend API URL (defaults to http://localhost:3000)
-  - Override via GitHub Secrets if using different API URL in CI
+### Running Tests Locally
 
-### 3. Test Data Cleanup
+**Open Cypress Test Runner (interactive mode):**
+```bash
+npm run e2e
+```
 
-All test users created during registration tests are automatically cleaned up at the end:
-- Uses `cy.deleteUser()` command for each created user
-- Endpoint: `DELETE /api/users/{email}`
-- Gracefully handles errors if endpoint doesn't exist
+**Run all tests headless (like CI):**
+```bash
+npm run e2e:run
+```
 
-### 4. Debugging Failed Tests in CI
+**Run tests in headed mode (see browser):**
+```bash
+npm run e2e:headed
+```
 
-When tests fail in the pipeline:
-1. **Check the Cypress videos and screenshots** (uploaded as artifacts)
-2. **Review the vite server logs** (output in "Collect server logs on failure" step)
-3. **Check GitHub Actions logs** for timing and network information
-4. **Run tests locally** to reproduce the issue
-5. **Add `.only` to a failing test** locally to debug faster
+**Run tests in specific Chrome version:**
+```bash
+npm run e2e:chrome
+```
 
-### 5. Adding New Tests
+**Debug mode (with dev tools):**
+```bash
+npm run e2e:debug
+```
+
+## Project Structure
+
+```
+cypress/
+├── e2e/                          # End-to-end test specs
+│   ├── auth-flows.cy.js         # Authentication and session tests
+│   └── pokemon-flows.cy.js       # Pokemon interaction tests
+├── support/
+│   ├── commands.js              # Custom Cypress commands
+│   ├── e2e.js                   # Global E2E configuration
+│   └── component.js             # Component test configuration
+├── fixtures/                     # Test data files
+├── screenshots/                  # Failed test screenshots
+├── videos/                       # Test run videos
+└── README.md                     # This file
+```
+
+## Configuration
+
+See `cypress.config.js` for:
+- **Base URL**: `http://localhost:5173` (Vite dev server)
+- **Viewport**: 1280x720
+- **Timeouts**: 8-10 seconds (increased for CI environments)
+- **Browser**: Chrome (headless in CI, normal locally)
+
+## Available Custom Commands
+
+### Authentication Commands
+
+```javascript
+// Login with email and password
+cy.login(email, password)
+
+// Logout the current user
+cy.logout()
+
+// Check if user is logged in
+cy.isLoggedIn()
+
+// Check if user is logged out
+cy.isLoggedOut()
+
+// Clear authentication state (localStorage, sessionStorage, cookies)
+cy.clearAuthState()
+```
+
+### Cleanup Commands
+
+```javascript
+// Delete a test user via API
+cy.deleteUser(email)
+```
+
+### Example Usage
+
+```javascript
+it('should login successfully', () => {
+  cy.visit('/login')
+  cy.login('user@example.com', 'Password123!')
+  cy.isLoggedIn()
+  cy.url().should('include', '/profile')
+})
+```
+
+## Writing New Tests
+
+### Best Practices
+
+1. **Use Data Attributes for Selection**
+   ```javascript
+   // ✅ Good - data-cy attributes
+   cy.get('[data-cy="login-submit"]').click()
+
+   // ❌ Avoid - fragile CSS selectors
+   cy.get('form button[type="submit"]').click()
+   ```
+
+2. **Clear Auth State Between Tests**
+   ```javascript
+   describe('My Test Suite', () => {
+     beforeEach(() => {
+       cy.clearAuthState()
+       cy.visit('/my-page')
+     })
+   })
+   ```
+
+3. **Track Test Data for Cleanup**
+   ```javascript
+   // At top of file
+   const createdUsers = []
+
+   it('should create a user', () => {
+     const testUser = generateTestUser()
+     createdUsers.push(testUser.email)
+
+     // ... test code ...
+   })
+
+   // At end of file
+   after(() => {
+     createdUsers.forEach(email => cy.deleteUser(email))
+   })
+   ```
+
+4. **Use Realistic Timeouts**
+   ```javascript
+   // ✅ Increase timeout for slow operations
+   cy.get('[data-cy="result"]', { timeout: 10000 }).should('be.visible')
+
+   // ❌ Don't hardcode artificial waits
+   cy.wait(5000)  // Bad practice
+   ```
+
+5. **Test User Workflows, Not Implementation**
+   ```javascript
+   // ✅ Test what users see and do
+   it('should display error on invalid login', () => {
+     cy.get('[data-cy="login-email"]').type('wrong@email.com')
+     cy.get('[data-cy="login-password"]').type('wrong')
+     cy.get('[data-cy="login-submit"]').click()
+     cy.get('[data-cy="login-error-message"]').should('be.visible')
+   })
+   ```
+
+### Adding Data Attributes to Components
+
+To make components testable, add `data-cy` attributes:
+
+```jsx
+// In your component
+<button data-cy="register-submit">Create account</button>
+<span data-cy="register-error-message">{error}</span>
+<input data-cy="register-username" type="text" />
+```
+
+## Running Tests in CI/CD
+
+Tests automatically run on:
+- Push to `main`, `develop`, or `feature/*` branches
+- Pull requests to `main` or `develop`
+
+The workflow:
+1. Checks out code
+2. Installs dependencies
+3. Starts Vite dev server
+4. Runs Cypress tests
+5. Uploads screenshots/videos on failure
+
+View results at: https://github.com/RHaalboom/PokeInfo/actions
+
+## Debugging Failed Tests
+
+### Locally
+
+1. **Run in headed mode to see what's happening:**
+   ```bash
+   npm run e2e:headed
+   ```
+
+2. **Use `.only` to run a single test:**
+   ```javascript
+   it.only('should login', () => {
+     // This test will run alone
+   })
+   ```
+
+3. **Use `.skip` to skip tests:**
+   ```javascript
+   it.skip('should be fixed later', () => {
+     // This test won't run
+   })
+   ```
+
+4. **Add debug statements:**
+   ```javascript
+   cy.get('[data-cy="element"]')
+     .debug()  // Pauses test and shows element in dev tools
+     .click()
+   ```
+
+5. **Check the command log** in Cypress UI for:
+   - What commands ran
+   - What was selected
+   - Why assertions failed
+
+### In CI
+
+1. Check the **GitHub Actions logs** at workflow run page
+2. Download **screenshots and videos** from artifacts
+3. Look for error messages in the test output
+4. Common issues:
+   - Timeouts (increase in cypress.config.js)
+   - API unavailable (ensure backend is set up)
+   - Element not found (add `data-cy` attribute)
+   - State pollution (add `cy.clearAuthState()`)
+
+## Common Issues & Solutions
+
+### Tests Pass Locally but Fail in CI
+
+**Cause**: CI environments are slower and have different timing.
+
+**Solution**: 
+- Timeouts are already increased to 8-10 seconds
+- Add `cy.clearAuthState()` to prevent state pollution
+- Avoid hardcoded waits (`cy.wait()`)
+
+### "Element not found" errors
+
+**Cause**: Element selector is wrong or element hasn't appeared yet.
+
+**Solution**: 
+- Ensure `data-cy` attributes exist on elements
+- Increase timeout if element appears slowly:
+```javascript
+cy.get('[data-cy="element"]', { timeout: 10000 }).should('exist')
+```
+
+### Tests stop after first failure
+
+**Cause**: Test suite was configured to stop on error.
+
+**Solution**: 
+- This has been fixed
+- Tests now continue through all failures
+- All failures are reported at end of run
+
+### API calls failing (404, 500)
+
+**Cause**: Backend API not running or test data doesn't exist.
+
+**Solution**: 
+- Ensure backend API is running locally or in CI
+- Check `VITE_API_BASE_URL` environment variable is correct
+- Verify test creates necessary data before using it
+
+### "Wait for dev server" timeout in CI
+
+**Cause**: Vite dev server takes too long to start or fails.
+
+**Solution**: 
+- Using Node.js 20+ (Vite requirement)
+- Increased wait time to 60 seconds
+- Better health checks before running tests
+
+## Performance Tips
+
+1. **Keep tests focused** - Each test should test one thing
+2. **Don't repeat setup** - Use `beforeEach()` and custom commands
+3. **Disable video** - Already done (slow in CI): `video: false`
+4. **Use efficient selectors** - `data-cy` is faster than complex CSS
+5. **Avoid unnecessary waits** - Let Cypress wait automatically
+6. **Clean up test data** - Use `after()` hooks for cleanup
+
+## Useful Resources
+
+- [Cypress Documentation](https://docs.cypress.io/)
+- [Cypress Best Practices](https://docs.cypress.io/guides/references/best-practices)
+- [Testing React with Cypress](https://docs.cypress.io/guides/component-testing/react)
+- [GitHub Actions with Cypress](https://docs.cypress.io/guides/continuous-integration/github-actions)
+
+## Environment Variables
+
+### Local Development
+
+Create `.env.local` if needed:
+```
+VITE_API_BASE_URL=http://localhost:3000
+```
+
+### CI/CD
+
+Set via GitHub Secrets:
+- `VITE_API_BASE_URL` - Backend API URL (defaults to http://localhost:3000)
+
+## Contributing
 
 When adding new tests:
-1. Add `cy.clearAuthState()` in the `beforeEach()` hook
-2. Track any created test data in the `createdUsers` array for cleanup
-3. Use data-cy attributes for element selection (more reliable than CSS selectors)
-4. Use reasonable timeouts that account for CI being slower
-5. Test in both local and CI environments before merging
 
-### 6. Current Configuration
+1. ✅ Use `data-cy` attributes for element selection
+2. ✅ Add `cy.clearAuthState()` in `beforeEach()`
+3. ✅ Track test data for cleanup in `after()` hook
+4. ✅ Test user workflows, not implementation details
+5. ✅ Use reasonable timeouts for CI (8-10 seconds)
+6. ✅ Run tests locally before pushing
+7. ✅ Keep tests independent and isolated
+
+## Current Test Configuration
 
 **Timeouts:**
 - Default Command Timeout: 8000ms (8 seconds)
 - Request/Response Timeout: 10000ms (10 seconds)
 - Task Timeout: 10000ms (10 seconds)
-
-**Retries:**
-- CI Mode: 1 retry for failed tests
-- Local Mode: No retries
 
 **Browser:**
 - Chrome (headless in CI, normal in local)
@@ -84,17 +361,40 @@ When adding new tests:
 **Viewport:**
 - 1280x720 (desktop resolution)
 
-### 7. Next Steps to Investigate
+**Error Handling:**
+- Uncaught exceptions logged but don't fail tests
+- Tests continue running even if one fails
 
-If tests still fail in CI after these changes:
-1. **Get actual error logs** from the failed pipeline run
-2. **Check if backend API is running** - may need to start it in the workflow
-3. **Review specific test failures** - which tests fail, what errors are shown
-4. **Check for network/port issues** - whether localhost:5173 is actually accessible
-5. **Monitor timing** - if delays are still causing timeouts
+## Troubleshooting
 
-## Resources
+### Getting Help
 
-- [Cypress Documentation](https://docs.cypress.io/)
-- [Cypress Best Practices](https://docs.cypress.io/guides/references/best-practices)
-- [GitHub Actions with Cypress](https://docs.cypress.io/guides/continuous-integration/github-actions)
+1. Check this README for common issues
+2. Review test logs in GitHub Actions
+3. Run tests locally with debug mode
+4. Check Cypress documentation
+5. Open an issue with:
+   - Test name and code
+   - Error message
+   - Steps to reproduce
+   - Screenshots/videos if available
+
+### Resetting Test State
+
+If tests are in a bad state:
+
+```bash
+# Clear browser cache and cookies
+rm -rf cypress/screenshots cypress/videos
+
+# Reinstall dependencies
+rm -rf node_modules package-lock.json
+npm install
+
+# Run tests fresh
+npm run e2e:run
+```
+
+## License
+
+These tests are part of the PokeInfo project and follow the same license.
