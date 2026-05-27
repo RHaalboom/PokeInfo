@@ -1,39 +1,73 @@
 import RedIcon from '../img/Games/Poké-info_Red.png';
+import BlueIcon from '../img/Games/Poké-info_Blue.png';
+import YellowIcon from '../img/Games/Poké-info_Yellow.png';
+import GoldIcon from '../img/Games/Poké-info_Gold.png';
+import SilverIcon from '../img/Games/Poké-info_Silver.png';
+import CrystalIcon from '../img/Games/Poké-info_Crystal.png';
+import RubyIcon from '../img/Games/Poké-info_Ruby.png';
+import SapphireIcon from '../img/Games/Poké-info_Sapphire.png';
+import EmeraldIcon from '../img/Games/Poké-info_Emerald.png';
+import FireRedIcon from '../img/Games/Poké-info_FireRed.png';
+import LeafGreenIcon from '../img/Games/Poké-info_LeafGreen.png';
+import DiamondIcon from '../img/Games/Poké-info_Diamond.png';
+import PearlIcon from '../img/Games/Poké-info_Pearl.png';
+import PlatinumIcon from '../img/Games/Poké-info_Platinum.png';
+import HeartGoldIcon from '../img/Games/Poké-info_HeartGold.png';
+import SoulSilverIcon from '../img/Games/Poké-info_SoulSilver.png';
+import BlackIcon from '../img/Games/Poké-info_Black.png';
+import WhiteIcon from '../img/Games/Poké-info_White.png';
+import Black2Icon from '../img/Games/Poké-info_Black2.png';
+import White2Icon from '../img/Games/Poké-info_White2.png';
+import XIcon from '../img/Games/Poké-info_X.png';
+import YIcon from '../img/Games/Poké-info_Y.png';
+import SunIcon from '../img/Games/Poké-info_Sun.png';
+import MoonIcon from '../img/Games/Poké-info_Moon.png';
+import UltraSunIcon from '../img/Games/Poké-info_UltraSun.png';
+import UltraMoonIcon from '../img/Games/Poké-info_UltraMoon.png';
 
 export const GAME_ICONS = {
     red: RedIcon,
-    blue: null, // Add when available
-    yellow: null, // Add when available
-    gold: null, // Add when available
-    silver: null, // Add when available
-    crystal: null, // Add when available
-    ruby: null, // Add when available
-    sapphire: null, // Add when available
-    emerald: null, // Add when available
-    'fire-red': null, // Add when available
-    'leaf-green': null, // Add when available
-    diamond: null, // Add when available
-    pearl: null, // Add when available
-    platinum: null, // Add when available
-    'heart-gold': null, // Add when available
-    'soul-silver': null, // Add when available
-    black: null, // Add when available
-    white: null, // Add when available
-    'black-2': null, // Add when available
-    'white-2': null, // Add when available
-    x: null, // Add when available
-    y: null, // Add when available
-    'omega-ruby': null, // Add when available
-    'alpha-sapphire': null, // Add when available
-    'sun': null, // Add when available
-    'moon': null, // Add when available
-    'ultra-sun': null, // Add when available
-    'ultra-moon': null, // Add when available
+    blue: BlueIcon,
+    yellow: YellowIcon,
+    gold: GoldIcon,
+    silver: SilverIcon,
+    crystal: CrystalIcon,
+    ruby: RubyIcon,
+    sapphire: SapphireIcon,
+    emerald: EmeraldIcon,
+    'fire-red': FireRedIcon,
+    'leaf-green': LeafGreenIcon,
+    firered: FireRedIcon, // Support alternative naming
+    leafgreen: LeafGreenIcon, // Support alternative naming
+    diamond: DiamondIcon,
+    pearl: PearlIcon,
+    platinum: PlatinumIcon,
+    'heart-gold': HeartGoldIcon,
+    'soul-silver': SoulSilverIcon,
+    heartgold: HeartGoldIcon, // Support alternative naming
+    soulsilver: SoulSilverIcon, // Support alternative naming
+    black: BlackIcon,
+    white: WhiteIcon,
+    'black-2': Black2Icon,
+    'white-2': White2Icon,
+    x: XIcon,
+    y: YIcon,
+    'sun': SunIcon,
+    'moon': MoonIcon,
+    'ultra-sun': UltraSunIcon,
+    'ultra-moon': UltraMoonIcon,
     'sword': null, // Add when available
     'shield': null, // Add when available
+    'omega-ruby': null, // Add when available
+    'omegaruby': null, // Support alternative naming
+    'alpha-sapphire': null, // Add when available
+    'alphasapphire': null, // Support alternative naming
     'legends-arceus': null, // Add when available
+    'legendsarceus': null, // Support alternative naming
     'brilliant-diamond': null, // Add when available
+    'brilliantdiamond': null, // Support alternative naming
     'shining-pearl': null, // Add when available
+    'shiningpearl': null, // Support alternative naming
     'scarlet': null, // Add when available
     'violet': null, // Add when available
 };
