@@ -52,8 +52,11 @@
 }
 
 .pokemon-detail-modal {
-    scrollbar-width: thin;
-    scrollbar-color: var(--primary-red) var(--soft-dark);
+    scrollbar-width: none;
+}
+
+.pokemon-detail-modal::-webkit-scrollbar {
+    display: none;
 }
 
 .modal-content h2 {
@@ -693,23 +696,23 @@
     display: inline-flex;
     align-items: center;
     justify-content: flex-start;
-    width: 120px;
-    padding: 8px 12px;
+    width: 144px;
+    padding: 10px 14px;
     border-radius: 8px;
     background: var(--soft-dark);
     color: var(--text-primary);
-    font-size: 12px;
+    font-size: 14px;
     border: 1px solid var(--border);
     border-left: 4px solid var(--border);
-    gap: 8px;
+    gap: 10px;
     text-align: left;
 }
 
 @media (max-width: 768px) {
     .game-badge {
-        width: 100px;
-        font-size: 11px;
-        padding: 8px 10px;
+        width: 120px;
+        font-size: 13px;
+        padding: 10px 12px;
     }
 }
 
@@ -865,8 +868,8 @@
 }
 
 .game-icon-img {
-    width: 24px;
-    height: 24px;
+    width: 29px;
+    height: 29px;
     object-fit: contain;
     flex-shrink: 0;
 }
