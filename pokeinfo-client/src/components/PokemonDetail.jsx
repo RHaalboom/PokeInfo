@@ -208,6 +208,68 @@ export default function PokemonDetail({ pokemon, onClose }) {
                     </div>
                 </div>
 
+                {/* Strengths and Weaknesses Section */}
+                {displayedPokemon.typeEffectiveness && (
+                    <div className="detail-section">
+                        <div className="strengths-weaknesses-container">
+                            {displayedPokemon.typeEffectiveness.strengths.length > 0 && (
+                                <div className="subsection">
+                                    <div className="section-header">
+                                        <img src={getSectionIcon('strength')} alt="Strengths" className="section-icon" />
+                                        <h3>Strengths</h3>
+                                    </div>
+                                    <div className="strengths-weaknesses-types">
+                                        {displayedPokemon.typeEffectiveness.strengths.map((type) => {
+                                            const iconSrc = getTypeIcon(type);
+                                            return (
+                                                <span key={type} className={`type-badge type-${type.toLowerCase()}`}>
+                                                    <img src={iconSrc} alt={type} className="type-icon" />
+                                                    {capitalize(type)}
+                                                </span>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            )}
+                            {displayedPokemon.typeEffectiveness.weaknesses.length > 0 && (
+                                <div className="subsection">
+                                    <div className="section-header">
+                                        <img src={getSectionIcon('weakness')} alt="Weaknesses" className="section-icon" />
+                                        <h3>Weaknesses</h3>
+                                    </div>
+                                    <div className="strengths-weaknesses-types">
+                                        {displayedPokemon.typeEffectiveness.superEffective && displayedPokemon.typeEffectiveness.superEffective.length > 0 && (
+                                            <>
+                                                {displayedPokemon.typeEffectiveness.superEffective.map((type) => {
+                                                    const iconSrc = getTypeIcon(type);
+                                                    return (
+                                                        <span key={type} className={`type-badge type-${type.toLowerCase()} super-weak-badge`} title="4x weak">
+                                                            <img src={iconSrc} alt={type} className="type-icon" />
+                                                            {capitalize(type)}
+                                                            <span className="weakness-multiplier">4x</span>
+                                                        </span>
+                                                    );
+                                                })}
+                                            </>
+                                        )}
+                                        {displayedPokemon.typeEffectiveness.weaknesses
+                                            .filter(type => !displayedPokemon.typeEffectiveness.superEffective || !displayedPokemon.typeEffectiveness.superEffective.includes(type))
+                                            .map((type) => {
+                                                const iconSrc = getTypeIcon(type);
+                                                return (
+                                                    <span key={type} className={`type-badge type-${type.toLowerCase()}`}>
+                                                        <img src={iconSrc} alt={type} className="type-icon" />
+                                                        {capitalize(type)}
+                                                    </span>
+                                                );
+                                            })}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                )}
+
                 {/* Games Section */}
                 <div className="detail-section">
                     <div className="section-header">
@@ -247,7 +309,7 @@ export default function PokemonDetail({ pokemon, onClose }) {
                                             <p className="evolution-name">{formatPokemonName(stage.pokemonName)}</p>
                                         </div>
                                         <div className="evolution-types">
-                                            {displayedPokemon.types.map((type) => (
+                                            {stage.types.map((type) => (
                                                 <span key={type} className={`evolution-type ${type.toLowerCase()}`}>
                                                     {capitalize(type)}
                                                 </span>

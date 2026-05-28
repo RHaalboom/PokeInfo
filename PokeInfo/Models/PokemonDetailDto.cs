@@ -12,6 +12,7 @@ public class PokemonDetailDto
     public List<PokemonVariantDto> Variants { get; set; } = new();
 
     public EvolutionChainDto? EvolutionChain { get; set; }
+    public TypeEffectivenessDto? TypeEffectiveness { get; set; }
 }
 
 public class AbilityDto
@@ -55,4 +56,12 @@ public class EvolutionStageDto
     public int? MinLevel { get; set; }
     public string? TriggerName { get; set; }
     public ItemDto? Item { get; set; }
+    public List<string> Types { get; set; } = new();
+}
+
+public class TypeEffectivenessDto
+{
+    public List<string> Strengths { get; set; } = new();
+    public List<string> Weaknesses { get; set; } = new();
+    public List<string> SuperEffective { get; set; } = new();
 }
