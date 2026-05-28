@@ -520,6 +520,23 @@
     border-color: #9CA3AF;
 }
 
+/* Super Weak Badge - 4x weak */
+.super-weak-badge {
+    position: relative;
+    border-width: 2px !important;
+    box-shadow: 0 0 12px currentColor, inset 0 0 6px rgba(255, 255, 255, 0.1);
+}
+
+.super-weak-badge .weakness-multiplier {
+    display: inline-block;
+    margin-left: 4px;
+    font-weight: 800;
+    font-size: 12px;
+    padding: 0 4px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 3px;
+}
+
 /* Abilities Container */
 .abilities-container {
     display: flex;
@@ -535,6 +552,19 @@
     color: var(--text-primary);
     font-size: 14px;
     border: 1px solid var(--border);
+}
+
+/* Strengths and Weaknesses Container */
+.strengths-weaknesses-container {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+
+.strengths-weaknesses-types {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
 }
 
 /* Add to Collection Section */

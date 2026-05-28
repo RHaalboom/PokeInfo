@@ -81,6 +81,13 @@ public class PokemonService : IPokemonService
 
             var variants = species?.Variants ?? new List<PokemonVariantDto>();
 
+            // Fetch type effectiveness data
+            TypeEffectivenessDto? typeEffectiveness = null;
+            if (types.Count > 0)
+            {
+                typeEffectiveness = await GetTypeEffectivenessAsync(types);
+            }
+
             return new PokemonDetailDto
             {
                 Id = root.GetProperty("id").GetInt32(),
@@ -90,12 +97,98 @@ public class PokemonService : IPokemonService
                 Abilities = abilities.Where(a => a != null).OfType<AbilityDto>().ToList(),
                 Games = games,
                 Variants = variants,
-                EvolutionChain = evolutionChain
+                EvolutionChain = evolutionChain,
+                TypeEffectiveness = typeEffectiveness
             };
         });
     }
 
-    private static AbilityDto? ParseAbility(JsonDocument doc)
+    private async Task<TypeEffectivenessDto> GetTypeEffectivenessAsync(List<string> types)
+    {
+        var strengths = new HashSet<string>();
+        var weaknesses = new HashSet<string>();
+        var typeDataByType = new Dictionary<string, TypeEffectivenessDto>();
+
+        // Fetch type effectiveness for each type
+        foreach (var type in types)
+        {
+            var typeData = await GetOrCreateCachedAsync($"pokemon:type:{type.ToLowerInvariant()}", 
+                $"type/{type.ToLowerInvariant()}", ParseTypeEffectiveness);
+
+            if (typeData != null)
+            {
+                typeDataByType[type] = typeData;
+
+                foreach (var strength in typeData.Strengths)
+                    strengths.Add(strength);
+
+                foreach (var weakness in typeData.Weaknesses)
+                    weaknesses.Add(weakness);
+            }
+        }
+
+        // Calculate super-weak types (4x weak) - only applies if pokemon has 2+ types
+        // A type is 4x weak only if it's weak to ALL of the pokemon's types
+        var superWeak = new List<string>();
+        if (types.Count >= 2)
+        {
+            superWeak = new List<string>(weaknesses);
+            foreach (var type in types)
+            {
+                if (typeDataByType.TryGetValue(type, out var typeData))
+                {
+                    // Keep only types that are in this type's weaknesses
+                    superWeak = superWeak.Intersect(typeData.Weaknesses).ToList();
+                }
+            }
+        }
+
+        return new TypeEffectivenessDto
+        {
+            Strengths = strengths.ToList(),
+            Weaknesses = weaknesses.ToList(),
+            SuperEffective = superWeak
+        };
+    }
+
+    private static TypeEffectivenessDto ParseTypeEffectiveness(JsonDocument doc)
+    {
+        var root = doc.RootElement;
+        var damageRelations = root.GetProperty("damage_relations");
+
+        var strengths = new List<string>();
+        var weaknesses = new List<string>();
+
+        // Parse types that deal double damage TO this type (what this type is weak to)
+        if (damageRelations.TryGetProperty("double_damage_from", out var doubleDamageFrom))
+        {
+            foreach (var type in doubleDamageFrom.EnumerateArray())
+            {
+                var typeName = type.GetProperty("name").GetString();
+                if (!string.IsNullOrWhiteSpace(typeName))
+                    weaknesses.Add(typeName);
+            }
+        }
+
+        // Parse types that take double damage FROM this type (what this type is strong against)
+        if (damageRelations.TryGetProperty("double_damage_to", out var doubleDamageTo))
+        {
+            foreach (var type in doubleDamageTo.EnumerateArray())
+            {
+                var typeName = type.GetProperty("name").GetString();
+                if (!string.IsNullOrWhiteSpace(typeName))
+                    strengths.Add(typeName);
+            }
+        }
+
+        return new TypeEffectivenessDto
+        {
+            Strengths = strengths,
+            Weaknesses = weaknesses
+        };
+    }
+
+    private static AbilityDto ParseAbility(JsonDocument doc)
     {
         var root = doc.RootElement;
         var englishEntry = root.GetProperty("effect_entries").EnumerateArray()
@@ -112,7 +205,7 @@ public class PokemonService : IPokemonService
         };
     }
 
-    private static ItemDto? ParseItem(JsonDocument doc)
+    private static ItemDto ParseItem(JsonDocument doc)
     {
         var root = doc.RootElement;
         var sprites = root.GetProperty("sprites");
@@ -227,13 +320,20 @@ public class PokemonService : IPokemonService
             return doc.RootElement.GetProperty("sprites").GetProperty("front_default").GetString() ?? string.Empty;
         }) ?? string.Empty;
 
+        // Fetch types for this Pokémon
+        var types = await GetOrCreateCachedAsync($"pokemon:types:{pokemonName}", $"pokemon/{pokemonName}", doc =>
+        {
+            return GetArrayPropertyValues(doc.RootElement, "types", "type", "name");
+        }) ?? new List<string>();
+
         stages.Add(new EvolutionStageDto
         {
             PokemonName = pokemonName,
             ImageUrl = imageUrl,
             MinLevel = minLevel,
             TriggerName = triggerName,
-            Item = item
+            Item = item,
+            Types = types
         });
 
         foreach (var nextEvolution in chainElement.GetProperty("evolves_to").EnumerateArray())
