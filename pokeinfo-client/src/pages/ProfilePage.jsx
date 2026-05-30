@@ -7,6 +7,7 @@ import OverallProgress from "../components/OverallProgress";
 import RegionalProgress from "../components/RegionalProgress";
 import { calculateOverallProgress, calculatePokedexProgress, POKEDEX_DATA } from "../utils/pokedexProgress";
 import { getCollections } from "../services/collectionService";
+import { getAllRankings } from "../services/rankingService";
 import settingsIcon from "../img/Poké-info_Settings.png";
 import settingsIconHover from "../img/Poké-info_Settings_hover.png";
 import logoutIcon from "../img/Poké-info_Logout.png";
@@ -23,6 +24,7 @@ export default function ProfilePage() {
     const [error, setError] = useState("");
     const [overallProgress, setOverallProgress] = useState(null);
     const [regionalProgress, setRegionalProgress] = useState(null);
+    const [regionalRanks, setRegionalRanks] = useState({});
     const [hoveredButton, setHoveredButton] = useState(null);
     const navigate = useNavigate();
     const { logout } = useAuth();
@@ -81,6 +83,12 @@ export default function ProfilePage() {
             const regionalProgData = calculatePokedexProgress(data);
             setOverallProgress(progress);
             setRegionalProgress(regionalProgData);
+
+            // Fetch rankings if user has RankedUser or Moderator role
+            const currentUser = getCurrentUser();
+            if (currentUser?.roleName === "RankedUser" || currentUser?.roleName === "Moderator") {
+                await fetchUserRankings(currentUser.username);
+            }
         } catch (err) {
             console.error("Error fetching collections:", err);
             // If there's an error, just set default progress
@@ -101,6 +109,43 @@ export default function ProfilePage() {
                 HISUI: 0,
                 PALDEA: 0
             });
+        }
+    }
+
+    async function fetchUserRankings(username) {
+        try {
+            const currentUser = getCurrentUser();
+            const allRankings = await getAllRankings();
+            console.log("Current user object:", currentUser);
+            console.log("Username for matching:", username);
+            console.log("Display name for matching:", currentUser?.displayName);
+            console.log("All rankings data:", allRankings);
+
+            if (allRankings && Array.isArray(allRankings)) {
+                const ranks = {};
+                // For each Pokédex, find this user's ranking position
+                allRankings.forEach(ranking => {
+                    console.log(`Checking ranking for ${ranking.pokedexKey}:`, ranking.rankings);
+                    const userEntry = ranking.rankings.find(entry => {
+                        // Match against either username or displayName
+                        const matchesUsername = entry.displayName.toLowerCase() === username.toLowerCase();
+                        const matchesDisplayName = currentUser?.displayName && 
+                                                   entry.displayName.toLowerCase() === currentUser.displayName.toLowerCase();
+                        const matches = matchesUsername || matchesDisplayName;
+                        console.log(`Comparing "${entry.displayName}" with username "${username}" or displayName "${currentUser?.displayName}" = ${matches}`);
+                        return matches;
+                    });
+                    console.log(`User entry for ${ranking.pokedexKey}:`, userEntry);
+                    if (userEntry) {
+                        ranks[ranking.pokedexKey] = userEntry.position;
+                    }
+                });
+                console.log("Final ranks object:", ranks);
+                setRegionalRanks(ranks);
+            }
+        } catch (err) {
+            console.error("Error fetching rankings:", err);
+            // Silently fail - rankings are optional
         }
     }
 
@@ -192,8 +237,8 @@ export default function ProfilePage() {
                 </div>
             </section>
 
-            {/* Overall Progress Section - shown if user has ShowRankings enabled */}
-            {user?.showRankings && overallProgress && (
+            {/* Overall Progress Section */}
+            {overallProgress && (
                 <section className="overall-progress-section">
                     <OverallProgress 
                         collected={overallProgress.collected}
@@ -209,6 +254,7 @@ export default function ProfilePage() {
                     <RegionalProgress 
                         pokedexProgress={regionalProgress}
                         pokedexData={POKEDEX_DATA}
+                        regionalRanks={regionalRanks}
                     />
                 </section>
             )}

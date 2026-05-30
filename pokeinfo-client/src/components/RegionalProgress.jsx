@@ -30,7 +30,7 @@ const REGION_DATA = [
     { key: 'PALDEA', name: 'Paldea' }
 ];
 
-export default function RegionalProgress({ pokedexProgress, pokedexData }) {
+export default function RegionalProgress({ pokedexProgress, pokedexData, regionalRanks = {} }) {
     return (
         <div className="regional-progress-container">
             <div className="regional-progress-header">
@@ -47,6 +47,7 @@ export default function RegionalProgress({ pokedexProgress, pokedexData }) {
                     const total = pokedexData[region.key]?.totalPokemon || 0;
                     const percentage = total > 0 ? Math.round((caught / total) * 100) : 0;
                     const color = REGION_COLORS[region.key];
+                    const rank = regionalRanks[region.key] || null;
 
                     return (
                         <RegionalProgressCard
@@ -56,7 +57,7 @@ export default function RegionalProgress({ pokedexProgress, pokedexData }) {
                             total={total}
                             percentage={percentage}
                             color={color}
-                            rank={null}
+                            rank={rank}
                         />
                     );
                 })}

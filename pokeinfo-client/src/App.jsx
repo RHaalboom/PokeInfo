@@ -6,6 +6,7 @@ import LoginPage from "./pages/LoginPage";
 import ProfilePage from "./pages/ProfilePage";
 import SettingsPage from "./pages/SettingsPage";
 import CollectionDetailsPage from "./pages/CollectionDetailsPage";
+import RankingsPage from "./pages/RankingsPage";
 import { useAuth } from "./hooks/useAuth";
 import PokeInfoBrand from "./components/PokeInfoBrand";
 import UserMenu from "./components/UserMenu";
@@ -47,6 +48,7 @@ function App() {
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/settings" element={<SettingsPage />} />
                 <Route path="/collections/:id" element={<CollectionDetailsPage />} />
+                <Route path="/rankings" element={<RankingsPage />} />
             </Routes>
         </>
     );
