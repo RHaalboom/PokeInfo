@@ -97,7 +97,7 @@ export default function CollectionsSection() {
                         <input
                             id="name"
                             type="text"
-                            placeholder="e.g., My Favorite Pokémon"
+                            placeholder="e.g., Kanto Pokédex"
                             value={newCollectionName}
                             onChange={(e) => setNewCollectionName(e.target.value)}
                             disabled={creatingCollection}
@@ -109,7 +109,7 @@ export default function CollectionsSection() {
                         <label htmlFor="description">Description</label>
                         <textarea
                             id="description"
-                            placeholder="e.g., A collection of my favorite water-type Pokémon"
+                            placeholder="e.g., A collection of my Pokémon caught in the Kanto region!"
                             value={newCollectionDescription}
                             onChange={(e) => setNewCollectionDescription(e.target.value)}
                             disabled={creatingCollection}

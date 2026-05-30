@@ -15,7 +15,19 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 40px;
     border: 1px solid var(--border);
+}
+
+.profile-left {
+    flex-shrink: 0;
+}
+
+.profile-center {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
 
 .profile-info {
@@ -37,13 +49,19 @@
 .profile-text {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 4px;
     text-align: left;
 }
 
 .profile-text h1 {
     font-size: 28px;
     color: var(--text-primary);
+    margin: 0;
+}
+
+.profile-join-date {
+    font-size: 14px;
+    color: var(--text-secondary);
     margin: 0;
 }
 
@@ -56,8 +74,43 @@
 .profile-friend-codes {
     display: flex;
     flex-direction: column;
-    gap: 4px;
-    margin-top: 6px;
+    gap: 10px;
+    margin-top: 0;
+}
+
+.friend-code-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--soft-dark);
+    padding: 10px 14px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.fc-icon {
+    font-size: 18px;
+    min-width: 24px;
+}
+
+.fc-icon-img {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.fc-label {
+    font-size: 13px;
+    color: var(--text-secondary);
+    min-width: 110px;
+}
+
+.fc-value {
+    font-size: 13px;
+    color: var(--text-primary);
+    font-family: 'Monaco', 'Courier New', monospace;
+    font-weight: 500;
 }
 
 .profile-fc {
@@ -80,7 +133,8 @@
 
 .profile-actions {
     display: flex;
-    gap: 10px;
+    gap: 12px;
+    flex-shrink: 0;
 }
 
 .settings-button,
@@ -88,17 +142,42 @@
     padding: 10px 20px;
     background: var(--primary-red);
     color: white;
-    border: none;
-    border-radius: 4px;
+    border: 1px solid transparent;
+    border-radius: 6px;
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
-    transition: background 0.3s;
+    transition: background 0.3s, border 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
 }
 
-.settings-button:hover,
+.settings-button {
+    background: transparent;
+    border: 1px solid var(--text-secondary);
+    color: var(--text-primary);
+}
+
+.settings-button:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--text-primary);
+}
+
+.logout-button {
+    background: var(--primary-red);
+    color: white;
+}
+
 .logout-button:hover {
-    background: var(--deep-red);
+    background: var(--primary-red);
+}
+
+.button-icon {
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
 }
 
 .rankings-section {

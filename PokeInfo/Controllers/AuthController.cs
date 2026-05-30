@@ -97,7 +97,8 @@ public class AuthController : ControllerBase
                 ThreedsFC = user.ThreedsFC,
                 SwitchFC = user.SwitchFC,
                 ShowRankings = user.RoleId == RoleService.RankedUserRoleId,
-                RoleName = user.Role.Name
+                RoleName = user.Role.Name,
+                CreatedAt = user.CreatedAt
             }
         };
 
