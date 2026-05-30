@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PokeInfo.Entities;
 
@@ -34,4 +35,7 @@ public class User
     public Role Role { get; set; } = null!;
 
     public List<Collection> Collections { get; set; } = new();
+
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public DateTime CreatedAt { get; set; }
 }

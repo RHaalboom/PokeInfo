@@ -11,4 +11,5 @@ public class UserResponseDto
     public string? SwitchFC { get; set; }
     public bool ShowRankings { get; set; }
     public string RoleName { get; set; } = string.Empty;
+    public DateTime CreatedAt { get; set; }
 }

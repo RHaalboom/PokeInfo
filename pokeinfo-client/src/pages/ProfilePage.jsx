@@ -3,20 +3,27 @@ import { useNavigate } from "react-router-dom";
 import { getCurrentUser, logout as logoutService, isAuthenticated, getAllUsers } from "../services/authService";
 import { useAuth } from "../hooks/useAuth";
 import CollectionsSection from "../components/CollectionsSection";
-import CircularProgress from "../components/CircularProgress";
-import { calculatePokedexProgress } from "../utils/pokedexProgress";
+import OverallProgress from "../components/OverallProgress";
+import RegionalProgress from "../components/RegionalProgress";
+import { calculateOverallProgress, calculatePokedexProgress, POKEDEX_DATA } from "../utils/pokedexProgress";
 import { getCollections } from "../services/collectionService";
+import settingsIcon from "../img/Poké-info_Settings.png";
+import settingsIconHover from "../img/Poké-info_Settings_hover.png";
+import logoutIcon from "../img/Poké-info_Logout.png";
+import logoutIconHover from "../img/Poké-info_Logout_hover.png";
+import threedsIcon from "../img/Profile/Poké-info_3ds.png";
+import switchIcon from "../img/Profile/Poké-info_Switch.png";
 import "../styles/colorPalette.css";
 import "../styles/profile.css";
-
-const POKEDEX_LIST = ['KANTO', 'JOHTO', 'HOENN', 'SINNOH', 'UNOVA', 'KALOS', 'ALOLA', 'GALAR', 'HISUI', 'PALDEA'];
 
 export default function ProfilePage() {
     const [user, setUser] = useState(null);
     const [users, setUsers] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
-    const [pokedexProgress, setPokedexProgress] = useState({});
+    const [overallProgress, setOverallProgress] = useState(null);
+    const [regionalProgress, setRegionalProgress] = useState(null);
+    const [hoveredButton, setHoveredButton] = useState(null);
     const navigate = useNavigate();
     const { logout } = useAuth();
 
@@ -31,6 +38,21 @@ export default function ProfilePage() {
         return cleaned;
     };
 
+    // Helper function to format join date
+    const formatJoinDate = (createdDate) => {
+        if (!createdDate) return "";
+        try {
+            const date = new Date(createdDate);
+            // Check if date is valid
+            if (isNaN(date.getTime())) return "";
+            const options = { year: 'numeric', month: 'long' };
+            return `Trainer since ${date.toLocaleDateString('en-US', options)}`;
+        } catch (err) {
+            console.error("Error formatting date:", err);
+            return "";
+        }
+    };
+
     useEffect(() => {
         if (!isAuthenticated()) {
             navigate("/login");
@@ -39,6 +61,7 @@ export default function ProfilePage() {
 
         const currentUser = getCurrentUser();
         setUser(currentUser);
+        console.log("Current user:", currentUser);
 
         // Fetch collections for Pokédex progress
         fetchCollectionsAndProgress();
@@ -54,17 +77,30 @@ export default function ProfilePage() {
     async function fetchCollectionsAndProgress() {
         try {
             const data = await getCollections();
-            const progress = calculatePokedexProgress(data);
-            setPokedexProgress(progress);
+            const progress = calculateOverallProgress(data);
+            const regionalProgData = calculatePokedexProgress(data);
+            setOverallProgress(progress);
+            setRegionalProgress(regionalProgData);
         } catch (err) {
             console.error("Error fetching collections:", err);
-            // If there's an error, just set empty progress
-            setPokedexProgress(
-                POKEDEX_LIST.reduce((acc, pokedex) => {
-                    acc[pokedex] = 0;
-                    return acc;
-                }, {})
-            );
+            // If there's an error, just set default progress
+            setOverallProgress({
+                collected: 0,
+                totalAvailable: 1025,
+                percentage: 0
+            });
+            setRegionalProgress({
+                KANTO: 0,
+                JOHTO: 0,
+                HOENN: 0,
+                SINNOH: 0,
+                UNOVA: 0,
+                KALOS: 0,
+                ALOLA: 0,
+                GALAR: 0,
+                HISUI: 0,
+                PALDEA: 0
+            });
         }
     }
 
@@ -92,7 +128,7 @@ export default function ProfilePage() {
     return (
         <main className="profile-page" data-cy="profile-page">
             <section className="profile-header">
-                <div className="profile-info">
+                <div className="profile-left">
                     {user?.profilePictureUrl && (
                         <img 
                             src={user.profilePictureUrl} 
@@ -100,42 +136,80 @@ export default function ProfilePage() {
                             className="profile-picture"
                         />
                     )}
+                </div>
+
+                <div className="profile-center">
                     <div className="profile-text">
                         <h1>{user?.displayName || user?.username}</h1>
-                        <div className="profile-friend-codes">
-                            <p className="profile-fc">3DS FC: {formatFriendCode(user?.threedsFC) || "XXXX-XXXX-XXXX"}</p>
-                            <p className="profile-fc">Switch FC: {formatFriendCode(user?.switchFC) || "XXXX-XXXX-XXXX"}</p>
+                        {formatJoinDate(user?.createdAt) && (
+                            <p className="profile-join-date">{formatJoinDate(user?.createdAt)}</p>
+                        )}
+                    </div>
+                    <div className="profile-friend-codes">
+                        <div className="friend-code-item">
+                            <img src={threedsIcon} alt="3DS" className="fc-icon-img" />
+                            <span className="fc-label">3DS Friend Code</span>
+                            <span className="fc-value">{formatFriendCode(user?.threedsFC) || "XXXX-XXXX-XXXX"}</span>
+                        </div>
+                        <div className="friend-code-item">
+                            <img src={switchIcon} alt="Switch" className="fc-icon-img" />
+                            <span className="fc-label">Switch Friend Code</span>
+                            <span className="fc-value">{formatFriendCode(user?.switchFC) || "XXXX-XXXX-XXXX"}</span>
                         </div>
                     </div>
                 </div>
+
                 <div className="profile-actions">
                     <button 
                         className="settings-button" 
                         onClick={() => navigate("/settings")}
+                        onMouseEnter={() => setHoveredButton('settings')}
+                        onMouseLeave={() => setHoveredButton(null)}
+                        title="Go to Settings"
                     >
-                        ⚙️ Settings
+                        <img 
+                            src={hoveredButton === 'settings' ? settingsIconHover : settingsIcon} 
+                            alt="Settings" 
+                            className="button-icon"
+                        />
+                        Settings
                     </button>
-                    <button className="logout-button" data-cy="logout-button" onClick={handleLogout}>
+                    <button 
+                        className="logout-button" 
+                        data-cy="logout-button" 
+                        onClick={handleLogout}
+                        onMouseEnter={() => setHoveredButton('logout')}
+                        onMouseLeave={() => setHoveredButton(null)}
+                        title="Logout"
+                    >
+                        <img 
+                            src={hoveredButton === 'logout' ? logoutIconHover : logoutIcon} 
+                            alt="Logout" 
+                            className="button-icon"
+                        />
                         Logout
                     </button>
                 </div>
             </section>
 
-            {/* Rankings Section - shown if user has ShowRankings enabled */}
-            {user?.showRankings && (
-                <section className="rankings-section">
-                    <div className="rankings-header">
-                        <h2>Ranking Information</h2>
-                    </div>
-                    <div className="rankings-content">
-                        {POKEDEX_LIST.map((pokedex) => (
-                            <CircularProgress
-                                key={pokedex}
-                                percentage={pokedexProgress[pokedex] || 0}
-                                pokedexName={pokedex}
-                            />
-                        ))}
-                    </div>
+            {/* Overall Progress Section - shown if user has ShowRankings enabled */}
+            {user?.showRankings && overallProgress && (
+                <section className="overall-progress-section">
+                    <OverallProgress 
+                        collected={overallProgress.collected}
+                        totalAvailable={overallProgress.totalAvailable}
+                        percentage={overallProgress.percentage}
+                    />
+                </section>
+            )}
+
+            {/* Regional Progress Section */}
+            {regionalProgress && (
+                <section className="regional-progress-section">
+                    <RegionalProgress 
+                        pokedexProgress={regionalProgress}
+                        pokedexData={POKEDEX_DATA}
+                    />
                 </section>
             )}
 
