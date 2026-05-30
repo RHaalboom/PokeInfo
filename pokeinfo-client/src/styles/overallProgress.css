@@ -13,10 +13,17 @@
     padding-bottom: 18px;
 }
 
+.overall-progress-header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
 .overall-progress-header h2 {
     font-size: 24px;
     color: var(--text-primary);
-    margin: 0 0 8px 0;
+    margin: 0;
     display: flex;
     align-items: center;
     gap: 12px;
@@ -26,6 +33,36 @@
 .progress-header-icon {
     width: 32px;
     height: 32px;
+    object-fit: contain;
+}
+
+.rankings-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--button-bg);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 14px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.rankings-button:hover {
+    background: var(--button-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.rankings-button:active {
+    transform: translateY(0);
+}
+
+.rankings-button-icon {
+    width: 18px;
+    height: 18px;
     object-fit: contain;
 }
 

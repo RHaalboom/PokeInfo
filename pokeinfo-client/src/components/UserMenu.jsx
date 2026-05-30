@@ -1,8 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { logout as logoutService } from "../services/authService";
+import { useAuth } from "../hooks/useAuth";
 import userIcon from "../img/Poké-info_User.png";
 import userIconHover from "../img/Poké-info_User_hover.png";
+import rankingsIcon from "../img/Profile/Poké-info_First_Place.png";
 import settingsIcon from "../img/Poké-info_Settings.png";
 import settingsIconHover from "../img/Poké-info_Settings_hover.png";
 import logoutIcon from "../img/Poké-info_Logout.png";
@@ -14,6 +16,10 @@ export default function UserMenu({ onLogout }) {
     const [hoveredItem, setHoveredItem] = useState(null);
     const navigate = useNavigate();
     const menuRef = useRef(null);
+    const { user } = useAuth();
+
+    // Check if user can view rankings
+    const canViewRankings = user && (user.showRankings || user.roleName === "Moderator");
 
     useEffect(() => {
         function handleClickOutside(event) {
@@ -72,6 +78,23 @@ export default function UserMenu({ onLogout }) {
 
                 {isMenuOpen && (
                     <div className="menu-dropdown" data-cy="menu-dropdown">
+                        {canViewRankings && (
+                            <Link 
+                                to="/rankings" 
+                                className="menu-item"
+                                onClick={handleMenuItemClick}
+                                onMouseEnter={() => setHoveredItem('rankings')}
+                                onMouseLeave={() => setHoveredItem(null)}
+                                data-cy="rankings-link"
+                            >
+                                <img 
+                                    src={rankingsIcon} 
+                                    alt="Rankings" 
+                                    className="menu-icon" 
+                                />
+                                Rankings
+                            </Link>
+                        )}
                         <Link 
                             to="/settings" 
                             className="menu-item"

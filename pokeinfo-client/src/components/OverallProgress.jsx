@@ -1,3 +1,5 @@
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
 import '../styles/overallProgress.css';
 import progressIcon from '../img/Profile/Poké-info_Progress_Overall.png';
 import nonRankIcon from '../img/Profile/Poké-info_NonRank_Overall.png';
@@ -5,11 +7,17 @@ import bronzeIcon from '../img/Profile/Poké-info_Bronze_Overall.png';
 import silverIcon from '../img/Profile/Poké-info_Silver_Overall.png';
 import goldIcon from '../img/Profile/Poké-info_Gold_Overall.png';
 import diamondIcon from '../img/Profile/Poké-info_Diamond_Overall.png';
+import rankingsIcon from '../img/Profile/Poké-info_First_Place.png';
 
 export default function OverallProgress({ collected, totalAvailable, percentage }) {
+    const navigate = useNavigate();
+    const { user } = useAuth();
     const radius = 65;
     const circumference = 2 * Math.PI * radius;
     const strokeDashoffset = circumference - (percentage / 100) * circumference;
+
+    // Check if user can view rankings
+    const canViewRankings = user && (user.showRankings || user.roleName === "Moderator");
 
     // Determine rank and message
     const getRankInfo = () => {
@@ -61,10 +69,23 @@ export default function OverallProgress({ collected, totalAvailable, percentage 
     return (
         <div className="overall-progress-container">
             <div className="overall-progress-header">
-                <h2>
-                    <img src={progressIcon} alt="Overall Progress" className="progress-header-icon" />
-                    Overall Progress
-                </h2>
+                <div className="overall-progress-header-top">
+                    <h2>
+                        <img src={progressIcon} alt="Overall Progress" className="progress-header-icon" />
+                        Overall Progress
+                    </h2>
+                    {canViewRankings && (
+                        <button 
+                            className="rankings-button"
+                            onClick={() => navigate('/rankings')}
+                            title="View Rankings"
+                            data-cy="overall-rankings-button"
+                        >
+                            <img src={rankingsIcon} alt="Rankings" className="rankings-button-icon" />
+                            <span>Rankings</span>
+                        </button>
+                    )}
+                </div>
                 <p className="overall-description">Your total collection across all regions.</p>
             </div>
 

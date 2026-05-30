@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using PokeInfo.Data;
 using PokeInfo.Services;
 using System;
+using System.Security.Claims;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -55,6 +56,7 @@ builder.Services.AddDbContext<PokeInfoDbContext>(options =>
 builder.Services.AddScoped<IPokeInfoDbContext>(provider => provider.GetRequiredService<PokeInfoDbContext>());
 
 builder.Services.AddScoped<JwtService>();
+builder.Services.AddScoped<RankingsService>();
 
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 var key = Encoding.ASCII.GetBytes(jwtSettings["Key"] ?? throw new InvalidOperationException("JwtSettings:Key is missing"));
@@ -74,8 +76,8 @@ builder.Services.AddAuthentication(options =>
         ValidateAudience = false,
         ValidateLifetime = true,
         ClockSkew = TimeSpan.Zero,
-        NameClaimType = "name",
-        RoleClaimType = "role"
+        NameClaimType = ClaimTypes.Name,
+        RoleClaimType = ClaimTypes.Role
     };
 });
 
