@@ -4,7 +4,8 @@ import { getCurrentUser, logout as logoutService, isAuthenticated, getAllUsers }
 import { useAuth } from "../hooks/useAuth";
 import CollectionsSection from "../components/CollectionsSection";
 import OverallProgress from "../components/OverallProgress";
-import { calculateOverallProgress } from "../utils/pokedexProgress";
+import RegionalProgress from "../components/RegionalProgress";
+import { calculateOverallProgress, calculatePokedexProgress, POKEDEX_DATA } from "../utils/pokedexProgress";
 import { getCollections } from "../services/collectionService";
 import settingsIcon from "../img/Poké-info_Settings.png";
 import settingsIconHover from "../img/Poké-info_Settings_hover.png";
@@ -21,6 +22,7 @@ export default function ProfilePage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [overallProgress, setOverallProgress] = useState(null);
+    const [regionalProgress, setRegionalProgress] = useState(null);
     const [hoveredButton, setHoveredButton] = useState(null);
     const navigate = useNavigate();
     const { logout } = useAuth();
@@ -76,14 +78,28 @@ export default function ProfilePage() {
         try {
             const data = await getCollections();
             const progress = calculateOverallProgress(data);
+            const regionalProgData = calculatePokedexProgress(data);
             setOverallProgress(progress);
+            setRegionalProgress(regionalProgData);
         } catch (err) {
             console.error("Error fetching collections:", err);
             // If there's an error, just set default progress
             setOverallProgress({
                 collected: 0,
-                totalAvailable: 1228,
+                totalAvailable: 1025,
                 percentage: 0
+            });
+            setRegionalProgress({
+                KANTO: 0,
+                JOHTO: 0,
+                HOENN: 0,
+                SINNOH: 0,
+                UNOVA: 0,
+                KALOS: 0,
+                ALOLA: 0,
+                GALAR: 0,
+                HISUI: 0,
+                PALDEA: 0
             });
         }
     }
@@ -183,6 +199,16 @@ export default function ProfilePage() {
                         collected={overallProgress.collected}
                         totalAvailable={overallProgress.totalAvailable}
                         percentage={overallProgress.percentage}
+                    />
+                </section>
+            )}
+
+            {/* Regional Progress Section */}
+            {regionalProgress && (
+                <section className="regional-progress-section">
+                    <RegionalProgress 
+                        pokedexProgress={regionalProgress}
+                        pokedexData={POKEDEX_DATA}
                     />
                 </section>
             )}

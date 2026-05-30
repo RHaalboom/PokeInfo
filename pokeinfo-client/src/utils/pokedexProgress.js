@@ -142,8 +142,8 @@ export function calculateOverallProgress(collections) {
         });
     }
 
-    // Calculate total available Pokémon across all regions
-    const totalAvailable = Object.values(POKEDEX_DATA).reduce((sum, data) => sum + data.totalPokemon, 0);
+    // Total unique Pokémon across all regions (accounting for duplicates across Pokédexes)
+    const totalAvailable = 1025;
 
     const caught = allCaughtPokemon.size;
     const percentage = totalAvailable > 0 ? Math.round((caught / totalAvailable) * 100) : 0;
