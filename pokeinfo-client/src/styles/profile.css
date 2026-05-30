@@ -180,6 +180,10 @@
     object-fit: contain;
 }
 
+.overall-progress-section {
+    width: 100%;
+}
+
 .rankings-section {
     background: var(--slate);
     border-radius: 8px;

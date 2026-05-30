@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { getCurrentUser, logout as logoutService, isAuthenticated, getAllUsers } from "../services/authService";
 import { useAuth } from "../hooks/useAuth";
 import CollectionsSection from "../components/CollectionsSection";
-import CircularProgress from "../components/CircularProgress";
-import { calculatePokedexProgress } from "../utils/pokedexProgress";
+import OverallProgress from "../components/OverallProgress";
+import { calculateOverallProgress } from "../utils/pokedexProgress";
 import { getCollections } from "../services/collectionService";
 import settingsIcon from "../img/Poké-info_Settings.png";
 import settingsIconHover from "../img/Poké-info_Settings_hover.png";
@@ -15,14 +15,12 @@ import switchIcon from "../img/Profile/Poké-info_Switch.png";
 import "../styles/colorPalette.css";
 import "../styles/profile.css";
 
-const POKEDEX_LIST = ['KANTO', 'JOHTO', 'HOENN', 'SINNOH', 'UNOVA', 'KALOS', 'ALOLA', 'GALAR', 'HISUI', 'PALDEA'];
-
 export default function ProfilePage() {
     const [user, setUser] = useState(null);
     const [users, setUsers] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
-    const [pokedexProgress, setPokedexProgress] = useState({});
+    const [overallProgress, setOverallProgress] = useState(null);
     const [hoveredButton, setHoveredButton] = useState(null);
     const navigate = useNavigate();
     const { logout } = useAuth();
@@ -77,17 +75,16 @@ export default function ProfilePage() {
     async function fetchCollectionsAndProgress() {
         try {
             const data = await getCollections();
-            const progress = calculatePokedexProgress(data);
-            setPokedexProgress(progress);
+            const progress = calculateOverallProgress(data);
+            setOverallProgress(progress);
         } catch (err) {
             console.error("Error fetching collections:", err);
-            // If there's an error, just set empty progress
-            setPokedexProgress(
-                POKEDEX_LIST.reduce((acc, pokedex) => {
-                    acc[pokedex] = 0;
-                    return acc;
-                }, {})
-            );
+            // If there's an error, just set default progress
+            setOverallProgress({
+                collected: 0,
+                totalAvailable: 1228,
+                percentage: 0
+            });
         }
     }
 
@@ -179,21 +176,14 @@ export default function ProfilePage() {
                 </div>
             </section>
 
-            {/* Rankings Section - shown if user has ShowRankings enabled */}
-            {user?.showRankings && (
-                <section className="rankings-section">
-                    <div className="rankings-header">
-                        <h2>Ranking Information</h2>
-                    </div>
-                    <div className="rankings-content">
-                        {POKEDEX_LIST.map((pokedex) => (
-                            <CircularProgress
-                                key={pokedex}
-                                percentage={pokedexProgress[pokedex] || 0}
-                                pokedexName={pokedex}
-                            />
-                        ))}
-                    </div>
+            {/* Overall Progress Section - shown if user has ShowRankings enabled */}
+            {user?.showRankings && overallProgress && (
+                <section className="overall-progress-section">
+                    <OverallProgress 
+                        collected={overallProgress.collected}
+                        totalAvailable={overallProgress.totalAvailable}
+                        percentage={overallProgress.percentage}
+                    />
                 </section>
             )}
 

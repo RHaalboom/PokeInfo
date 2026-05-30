@@ -123,6 +123,39 @@ export function calculatePokedexProgress(collections) {
 }
 
 /**
+ * Calculate overall progress across all Pokédex regions
+ * @param {Array} collections - Array of collection objects with pokemons
+ * @returns {Object} Object with overall progress statistics
+ */
+export function calculateOverallProgress(collections) {
+    // Count unique Pokémon caught across all regions
+    const allCaughtPokemon = new Set();
+
+    // Iterate through all collections and track all caught Pokémon
+    if (collections && Array.isArray(collections)) {
+        collections.forEach(collection => {
+            if (collection.pokemons && Array.isArray(collection.pokemons)) {
+                collection.pokemons.forEach(pokemon => {
+                    allCaughtPokemon.add(pokemon.pokemonId);
+                });
+            }
+        });
+    }
+
+    // Calculate total available Pokémon across all regions
+    const totalAvailable = Object.values(POKEDEX_DATA).reduce((sum, data) => sum + data.totalPokemon, 0);
+
+    const caught = allCaughtPokemon.size;
+    const percentage = totalAvailable > 0 ? Math.round((caught / totalAvailable) * 100) : 0;
+
+    return {
+        collected: caught,
+        totalAvailable: totalAvailable,
+        percentage: percentage
+    };
+}
+
+/**
  * Get progress data for a single Pokédex
  * @param {string} pokedexKey - The Pokédex key (e.g., 'KANTO')
  * @param {number} percentage - The completion percentage
