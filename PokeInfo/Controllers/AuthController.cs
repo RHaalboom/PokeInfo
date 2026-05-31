@@ -76,6 +76,12 @@ public class AuthController : ControllerBase
             return Unauthorized(new { message = "Invalid credentials." });
         }
 
+        // Check if user is banned
+        if (user.Banned == 1)
+        {
+            return Unauthorized(new { message = "Your account has been banned and you cannot log in. For more information, please contact: xxxxx@xxxxx.com" });
+        }
+
         var result = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, request.Password);
         if (result == PasswordVerificationResult.Failed)
         {
@@ -98,7 +104,9 @@ public class AuthController : ControllerBase
                 SwitchFC = user.SwitchFC,
                 ShowRankings = user.RoleId == RoleService.RankedUserRoleId,
                 RoleName = user.Role.Name,
-                CreatedAt = user.CreatedAt
+                RoleId = user.RoleId,
+                CreatedAt = user.CreatedAt,
+                Banned = user.Banned
             }
         };
 
@@ -111,7 +119,7 @@ public class AuthController : ControllerBase
     {
         var roleClaim = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
 
-        if (roleClaim?.ToLower() != "moderator")
+        if (roleClaim?.ToLower() != "moderator" && roleClaim?.ToLower() != "admin")
         {
             return Forbid();
         }
@@ -123,7 +131,10 @@ public class AuthController : ControllerBase
                 Id = u.Id,
                 Username = u.Username,
                 Email = u.Email,
-                RoleName = u.Role.Name
+                DisplayName = u.DisplayName,
+                RoleName = u.Role.Name,
+                RoleId = u.RoleId,
+                Banned = u.Banned
             })
             .ToListAsync();
 
@@ -136,7 +147,7 @@ public class AuthController : ControllerBase
     {
         var roleClaim = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
 
-        if (roleClaim?.ToLower() != "moderator")
+        if (roleClaim?.ToLower() != "admin")
         {
             return Forbid();
         }
@@ -145,6 +156,12 @@ public class AuthController : ControllerBase
         if (user == null)
         {
             return NotFound(new { message = "User not found." });
+        }
+
+        // Prevent changing admin roles
+        if (user.RoleId == 4)
+        {
+            return BadRequest(new { message = "Cannot change admin user roles." });
         }
 
         var role = await _context.Roles.FindAsync(roleId);
@@ -165,6 +182,40 @@ public class AuthController : ControllerBase
     {
         var roles = await _context.Roles.ToListAsync();
         return Ok(roles);
+    }
+
+    [HttpPost("users/{id}/ban")]
+    [Authorize]
+    public async Task<IActionResult> BanUser(int id)
+    {
+        var roleClaim = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+
+        if (roleClaim?.ToLower() != "moderator" && roleClaim?.ToLower() != "admin")
+        {
+            return Forbid();
+        }
+
+        var user = await _context.Users.FindAsync(id);
+        if (user == null)
+        {
+            return NotFound(new { message = "User not found." });
+        }
+
+        // Prevent banning admins
+        if (user.RoleId == 4)
+        {
+            return BadRequest(new { message = "Cannot ban admin users." });
+        }
+
+        // Toggle ban status: if banned, unban; otherwise, ban
+        user.Banned = user.Banned == 1 ? null : 1;
+        _context.Users.Update(user);
+        await _context.SaveChangesAsync();
+
+        var isBanned = user.Banned == 1;
+        var message = isBanned ? $"User '{user.Username}' has been banned." : $"User '{user.Username}' has been unbanned.";
+
+        return Ok(new { message, banned = isBanned });
     }
 
     [HttpPut("profile")]

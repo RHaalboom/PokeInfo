@@ -638,13 +638,6 @@
     margin-bottom: 12px;
     font-size: 14px;
 }
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    font-weight: 500;
-    transition: background 0.2s ease;
-}
 
 .add-collection-btn:hover:not(:disabled) {
     background: #059669;

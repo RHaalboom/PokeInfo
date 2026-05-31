@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getCurrentUser, logout as logoutService, isAuthenticated, getAllUsers } from "../services/authService";
+import { getCurrentUser, logout as logoutService, isAuthenticated } from "../services/authService";
 import { useAuth } from "../hooks/useAuth";
 import CollectionsSection from "../components/CollectionsSection";
 import OverallProgress from "../components/OverallProgress";
@@ -19,9 +19,7 @@ import "../styles/profile.css";
 
 export default function ProfilePage() {
     const [user, setUser] = useState(null);
-    const [users, setUsers] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
     const [overallProgress, setOverallProgress] = useState(null);
     const [regionalProgress, setRegionalProgress] = useState(null);
     const [regionalRanks, setRegionalRanks] = useState({});
@@ -67,13 +65,6 @@ export default function ProfilePage() {
 
         // Fetch collections for Pokédex progress
         fetchCollectionsAndProgress();
-
-        // Fetch all users if moderator
-        if (currentUser?.roleName === "Moderator") {
-            fetchUsers();
-        } else {
-            setLoading(false);
-        }
     }, [navigate]);
 
     async function fetchCollectionsAndProgress() {
@@ -109,6 +100,8 @@ export default function ProfilePage() {
                 HISUI: 0,
                 PALDEA: 0
             });
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -146,17 +139,6 @@ export default function ProfilePage() {
         } catch (err) {
             console.error("Error fetching rankings:", err);
             // Silently fail - rankings are optional
-        }
-    }
-
-    async function fetchUsers() {
-        try {
-            const data = await getAllUsers();
-            setUsers(data);
-        } catch (err) {
-            setError(err.message);
-        } finally {
-            setLoading(false);
         }
     }
 
@@ -256,35 +238,6 @@ export default function ProfilePage() {
                         pokedexData={POKEDEX_DATA}
                         regionalRanks={regionalRanks}
                     />
-                </section>
-            )}
-
-            {user?.roleName === "Moderator" && (
-                <section className="moderator-section">
-                    <h2>All Users</h2>
-                    {error && <p className="error-message">{error}</p>}
-                    {users && (
-                        <table className="users-table">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Username</th>
-                                    <th>Email</th>
-                                    <th>Role</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {users.map((u) => (
-                                    <tr key={u.id}>
-                                        <td>{u.id}</td>
-                                        <td>{u.username}</td>
-                                        <td>{u.email}</td>
-                                        <td>{u.roleName}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    )}
                 </section>
             )}
 

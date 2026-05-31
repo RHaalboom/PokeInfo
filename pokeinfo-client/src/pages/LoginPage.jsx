@@ -47,7 +47,11 @@ export default function LoginPage() {
         } catch (error) {
             // For login, show a single error message above the button
             console.error("Login error caught:", error?.message || error);
-            const errorMessage = "Username and/or password is incorrect. Please try again";
+            // Check if it's a ban error
+            const isBanError = error?.message?.includes("banned");
+            const errorMessage = isBanError
+                ? "Your account has been banned and you cannot log in. For more information, please contact: xxxxx@xxxxx.com"
+                : error?.message || "Username and/or password is incorrect. Please try again";
             console.log("Setting form error to:", errorMessage);
             setFormError(errorMessage);
         } finally {
