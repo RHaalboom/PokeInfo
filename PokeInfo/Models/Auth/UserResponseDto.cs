@@ -11,5 +11,7 @@ public class UserResponseDto
     public string? SwitchFC { get; set; }
     public bool ShowRankings { get; set; }
     public string RoleName { get; set; } = string.Empty;
+    public int RoleId { get; set; }
     public DateTime CreatedAt { get; set; }
+    public int? Banned { get; set; }
 }

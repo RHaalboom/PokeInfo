@@ -38,4 +38,6 @@ public class User
 
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public DateTime CreatedAt { get; set; }
+
+    public int? Banned { get; set; } = null;
 }

@@ -4,6 +4,7 @@ import { logout as logoutService } from "../services/authService";
 import { useAuth } from "../hooks/useAuth";
 import userIcon from "../img/Poké-info_User.png";
 import userIconHover from "../img/Poké-info_User_hover.png";
+import moderatorIcon from "../img/Profile/Poké-info_First_Place.png";
 import rankingsIcon from "../img/Profile/Poké-info_First_Place.png";
 import settingsIcon from "../img/Poké-info_Settings.png";
 import settingsIconHover from "../img/Poké-info_Settings_hover.png";
@@ -20,6 +21,9 @@ export default function UserMenu({ onLogout }) {
 
     // Check if user can view rankings
     const canViewRankings = user && (user.showRankings || user.roleName === "Moderator");
+
+    // Check if user can view moderator panel
+    const canAccessModerator = user && (user.roleName === "Admin" || user.roleName === "Moderator");
 
     useEffect(() => {
         function handleClickOutside(event) {
@@ -78,6 +82,23 @@ export default function UserMenu({ onLogout }) {
 
                 {isMenuOpen && (
                     <div className="menu-dropdown" data-cy="menu-dropdown">
+                        {canAccessModerator && (
+                            <Link 
+                                to="/moderator" 
+                                className="menu-item"
+                                onClick={handleMenuItemClick}
+                                onMouseEnter={() => setHoveredItem('moderator')}
+                                onMouseLeave={() => setHoveredItem(null)}
+                                data-cy="moderator-link"
+                            >
+                                <img 
+                                    src={moderatorIcon} 
+                                    alt="Moderator" 
+                                    className="menu-icon" 
+                                />
+                                User Management
+                            </Link>
+                        )}
                         {canViewRankings && (
                             <Link 
                                 to="/rankings" 

@@ -78,3 +78,42 @@ export async function getAllUsers() {
 
     return data;
 }
+
+export async function banUser(userId) {
+    const token = getAuthToken();
+    const response = await fetch(`${AUTH_API_URL}/users/${userId}/ban`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+        }
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.message || "Failed to ban user.");
+    }
+
+    return data;
+}
+
+export async function changeUserRole(userId, roleId) {
+    const token = getAuthToken();
+    const response = await fetch(`${AUTH_API_URL}/users/${userId}/role/${roleId}`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+        }
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.message || "Failed to change user role.");
+    }
+
+    return data;
+}
+
