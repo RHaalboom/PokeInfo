@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getCurrentUser, isAuthenticated } from "../services/authService";
+import { useAuth } from "../hooks/useAuth";
 import { updateProfile, changePassword, updateAccount } from "../services/userService";
 import "../styles/colorPalette.css";
 import "../styles/settings.css";
@@ -11,6 +12,7 @@ export default function SettingsPage() {
     const [success, setSuccess] = useState("");
     const [activeTab, setActiveTab] = useState("profile");
     const navigate = useNavigate();
+    const { updateUser } = useAuth();
 
     // Helper function to format friend code input
     const formatFriendCodeInput = (value) => {
@@ -85,8 +87,8 @@ export default function SettingsPage() {
             setIsSavingProfile(true);
             const updatedUser = await updateProfile(displayName, profilePictureUrl, cleanedThreedsFC, cleanedSwitchFC, showRankings);
 
-            // Update localStorage
-            localStorage.setItem("user", JSON.stringify(updatedUser));
+            // Update both localStorage and React auth context
+            updateUser(updatedUser);
 
             setSuccess("Profile updated successfully!");
         } catch (err) {
