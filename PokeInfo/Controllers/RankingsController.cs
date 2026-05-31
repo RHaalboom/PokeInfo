@@ -38,15 +38,22 @@ public class RankingsController : ControllerBase
             var allClaims = User.Claims.ToList();
             _logger.LogInformation("All claims for user: {claims}", string.Join(", ", allClaims.Select(c => $"{c.Type}={c.Value}")));
 
-            // Check authorization - only RankedUser and Moderator can view rankings
+            // Check authorization - only Ranked users and Moderator+ can view rankings
             var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
             var roleId = GetRoleId(userRole);
 
-            _logger.LogInformation("User role claim: {role}, converted to roleId: {roleId}, CanSeeRankings: {canSee}", userRole ?? "null", roleId, RoleService.CanSeeRankings(roleId));
+            // Look for Ranked claim with value "1"
+            var rankedClaim = User.FindFirst("Ranked")?.Value;
+            bool isRanked = rankedClaim == "1";
 
-            if (!RoleService.CanSeeRankings(roleId))
+            _logger.LogInformation("User role: {role} (RoleId: {roleId}), Ranked claim: {rankedClaim}, IsRanked: {isRanked}", userRole ?? "null", roleId, rankedClaim ?? "null", isRanked);
+
+            // Check if user can see rankings: either ranked=1 OR moderator/admin role
+            bool canSeeRankings = isRanked || roleId == RoleService.ModeratorRoleId || roleId == RoleService.AdminRoleId;
+
+            if (!canSeeRankings)
             {
-                _logger.LogWarning("Unauthorized ranking access attempt by user with role: {role} (roleId: {roleId})", userRole ?? "null", roleId);
+                _logger.LogWarning("Unauthorized ranking access: role={role} (RoleId={roleId}), isRanked={isRanked}", userRole ?? "null", roleId, isRanked);
                 return Forbid();
             }
 
@@ -81,15 +88,22 @@ public class RankingsController : ControllerBase
             var allClaims = User.Claims.ToList();
             _logger.LogInformation("All claims for user: {claims}", string.Join(", ", allClaims.Select(c => $"{c.Type}={c.Value}")));
 
-            // Check authorization - only RankedUser and Moderator can view rankings
+            // Check authorization - only Ranked users and Moderator+ can view rankings
             var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
             var roleId = GetRoleId(userRole);
 
-            _logger.LogInformation("User role claim: {role}, converted to roleId: {roleId}, CanSeeRankings: {canSee}", userRole ?? "null", roleId, RoleService.CanSeeRankings(roleId));
+            // Look for Ranked claim with value "1"
+            var rankedClaim = User.FindFirst("Ranked")?.Value;
+            bool isRanked = rankedClaim == "1";
 
-            if (!RoleService.CanSeeRankings(roleId))
+            _logger.LogInformation("User role: {role} (RoleId: {roleId}), Ranked claim: {rankedClaim}, IsRanked: {isRanked}", userRole ?? "null", roleId, rankedClaim ?? "null", isRanked);
+
+            // Check if user can see rankings: either ranked=1 OR moderator/admin role
+            bool canSeeRankings = isRanked || roleId == RoleService.ModeratorRoleId || roleId == RoleService.AdminRoleId;
+
+            if (!canSeeRankings)
             {
-                _logger.LogWarning("Unauthorized ranking access attempt by user with role: {role} (roleId: {roleId})", userRole ?? "null", roleId);
+                _logger.LogWarning("Unauthorized ranking access: role={role} (RoleId={roleId}), isRanked={isRanked}", userRole ?? "null", roleId, isRanked);
                 return Forbid();
             }
 
@@ -110,8 +124,8 @@ public class RankingsController : ControllerBase
     private static int GetRoleId(string? roleName) => roleName?.ToLower() switch
     {
         "user" => RoleService.UserRoleId,
-        "rankeduser" => RoleService.RankedUserRoleId,
         "moderator" => RoleService.ModeratorRoleId,
+        "admin" => RoleService.AdminRoleId,
         _ => RoleService.UserRoleId
     };
 }

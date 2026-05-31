@@ -22,8 +22,8 @@ export default function RankingsPage() {
             return;
         }
 
-        // Only RankedUser and Moderator can view rankings
-        if (user.roleName !== "RankedUser" && user.roleName !== "Moderator") {
+        // Only users with ShowRankings flag or Moderator/Admin roles can view rankings
+        if (!user.showRankings && user.roleName !== "Moderator" && user.roleName !== "Admin") {
             navigate("/");
             return;
         }

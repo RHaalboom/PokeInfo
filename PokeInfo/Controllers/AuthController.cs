@@ -102,11 +102,12 @@ public class AuthController : ControllerBase
                 ProfilePictureUrl = user.ProfilePictureUrl,
                 ThreedsFC = user.ThreedsFC,
                 SwitchFC = user.SwitchFC,
-                ShowRankings = user.RoleId == RoleService.RankedUserRoleId,
+                ShowRankings = user.Ranked == 1,
                 RoleName = user.Role.Name,
                 RoleId = user.RoleId,
                 CreatedAt = user.CreatedAt,
-                Banned = user.Banned
+                Banned = user.Banned,
+                Ranked = user.Ranked
             }
         };
 
@@ -159,7 +160,7 @@ public class AuthController : ControllerBase
         }
 
         // Prevent changing admin roles
-        if (user.RoleId == 4)
+        if (user.RoleId == RoleService.AdminRoleId)
         {
             return BadRequest(new { message = "Cannot change admin user roles." });
         }
@@ -202,7 +203,7 @@ public class AuthController : ControllerBase
         }
 
         // Prevent banning admins
-        if (user.RoleId == 4)
+        if (user.RoleId == RoleService.AdminRoleId)
         {
             return BadRequest(new { message = "Cannot ban admin users." });
         }
@@ -269,7 +270,7 @@ public class AuthController : ControllerBase
 
         if (request.ShowRankings.HasValue)
         {
-            user.RoleId = request.ShowRankings.Value ? RoleService.RankedUserRoleId : RoleService.UserRoleId;
+            user.Ranked = request.ShowRankings.Value ? 1 : null;
         }
 
         _context.Users.Update(user);
@@ -286,8 +287,9 @@ public class AuthController : ControllerBase
             ProfilePictureUrl = user.ProfilePictureUrl,
             ThreedsFC = user.ThreedsFC,
             SwitchFC = user.SwitchFC,
-            ShowRankings = user.RoleId == RoleService.RankedUserRoleId,
-            RoleName = user.Role?.Name ?? "User"
+            ShowRankings = user.Ranked == 1,
+            RoleName = user.Role?.Name ?? "User",
+            Ranked = user.Ranked
         };
 
         return Ok(response);

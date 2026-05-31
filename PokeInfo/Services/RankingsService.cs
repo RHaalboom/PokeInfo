@@ -19,7 +19,7 @@ public class RankingsService
 
     /// <summary>
     /// Get the ranking for a specific Pokédex region
-    /// Only includes users with RankedUser or Moderator role
+    /// Only includes users with Ranked flag or Moderator/Admin role
     /// </summary>
     /// <param name="pokedexKey">The Pokédex region key (e.g., "KANTO")</param>
     /// <returns>The ranking DTO for the specified Pokédex, or null if invalid key</returns>
@@ -30,14 +30,14 @@ public class RankingsService
         if (pokedexRegion == null)
             return null;
 
-        // Get all RankedUser and Moderator role IDs
-        int rankedUserRoleId = PokeInfo.Services.RoleService.RankedUserRoleId;
+        // Get all users who are ranked (Ranked=1) or have moderator/admin roles
         int moderatorRoleId = PokeInfo.Services.RoleService.ModeratorRoleId;
+        int adminRoleId = PokeInfo.Services.RoleService.AdminRoleId;
 
         // Fetch all ranked users with their collections and Pokémon
         // Split into multiple queries to avoid EF Core expression tree issues
         var rankedUsers = await _context.Users
-            .Where(u => u.RoleId == rankedUserRoleId || u.RoleId == moderatorRoleId)
+            .Where(u => u.Ranked == 1 || u.RoleId == moderatorRoleId || u.RoleId == adminRoleId)
             .Include(u => u.Collections)
             .ThenInclude(c => c.CollectionPokemons)
             .AsNoTracking()

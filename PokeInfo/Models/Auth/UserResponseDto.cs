@@ -12,6 +12,7 @@ public class UserResponseDto
     public bool ShowRankings { get; set; }
     public string RoleName { get; set; } = string.Empty;
     public int RoleId { get; set; }
+    public int? Ranked { get; set; }
     public DateTime CreatedAt { get; set; }
     public int? Banned { get; set; }
 }
