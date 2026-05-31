@@ -6,19 +6,19 @@ namespace PokeInfo.Services;
 public class RoleService
 {
     public const int UserRoleId = 1;
-    public const int RankedUserRoleId = 2;
-    public const int ModeratorRoleId = 3;
+    public const int ModeratorRoleId = 2;
+    public const int AdminRoleId = 3;
 
     public const string UserRoleName = "User";
-    public const string RankedUserRoleName = "RankedUser";
     public const string ModeratorRoleName = "Moderator";
+    public const string AdminRoleName = "Admin";
 
     /// <summary>
     /// Checks if a user can see rankings
     /// </summary>
-    public static bool CanSeeRankings(int roleId)
+    public static bool CanSeeRankings(int roleId, int? ranked)
     {
-        return roleId == RankedUserRoleId || roleId == ModeratorRoleId;
+        return ranked == 1 || roleId == ModeratorRoleId || roleId == AdminRoleId;
     }
 
     /// <summary>
@@ -26,7 +26,7 @@ public class RoleService
     /// </summary>
     public static bool IsModeratorOrAbove(int roleId)
     {
-        return roleId == ModeratorRoleId;
+        return roleId == ModeratorRoleId || roleId == AdminRoleId;
     }
 
     /// <summary>
@@ -37,8 +37,8 @@ public class RoleService
         return roleId switch
         {
             UserRoleId => UserRoleName,
-            RankedUserRoleId => RankedUserRoleName,
             ModeratorRoleId => ModeratorRoleName,
+            AdminRoleId => AdminRoleName,
             _ => "Unknown"
         };
     }

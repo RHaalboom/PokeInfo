@@ -20,7 +20,7 @@ export default function UserMenu({ onLogout }) {
     const { user } = useAuth();
 
     // Check if user can view rankings
-    const canViewRankings = user && (user.showRankings || user.roleName === "Moderator");
+    const canViewRankings = user && (user.showRankings || user.roleName === "Moderator" || user.roleName === "Admin");
 
     // Check if user can view moderator panel
     const canAccessModerator = user && (user.roleName === "Admin" || user.roleName === "Moderator");

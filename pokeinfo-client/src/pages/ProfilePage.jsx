@@ -75,9 +75,9 @@ export default function ProfilePage() {
             setOverallProgress(progress);
             setRegionalProgress(regionalProgData);
 
-            // Fetch rankings if user has RankedUser or Moderator role
+            // Fetch rankings if user has ShowRankings flag enabled
             const currentUser = getCurrentUser();
-            if (currentUser?.roleName === "RankedUser" || currentUser?.roleName === "Moderator") {
+            if (currentUser?.showRankings) {
                 await fetchUserRankings(currentUser.username);
             }
         } catch (err) {
