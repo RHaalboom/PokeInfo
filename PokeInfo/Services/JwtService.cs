@@ -23,13 +23,19 @@ public class JwtService
         var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_key));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-        var claims = new[]
+        var claims = new List<Claim>
         {
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(ClaimTypes.Name, user.Username),
             new Claim(ClaimTypes.Email, user.Email),
-            new Claim("role", user.Role?.Name ?? "User")
+            new Claim(ClaimTypes.Role, user.Role?.Name ?? "User")
         };
+
+        // Add Ranked claim only if user is ranked
+        if (user.Ranked.HasValue && user.Ranked == 1)
+        {
+            claims.Add(new Claim("Ranked", "1"));
+        }
 
         var token = new JwtSecurityToken(
             claims: claims,

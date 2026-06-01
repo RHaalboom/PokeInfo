@@ -7,7 +7,9 @@ export const SECTION_ICONS = {
     ability: AbilityIcon,
     evolutionChain: EvolutionChainIcon,
     games: GamesIcon,
-    typing: TypingIcon
+    typing: TypingIcon,
+    strength: TypingIcon,
+    weakness: TypingIcon
 };
 
 export function getSectionIcon(section) {

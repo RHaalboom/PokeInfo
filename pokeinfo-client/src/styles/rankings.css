@@ -1,0 +1,462 @@
+.rankings-page {
+    padding: 30px 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.rankings-container {
+    width: 100%;
+}
+
+.rankings-header {
+    margin-bottom: 30px;
+}
+
+.rankings-header h1 {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 8px 0;
+}
+
+.rankings-description {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+/* Controls Section */
+.rankings-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 30px;
+    padding: 20px;
+    background: var(--soft-dark);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+}
+
+.pokedex-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    min-width: 120px;
+}
+
+.pokedex-selector {
+    padding: 10px 12px;
+    background: var(--slate);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-primary);
+    font-size: 14px;
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+    min-width: 200px;
+}
+
+.pokedex-selector:hover {
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.pokedex-selector:focus {
+    outline: none;
+    border-color: var(--primary-red);
+}
+
+/* Loading State */
+.loading-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    text-align: center;
+}
+
+.loading-state p {
+    font-size: 16px;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+/* Error State */
+.error-state {
+    padding: 20px;
+    background: rgba(231, 76, 60, 0.1);
+    border: 1px solid rgba(231, 76, 60, 0.3);
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.error-message {
+    color: var(--primary-red);
+    margin: 0;
+    font-size: 14px;
+}
+
+/* Rankings Content */
+.rankings-content {
+    background: var(--soft-dark);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 30px;
+}
+
+.rankings-info {
+    margin-bottom: 20px;
+    padding: 0;
+    border-bottom: none;
+}
+
+.rankings-info h2 {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 12px 0;
+}
+
+.total-pokemon {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+/* No Rankings State */
+.no-rankings {
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.no-rankings p {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+/* Rankings Table */
+.rankings-table-wrapper {
+    overflow-x: auto;
+}
+
+.rankings-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.rankings-table thead {
+    background: rgba(255, 255, 255, 0.05);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.rankings-table th {
+    padding: 16px 12px;
+    text-align: left;
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.col-position {
+    width: 60px;
+}
+
+.position-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    height: 40px;
+}
+
+.rank-badge-small {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.position-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    height: 32px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 14px;
+}
+
+.col-name {
+    width: 200px;
+}
+
+.col-progress {
+    width: 120px;
+}
+
+.col-percentage {
+    width: 180px;
+}
+
+.col-date {
+    width: 140px;
+}
+
+.rankings-table tbody tr {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    transition: background-color 0.2s ease;
+}
+
+.rankings-table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.rankings-table td {
+    padding: 16px 12px;
+    color: var(--text-primary);
+}
+
+.ranking-row.completed td {
+    color: var(--text-primary);
+}
+
+/* Position Column */
+.position {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, var(--primary-red), rgba(231, 76, 60, 0.7));
+    border-radius: 50%;
+    font-weight: 700;
+    font-size: 16px;
+}
+
+.ranking-row:nth-child(1) .position {
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+}
+
+.ranking-row:nth-child(2) .position {
+    background: linear-gradient(135deg, #C0C0C0, #808080);
+}
+
+.ranking-row:nth-child(3) .position {
+    background: linear-gradient(135deg, #CD7F32, #8B4513);
+}
+
+/* Trainer Name */
+.trainer-name {
+    font-weight: 600;
+}
+
+/* Progress Text */
+.progress-text {
+    font-weight: 500;
+}
+
+/* Percentage Display */
+.percentage-display {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+}
+
+.percentage-bar {
+    flex: 1;
+    height: 6px;
+    background: rgba(203, 213, 225, 0.1);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.percentage-fill {
+    height: 100%;
+    background: var(--primary-red);
+    border-radius: 3px;
+    transition: width 0.3s ease;
+    box-shadow: 0 0 4px rgba(231, 76, 60, 0.3);
+}
+
+.percentage-text {
+    font-weight: 700;
+    min-width: 35px;
+    text-align: right;
+}
+
+/* Status Badge */
+.status-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-badge.completed {
+    background: rgba(39, 174, 96, 0.15);
+    color: #27AE60;
+    border: 1px solid rgba(39, 174, 96, 0.3);
+}
+
+.status-badge.incomplete {
+    background: rgba(231, 76, 60, 0.1);
+    color: var(--primary-red);
+    border: 1px solid rgba(231, 76, 60, 0.3);
+}
+
+/* Completion Date */
+.completion-date {
+    font-size: 13px;
+    color: var(--text-primary);
+}
+
+.no-date {
+    color: var(--text-secondary);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .rankings-page {
+        padding: 20px 15px;
+    }
+
+    .rankings-content {
+        padding: 20px;
+    }
+
+    .col-percentage {
+        width: 150px;
+    }
+
+    .col-date {
+        width: 120px;
+    }
+}
+
+@media (max-width: 768px) {
+    .rankings-page {
+        padding: 15px 10px;
+    }
+
+    .rankings-header h1 {
+        font-size: 24px;
+    }
+
+    .rankings-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .pokedex-label {
+        min-width: auto;
+    }
+
+    .pokedex-selector {
+        min-width: auto;
+        width: 100%;
+    }
+
+    .rankings-content {
+        padding: 15px;
+    }
+
+    .rankings-table-wrapper {
+        overflow-x: auto;
+    }
+
+    .rankings-table th,
+    .rankings-table td {
+        padding: 12px 8px;
+        font-size: 13px;
+    }
+
+    .col-position {
+        width: 50px;
+    }
+
+    .col-name {
+        width: 140px;
+    }
+
+    .col-progress {
+        width: 100px;
+    }
+
+    .col-percentage {
+        width: 120px;
+    }
+
+    .col-status {
+        width: 100px;
+    }
+
+    .col-date {
+        width: 100px;
+        font-size: 12px;
+    }
+
+    .percentage-text {
+        min-width: 30px;
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .rankings-page {
+        padding: 10px;
+    }
+
+    .rankings-header h1 {
+        font-size: 20px;
+        margin-bottom: 4px;
+    }
+
+    .rankings-description {
+        font-size: 12px;
+    }
+
+    .rankings-controls {
+        padding: 15px;
+    }
+
+    .rankings-table-wrapper {
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        overflow-x: auto;
+    }
+
+    .rankings-table {
+        min-width: 600px;
+    }
+
+    .rankings-table th,
+    .rankings-table td {
+        padding: 10px 6px;
+        font-size: 12px;
+    }
+
+    .col-position {
+        width: 45px;
+    }
+
+    .position {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+    }
+
+    .trainer-name {
+        font-size: 12px;
+    }
+}

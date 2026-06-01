@@ -140,6 +140,15 @@ namespace PokeInfo.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("Banned")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime(6)");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<DateTime>("CreatedAt"));
+
                     b.Property<string>("DisplayName")
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)");
@@ -155,6 +164,9 @@ namespace PokeInfo.Migrations
 
                     b.Property<string>("ProfilePictureUrl")
                         .HasColumnType("longtext");
+
+                    b.Property<int?>("Ranked")
+                        .HasColumnType("int");
 
                     b.Property<int>("RoleId")
                         .HasColumnType("int");

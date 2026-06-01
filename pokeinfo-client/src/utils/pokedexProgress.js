@@ -74,9 +74,9 @@ export const GAME_TO_POKEDEX = {
 };
 
 /**
- * Calculate Pokédex completion percentages from user's collections
+ * Calculate Pokédex completion counts from user's collections
  * @param {Array} collections - Array of collection objects with pokemons
- * @returns {Object} Object with Pokédex names as keys and completion percentages as values
+ * @returns {Object} Object with Pokédex names as keys and count of caught Pokémon as values
  */
 export function calculatePokedexProgress(collections) {
     // Count unique Pokémon caught in each Pokédex across all collections
@@ -98,7 +98,7 @@ export function calculatePokedexProgress(collections) {
         collections.forEach(collection => {
             if (collection.pokemons && Array.isArray(collection.pokemons)) {
                 collection.pokemons.forEach(pokemon => {
-                    const gameName = pokemon.caughtInGame?.toLowerCase();
+                    const gameName = pokemon.caughtInGame?.toLowerCase().trim();
                     if (gameName) {
                         // Map game name to Pokédex
                         const pokedex = GAME_TO_POKEDEX[gameName];
@@ -111,15 +111,46 @@ export function calculatePokedexProgress(collections) {
         });
     }
 
-    // Calculate percentages
-    const percentages = {};
+    // Return counts for each Pokédex
+    const counts = {};
     Object.keys(POKEDEX_DATA).forEach(key => {
-        const caught = caughtInPokedex[key].size;
-        const total = POKEDEX_DATA[key].totalPokemon;
-        percentages[key] = total > 0 ? Math.round((caught / total) * 100) : 0;
+        counts[key] = caughtInPokedex[key].size;
     });
 
-    return percentages;
+    return counts;
+}
+
+/**
+ * Calculate overall progress across all Pokédex regions
+ * @param {Array} collections - Array of collection objects with pokemons
+ * @returns {Object} Object with overall progress statistics
+ */
+export function calculateOverallProgress(collections) {
+    // Count unique Pokémon caught across all regions
+    const allCaughtPokemon = new Set();
+
+    // Iterate through all collections and track all caught Pokémon
+    if (collections && Array.isArray(collections)) {
+        collections.forEach(collection => {
+            if (collection.pokemons && Array.isArray(collection.pokemons)) {
+                collection.pokemons.forEach(pokemon => {
+                    allCaughtPokemon.add(pokemon.pokemonId);
+                });
+            }
+        });
+    }
+
+    // Total unique Pokémon across all regions (accounting for duplicates across Pokédexes)
+    const totalAvailable = 1025;
+
+    const caught = allCaughtPokemon.size;
+    const percentage = totalAvailable > 0 ? Math.round((caught / totalAvailable) * 100) : 0;
+
+    return {
+        collected: caught,
+        totalAvailable: totalAvailable,
+        percentage: percentage
+    };
 }
 
 /**

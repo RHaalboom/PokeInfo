@@ -52,8 +52,11 @@
 }
 
 .pokemon-detail-modal {
-    scrollbar-width: thin;
-    scrollbar-color: var(--primary-red) var(--soft-dark);
+    scrollbar-width: none;
+}
+
+.pokemon-detail-modal::-webkit-scrollbar {
+    display: none;
 }
 
 .modal-content h2 {
@@ -517,6 +520,23 @@
     border-color: #9CA3AF;
 }
 
+/* Super Weak Badge - 4x weak */
+.super-weak-badge {
+    position: relative;
+    border-width: 2px !important;
+    box-shadow: 0 0 12px currentColor, inset 0 0 6px rgba(255, 255, 255, 0.1);
+}
+
+.super-weak-badge .weakness-multiplier {
+    display: inline-block;
+    margin-left: 4px;
+    font-weight: 800;
+    font-size: 12px;
+    padding: 0 4px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 3px;
+}
+
 /* Abilities Container */
 .abilities-container {
     display: flex;
@@ -532,6 +552,19 @@
     color: var(--text-primary);
     font-size: 14px;
     border: 1px solid var(--border);
+}
+
+/* Strengths and Weaknesses Container */
+.strengths-weaknesses-container {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+
+.strengths-weaknesses-types {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
 }
 
 /* Add to Collection Section */
@@ -604,13 +637,6 @@
     border: 1px solid var(--success-green);
     margin-bottom: 12px;
     font-size: 14px;
-}
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    font-weight: 500;
-    transition: background 0.2s ease;
 }
 
 .add-collection-btn:hover:not(:disabled) {
@@ -693,23 +719,23 @@
     display: inline-flex;
     align-items: center;
     justify-content: flex-start;
-    width: 120px;
-    padding: 8px 12px;
+    width: 144px;
+    padding: 10px 14px;
     border-radius: 8px;
     background: var(--soft-dark);
     color: var(--text-primary);
-    font-size: 12px;
+    font-size: 14px;
     border: 1px solid var(--border);
     border-left: 4px solid var(--border);
-    gap: 8px;
+    gap: 10px;
     text-align: left;
 }
 
 @media (max-width: 768px) {
     .game-badge {
-        width: 100px;
-        font-size: 11px;
-        padding: 8px 10px;
+        width: 120px;
+        font-size: 13px;
+        padding: 10px 12px;
     }
 }
 
@@ -865,8 +891,8 @@
 }
 
 .game-icon-img {
-    width: 24px;
-    height: 24px;
+    width: 29px;
+    height: 29px;
     object-fit: contain;
     flex-shrink: 0;
 }

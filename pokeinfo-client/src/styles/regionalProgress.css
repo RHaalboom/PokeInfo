@@ -1,0 +1,306 @@
+/* Regional Progress Container */
+.regional-progress-container {
+    width: 100%;
+    padding: 30px;
+    background: var(--slate);
+    border-radius: 8px;
+    margin-bottom: 30px;
+    border: 1px solid var(--border);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+}
+
+/* Header Section */
+.regional-progress-header {
+    margin-bottom: 30px;
+}
+
+.regional-progress-header h2 {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 8px 0;
+    letter-spacing: 0;
+}
+
+.progress-header-icon {
+    width: 28px;
+    height: 28px;
+}
+
+.regional-description {
+    color: var(--text-secondary);
+    font-size: 14px;
+    margin-left: 40px;
+    font-weight: 400;
+    text-align: left;
+}
+
+/* Regional Cards Grid */
+.regional-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+@media (max-width: 1400px) {
+    .regional-cards-grid {
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    }
+}
+
+@media (max-width: 1024px) {
+    .regional-cards-grid {
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .regional-cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .regional-cards-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+}
+
+/* Regional Progress Card */
+.regional-progress-card {
+    background: var(--soft-dark);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    transition: all 0.2s ease;
+}
+
+.regional-progress-card:hover {
+    border-color: rgba(255, 255, 255, 0.15);
+    background: rgba(17, 24, 39, 0.8);
+}
+
+/* Card Header */
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+    position: relative;
+}
+
+.region-circle {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: 700;
+    color: #ffffff;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.region-info {
+    flex: 1;
+}
+
+.region-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 4px 0;
+    letter-spacing: 0;
+    text-align: left;
+}
+
+/* Rank Badge */
+.regional-progress-card .rank-badge {
+    margin-left: auto;
+    align-self: flex-start;
+    margin-top: -8px;
+    margin-right: -8px;
+    flex-shrink: 0;
+}
+
+.regional-progress-card .rank-badge-icon {
+    width: 42px;
+    height: 42px;
+    object-fit: contain;
+}
+
+.regional-progress-card .rank-badge-text {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 58px;
+    height: 32px;
+    padding: 0 12px;
+    border-radius: 999px;
+    background: rgba(148, 163, 184, 0.12);
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    color: #CBD5E1;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+/* Progress Bar */
+.progress-bar-container {
+    margin-top: 16px;
+}
+
+.progress-bar-background {
+    width: 100%;
+    height: 6px;
+    background: rgba(203, 213, 225, 0.1);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    transition: width 0.3s ease;
+    border-radius: 3px;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
+}
+.progress-percentage {
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+/* Card Stats */
+
+.region-count {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1;
+}
+
+.count-current {
+    color: var(--text-primary);
+}
+
+.count-separator {
+    color: var(--text-secondary);
+}
+
+.count-total {
+    color: var(--text-secondary);
+}
+
+/* Footer Info */
+.regional-info-footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: var(--text-secondary);
+    font-size: 13px;
+    text-align: center;
+    padding-top: 8px;
+    border-top: 1px solid rgba(203, 213, 225, 0.1);
+}
+
+.regional-info-footer p {
+    margin: 0;
+}
+
+.info-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 1px solid rgba(203, 213, 225, 0.3);
+    font-size: 10px;
+    flex-shrink: 0;
+}
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 12px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .regional-progress-container {
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    .regional-progress-header h2 {
+        font-size: 18px;
+        gap: 8px;
+    }
+
+    .progress-header-icon {
+        width: 24px;
+        height: 24px;
+    }
+
+    .region-circle {
+        width: 48px;
+        height: 48px;
+        font-size: 20px;
+    }
+
+    .regional-progress-card {
+        padding: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .regional-progress-container {
+        padding: 16px;
+        margin-bottom: 16px;
+    }
+
+    .regional-progress-header h2 {
+        font-size: 16px;
+    }
+
+    .regional-description {
+        font-size: 12px;
+        text-align: left;
+    }
+
+    .region-circle {
+        width: 44px;
+        height: 44px;
+        font-size: 18px;
+    }
+
+    .region-name {
+        font-size: 14px;
+    }
+
+    .region-percentage {
+        font-size: 18px;
+    }
+
+    .stat-value {
+        font-size: 12px;
+    }
+
+    .stat-label {
+        font-size: 10px;
+    }
+
+    .regional-progress-card {
+        padding: 12px;
+    }
+}

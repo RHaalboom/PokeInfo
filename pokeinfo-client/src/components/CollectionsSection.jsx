@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getCollections, createCollection, deleteCollection } from "../services/collectionService";
+import { useAuth } from "../hooks/useAuth";
 import "../styles/colorPalette.css";
 import "../styles/collections.css";
 
 export default function CollectionsSection() {
+    const { isAuthenticated } = useAuth();
     const [collections, setCollections] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -14,8 +16,12 @@ export default function CollectionsSection() {
     const [creatingCollection, setCreatingCollection] = useState(false);
 
     useEffect(() => {
-        fetchCollections();
-    }, []);
+        if (isAuthenticated) {
+            fetchCollections();
+        } else {
+            setLoading(false);
+        }
+    }, [isAuthenticated]);
 
     async function fetchCollections() {
         try {
@@ -91,7 +97,7 @@ export default function CollectionsSection() {
                         <input
                             id="name"
                             type="text"
-                            placeholder="e.g., My Favorite Pokémon"
+                            placeholder="e.g., Kanto Pokédex"
                             value={newCollectionName}
                             onChange={(e) => setNewCollectionName(e.target.value)}
                             disabled={creatingCollection}
@@ -103,7 +109,7 @@ export default function CollectionsSection() {
                         <label htmlFor="description">Description</label>
                         <textarea
                             id="description"
-                            placeholder="e.g., A collection of my favorite water-type Pokémon"
+                            placeholder="e.g., A collection of my Pokémon caught in the Kanto region!"
                             value={newCollectionDescription}
                             onChange={(e) => setNewCollectionDescription(e.target.value)}
                             disabled={creatingCollection}

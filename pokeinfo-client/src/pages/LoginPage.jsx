@@ -24,9 +24,6 @@ export default function LoginPage() {
             ...previousData,
             [name]: value
         }));
-
-        // Clear form error when user starts typing
-        setFormError("");
     }
 
     async function handleSubmit(event) {
@@ -37,6 +34,7 @@ export default function LoginPage() {
         setIsSubmitting(true);
 
         try {
+            console.log("Attempting login with credentials:", { usernameOrEmail: formData.usernameOrEmail });
             await loginUser(formData);
             const currentUser = getCurrentUser();
             login(currentUser);
@@ -46,9 +44,16 @@ export default function LoginPage() {
             setTimeout(() => {
                 navigate("/profile");
             }, 500);
-        } catch {
+        } catch (error) {
             // For login, show a single error message above the button
-            setFormError("Username/email or password is incorrect");
+            console.error("Login error caught:", error?.message || error);
+            // Check if it's a ban error
+            const isBanError = error?.message?.includes("banned");
+            const errorMessage = isBanError
+                ? "Your account has been banned and you cannot log in. For more information, please contact: xxxxx@xxxxx.com"
+                : error?.message || "Username and/or password is incorrect. Please try again";
+            console.log("Setting form error to:", errorMessage);
+            setFormError(errorMessage);
         } finally {
             setIsSubmitting(false);
         }
@@ -69,6 +74,7 @@ export default function LoginPage() {
                             placeholder="ashketchum"
                             value={formData.usernameOrEmail}
                             onChange={handleChange}
+                            className={formError ? "input-error" : ""}
                             data-cy="login-email"
                         />
                     </div>
@@ -82,22 +88,27 @@ export default function LoginPage() {
                             placeholder="••••••••••"
                             value={formData.password}
                             onChange={handleChange}
+                            className={formError ? "input-error" : ""}
                             data-cy="login-password"
                         />
                     </div>
 
-                    {formError && (
-                        <p className="form-error-message" data-cy="login-error-message">{formError}</p>
-                    )}
+                    {formError ? (
+                        <div className="form-error-message" data-cy="login-error-message">
+                            {formError}
+                        </div>
+                    ) : null}
+
+                    {successMessage ? (
+                        <div className="success-message" data-cy="login-success-message">
+                            {successMessage}
+                        </div>
+                    ) : null}
 
                     <button type="submit" disabled={isSubmitting} data-cy="login-submit">
                         {isSubmitting ? "Signing in..." : "Sign In"}
                     </button>
                 </form>
-
-                {successMessage && (
-                    <p className="success-message" data-cy="login-success-message">{successMessage}</p>
-                )}
 
                 <p className="register-link">
                     Don't have an account? <a href="/register" data-cy="login-register-link">Register here</a>
