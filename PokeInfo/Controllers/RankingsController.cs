@@ -121,11 +121,17 @@ public class RankingsController : ControllerBase
     /// <summary>
     /// Helper method to convert role name string to role ID
     /// </summary>
-    private static int GetRoleId(string? roleName) => roleName?.ToLower() switch
+    private static int GetRoleId(string? roleName)
     {
-        "user" => RoleService.UserRoleId,
-        "moderator" => RoleService.ModeratorRoleId,
-        "admin" => RoleService.AdminRoleId,
-        _ => RoleService.UserRoleId
-    };
+        if (string.IsNullOrWhiteSpace(roleName))
+            return RoleService.UserRoleId;
+
+        return roleName.ToLower().Trim() switch
+        {
+            "user" => RoleService.UserRoleId,
+            "moderator" => RoleService.ModeratorRoleId,
+            "admin" => RoleService.AdminRoleId,
+            _ => RoleService.UserRoleId
+        };
+    }
 }

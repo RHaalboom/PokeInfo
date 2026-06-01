@@ -75,7 +75,7 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuer = false,
         ValidateAudience = false,
         ValidateLifetime = true,
-        ClockSkew = TimeSpan.Zero,
+        ClockSkew = TimeSpan.FromSeconds(30),
         NameClaimType = ClaimTypes.Name,
         RoleClaimType = ClaimTypes.Role
     };

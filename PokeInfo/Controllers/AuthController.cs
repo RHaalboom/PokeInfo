@@ -397,4 +397,54 @@ public class AuthController : ControllerBase
 
         return Ok(new { message = "Account updated successfully." });
     }
+
+    [HttpPost("validate-token")]
+    [Authorize]
+    public async Task<IActionResult> ValidateToken()
+    {
+        // If we reach here, the token was valid (Authorize attribute passed)
+        var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+        if (string.IsNullOrWhiteSpace(userId) || !int.TryParse(userId, out int userIdInt))
+        {
+            return Unauthorized(new { message = "Invalid token claims." });
+        }
+
+        var user = await _context.Users
+            .Include(u => u.Role)
+            .FirstOrDefaultAsync(u => u.Id == userIdInt);
+
+        if (user == null)
+        {
+            return Unauthorized(new { message = "User not found." });
+        }
+
+        // Check if user is banned
+        if (user.Banned == 1)
+        {
+            return Unauthorized(new { message = "Your account has been banned." });
+        }
+
+        // Token is valid - return user info
+        return Ok(new
+        {
+            message = "Token is valid.",
+            user = new UserResponseDto
+            {
+                Id = user.Id,
+                Username = user.Username,
+                Email = user.Email,
+                DisplayName = user.DisplayName,
+                ProfilePictureUrl = user.ProfilePictureUrl,
+                ThreedsFC = user.ThreedsFC,
+                SwitchFC = user.SwitchFC,
+                ShowRankings = user.Ranked == 1,
+                RoleName = user.Role.Name,
+                RoleId = user.RoleId,
+                CreatedAt = user.CreatedAt,
+                Banned = user.Banned,
+                Ranked = user.Ranked
+            }
+        });
+    }
 }
