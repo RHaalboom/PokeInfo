@@ -1,10 +1,35 @@
 import { useState, useEffect } from "react";
 import { AuthContext } from "./AuthContext";
-import { getAuthToken, getCurrentUser } from "../services/authService";
+import { getAuthToken, getCurrentUser, validateToken } from "../services/authService";
 
 export function AuthProvider({ children }) {
     const [isAuthenticated, setIsAuthenticated] = useState(() => !!getAuthToken());
     const [user, setUser] = useState(() => getCurrentUser());
+    const [isValidating, setIsValidating] = useState(true);
+
+    // Validate token on app startup
+    useEffect(() => {
+        const validateStoredToken = async () => {
+            const token = getAuthToken();
+            if (token) {
+                try {
+                    const userData = await validateToken();
+                    setUser(userData);
+                    setIsAuthenticated(true);
+                } catch (error) {
+                    // Token is invalid or expired, clear auth
+                    console.warn("Stored token is invalid:", error.message);
+                    setIsAuthenticated(false);
+                    setUser(null);
+                    localStorage.removeItem("authToken");
+                    localStorage.removeItem("user");
+                }
+            }
+            setIsValidating(false);
+        };
+
+        validateStoredToken();
+    }, []);
 
     useEffect(() => {
         function handleStorageChange() {

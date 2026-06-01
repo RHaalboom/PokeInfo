@@ -117,3 +117,31 @@ export async function changeUserRole(userId, roleId) {
     return data;
 }
 
+export async function validateToken() {
+    const token = getAuthToken();
+    if (!token) {
+        throw new Error("No token found.");
+    }
+
+    const response = await fetch(`${AUTH_API_URL}/validate-token`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+        }
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.message || "Token validation failed.");
+    }
+
+    // Update stored user data with fresh data from server
+    if (data.user) {
+        localStorage.setItem("user", JSON.stringify(data.user));
+        return data.user;
+    }
+
+    throw new Error("No user data in response.");
+}
