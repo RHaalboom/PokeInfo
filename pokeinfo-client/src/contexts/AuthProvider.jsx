@@ -5,7 +5,6 @@ import { getAuthToken, getCurrentUser, validateToken } from "../services/authSer
 export function AuthProvider({ children }) {
     const [isAuthenticated, setIsAuthenticated] = useState(() => !!getAuthToken());
     const [user, setUser] = useState(() => getCurrentUser());
-    const [isValidating, setIsValidating] = useState(true);
 
     // Validate token on app startup
     useEffect(() => {
@@ -25,7 +24,6 @@ export function AuthProvider({ children }) {
                     localStorage.removeItem("user");
                 }
             }
-            setIsValidating(false);
         };
 
         validateStoredToken();
