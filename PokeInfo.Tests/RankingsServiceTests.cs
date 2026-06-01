@@ -5,78 +5,84 @@ using PokeInfo.Entities;
 using PokeInfo.Services;
 using PokeInfo.Data;
 using System.Linq.Expressions;
+using PokeInfo.Models.Rankings;
 
 namespace PokeInfo.Tests;
 
 public class RankingsServiceTests
 {
-    [Fact(Skip = "Requires Entity Framework In-Memory provider or database context to properly mock Include/ThenInclude chains")]
+    [Fact]
     public async Task GetPokedexRanking_ShouldOnlyIncludeRankedUserAndModeratorRoles()
     {
-        // Arrange - This test verifies the role filtering logic
-        // We're testing that users with Ranked=1 or Moderator/Admin roles are included
-        // The Include().ThenInclude() calls in the service will return empty collections,
-        // but we can still verify the filtering works
+        // Arrange - Use in-memory database context for proper Include/ThenInclude support
+        var options = new DbContextOptionsBuilder<PokeInfoDbContext>()
+            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
+            .Options;
+
+        using var context = new PokeInfoDbContext(options);
+
+        // Create roles
         var userRole = new Role { Id = RoleService.UserRoleId, Name = "User" };
         var moderatorRole = new Role { Id = RoleService.ModeratorRoleId, Name = "Moderator" };
 
-        var users = new List<User>
+        context.Roles.Add(userRole);
+        context.Roles.Add(moderatorRole);
+
+        // Create test users
+        var rankedUser = new User
         {
-            new User 
-            { 
-                Id = 1, 
-                Username = "ranked_user", 
-                RoleId = RoleService.UserRoleId, 
-                Role = userRole, 
-                Ranked = 1, 
-                Collections = new List<Collection>()
-            },
-            new User 
-            { 
-                Id = 2, 
-                Username = "regular_user", 
-                RoleId = RoleService.UserRoleId, 
-                Role = userRole, 
-                Ranked = null, 
-                Collections = new List<Collection>()
-            },
-            new User 
-            { 
-                Id = 3, 
-                Username = "moderator", 
-                RoleId = RoleService.ModeratorRoleId, 
-                Role = moderatorRole, 
-                Ranked = null, 
-                Collections = new List<Collection>()
-            }
+            Id = 1,
+            Username = "ranked_user",
+            Email = "ranked@test.com",
+            PasswordHash = "hash123",
+            RoleId = RoleService.UserRoleId,
+            Role = userRole,
+            Ranked = 1,
+            Collections = new List<Collection>()
         };
 
-        var mockContext = new Mock<IPokeInfoDbContext>();
-        var queryable = users.AsQueryable();
-        var mockDbSet = new Mock<DbSet<User>>();
+        var regularUser = new User
+        {
+            Id = 2,
+            Username = "regular_user",
+            Email = "regular@test.com",
+            PasswordHash = "hash123",
+            RoleId = RoleService.UserRoleId,
+            Role = userRole,
+            Ranked = null,
+            Collections = new List<Collection>()
+        };
 
-        // Set up the basic LINQ queryable support
-        mockDbSet.As<IQueryable<User>>().Setup(m => m.Provider).Returns(queryable.Provider);
-        mockDbSet.As<IQueryable<User>>().Setup(m => m.Expression).Returns(queryable.Expression);
-        mockDbSet.As<IQueryable<User>>().Setup(m => m.ElementType).Returns(queryable.ElementType);
-        mockDbSet.As<IQueryable<User>>().Setup(m => m.GetEnumerator()).Returns(() => queryable.GetEnumerator());
+        var moderatorUser = new User
+        {
+            Id = 3,
+            Username = "moderator",
+            Email = "moderator@test.com",
+            PasswordHash = "hash123",
+            RoleId = RoleService.ModeratorRoleId,
+            Role = moderatorRole,
+            Ranked = null,
+            Collections = new List<Collection>()
+        };
 
-        // Set up async support for ToListAsync()
-        mockDbSet.As<IAsyncEnumerable<User>>().Setup(m => m.GetAsyncEnumerator(It.IsAny<CancellationToken>()))
-            .Returns(() => new AsyncEnumerator<User>(queryable.GetEnumerator()));
+        context.Users.Add(rankedUser);
+        context.Users.Add(regularUser);
+        context.Users.Add(moderatorUser);
+        context.SaveChanges();
 
-        mockContext.Setup(c => c.Users).Returns(mockDbSet.Object);
-
-        var service = new RankingsService(mockContext.Object);
+        var service = new RankingsService(context);
 
         // Act
         var result = await service.GetPokedexRanking("KANTO");
 
         // Assert
         Assert.NotNull(result);
-        // Only users with Ranked=1 or role ID 2 (Moderator) or 3 (Admin) should be included
+        // Only users with Ranked=1 or role ID 2 (Moderator) should be included
         // That's: ranked_user (Ranked=1) and moderator (RoleId=2)
+        // regular_user should NOT be included since Ranked is null and they're a regular user
         Assert.Equal(2, result.Rankings.Count);
+        Assert.Single(result.Rankings.Where(r => r.DisplayName == "ranked_user"));
+        Assert.Single(result.Rankings.Where(r => r.DisplayName == "moderator"));
     }
 
     [Fact]
@@ -103,33 +109,67 @@ public class RankingsServiceTests
         Assert.Null(result);
     }
 
-    [Fact(Skip = "Requires Entity Framework In-Memory provider or database context to properly mock Include/ThenInclude chains")]
+    [Fact]
     public async Task GetAllRankings_ShouldReturnRankingsForAllPokedexes()
     {
-        // Arrange - Empty list to avoid Include chain issues
-        var mockContext = new Mock<IPokeInfoDbContext>();
-        var users = new List<User>();
-        var queryable = users.AsQueryable();
-        var mockDbSet = new Mock<DbSet<User>>();
+        // Arrange - Use in-memory database context for proper Include/ThenInclude support
+        var options = new DbContextOptionsBuilder<PokeInfoDbContext>()
+            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
+            .Options;
 
-        mockDbSet.As<IQueryable<User>>().Setup(m => m.Provider).Returns(queryable.Provider);
-        mockDbSet.As<IQueryable<User>>().Setup(m => m.Expression).Returns(queryable.Expression);
-        mockDbSet.As<IQueryable<User>>().Setup(m => m.ElementType).Returns(queryable.ElementType);
-        mockDbSet.As<IQueryable<User>>().Setup(m => m.GetEnumerator()).Returns(() => queryable.GetEnumerator());
-        mockDbSet.As<IAsyncEnumerable<User>>().Setup(m => m.GetAsyncEnumerator(It.IsAny<CancellationToken>()))
-            .Returns(() => new AsyncEnumerator<User>(queryable.GetEnumerator()));
+        using var context = new PokeInfoDbContext(options);
 
-        mockContext.Setup(c => c.Users).Returns(mockDbSet.Object);
+        // Create a role
+        var userRole = new Role { Id = RoleService.UserRoleId, Name = "User" };
+        context.Roles.Add(userRole);
 
-        var service = new RankingsService(mockContext.Object);
+        // Create a ranked user with a collection (but no Pokémon for simplicity)
+        var rankedUser = new User
+        {
+            Id = 1,
+            Username = "ranked_user",
+            Email = "ranked@test.com",
+            PasswordHash = "hash123",
+            RoleId = RoleService.UserRoleId,
+            Role = userRole,
+            Ranked = 1,
+            Collections = new List<Collection>
+            {
+                new Collection
+                {
+                    Id = 1,
+                    UserId = 1,
+                    Name = "Test Collection",
+                    CollectionPokemons = new List<CollectionPokemon>()
+                }
+            }
+        };
+
+        context.Users.Add(rankedUser);
+        context.SaveChanges();
+
+        var service = new RankingsService(context);
 
         // Act
         var result = await service.GetAllRankings();
 
         // Assert
         Assert.NotNull(result);
-        // Should have 10 empty rankings (one for each Pokédex region) since we have no users
+        // Should have 10 rankings (one for each Pokédex region)
         Assert.Equal(10, result.Count);
+
+        // Verify that all expected Pokédex regions are present
+        var regionNames = result.Select(r => r.PokedexName).ToList();
+        Assert.Contains("Kanto", regionNames);
+        Assert.Contains("Johto", regionNames);
+        Assert.Contains("Hoenn", regionNames);
+        Assert.Contains("Sinnoh", regionNames);
+        Assert.Contains("Unova", regionNames);
+        Assert.Contains("Kalos", regionNames);
+        Assert.Contains("Alola", regionNames);
+        Assert.Contains("Galar", regionNames);
+        Assert.Contains("Paldea", regionNames);
+        Assert.Contains("Hisui", regionNames);
     }
 }
 
