@@ -447,4 +447,27 @@ public class AuthController : ControllerBase
             }
         });
     }
+
+    [HttpDelete("users")]
+    public async Task<IActionResult> DeleteUser([FromQuery] string email)
+    {
+        // Note: This endpoint is used for test cleanup by Cypress E2E tests
+        // In production, you may want to restrict this to test environments only
+
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            return BadRequest(new { message = "Email is required." });
+        }
+
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+        if (user == null)
+        {
+            return NotFound(new { message = "User not found." });
+        }
+
+        _context.Users.Remove(user);
+        await _context.SaveChangesAsync();
+
+        return Ok(new { message = $"User {email} successfully deleted." });
+    }
 }
