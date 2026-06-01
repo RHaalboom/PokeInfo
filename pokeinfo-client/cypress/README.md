@@ -61,7 +61,7 @@ npm run e2e:debug
 ```
 
 ## Project Structure
-
+ 
 ```
 cypress/
 ├── e2e/                          # End-to-end test specs
