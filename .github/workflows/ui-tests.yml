@@ -1,17 +1,13 @@
 name: UI Tests
 
-# DISABLED: Cypress UI tests no longer run through GitHub Actions
-# Run Cypress tests locally using: npm run e2e:run (in pokeinfo-client directory)
-# To re-enable this workflow, change the branch to a valid branch name (e.g., "main")
-
 on:
   push:
-    branches: [ never-run-workflow ]
+    branches: [ main, develop, feature/* ]
     paths:
       - 'pokeinfo-client/**'
       - '.github/workflows/ui-tests.yml'
   pull_request:
-    branches: [ never-run-workflow ]
+    branches: [ main, develop ]
     paths:
       - 'pokeinfo-client/**'
 

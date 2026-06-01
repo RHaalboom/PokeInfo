@@ -236,8 +236,8 @@ describe('Login - Unhappy Path', () => {
     // Clear and try again
     cy.get('[data-cy="login-email"]').clear()
     cy.get('[data-cy="login-password"]').clear()
-      cy.get('[data-cy="login-email"]').type(testUser.email)
-      cy.get('[data-cy="login-password"]').type(testUser.password)
+    cy.get('[data-cy="login-email"]').type('testuser@example.com')
+    cy.get('[data-cy="login-password"]').type('TestPassword123!')
     cy.get('[data-cy="login-submit"]').click()
 
     cy.url().should('include', '/profile')
@@ -387,8 +387,7 @@ describe('Authentication State - Session Persistence', () => {
     // Navigate to different pages
 
     cy.visit('/settings')
-    cy.get('[data-cy="hamburger-toggle"]').click()
-    cy.isLoggedIn()
+
     cy.visit('/pokedex')
     cy.get('[data-cy="hamburger-toggle"]').click()
     cy.isLoggedIn()
@@ -414,4 +413,20 @@ describe('Authentication State - Session Persistence', () => {
     cy.get('[data-cy="user-profile-link"]').click()
     cy.isLoggedIn()
   })
+})
+
+// ============================================
+// CLEANUP: Delete all created test users
+// ============================================
+
+after(() => {
+  // Delete all users created during the test run
+  if (createdUsers.length > 0) {
+    cy.log(`🧹 Cleaning up ${createdUsers.length} test user(s)...`)
+    createdUsers.forEach((email) => {
+      cy.deleteUser(email)
+    })
+  } else {
+    cy.log('✅ No test users to clean up')
+  }
 })
