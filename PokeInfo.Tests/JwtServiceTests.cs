@@ -178,7 +178,7 @@ public class JwtServiceTests
         // Assert
         var handler = new JwtSecurityTokenHandler();
         var parsedToken = handler.ReadJwtToken(token);
-        var roleClaim = parsedToken.Claims.FirstOrDefault(c => c.Type == "role");
+        var roleClaim = parsedToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
 
         Assert.NotNull(roleClaim);
         Assert.Equal(roleName, roleClaim.Value);
@@ -283,7 +283,7 @@ public class JwtServiceTests
             ClaimTypes.NameIdentifier, // UserId
             ClaimTypes.Name,            // Username
             ClaimTypes.Email,           // Email
-            "role"                      // Role
+            ClaimTypes.Role             // Role
         };
 
         foreach (var claimType in requiredClaimTypes)
@@ -315,7 +315,7 @@ public class JwtServiceTests
         // Assert
         var handler = new JwtSecurityTokenHandler();
         var parsedToken = handler.ReadJwtToken(token);
-        var roleClaim = parsedToken.Claims.FirstOrDefault(c => c.Type == "role");
+        var roleClaim = parsedToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
 
         Assert.NotNull(roleClaim);
         Assert.Equal("User", roleClaim.Value);

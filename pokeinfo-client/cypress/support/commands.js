@@ -40,13 +40,19 @@ Cypress.Commands.add('clearAuthState', () => {
 
 // Delete a user via API (for cleanup)
 Cypress.Commands.add('deleteUser', (email) => {
-  cy.request({
+  return cy.request({
     method: 'DELETE',
-    url: `/api/users/${email}`,
+    url: `/api/auth/users?email=${encodeURIComponent(email)}`,
     failOnStatusCode: false,
   }).then((response) => {
-    cy.log(`🗑️ User ${email} cleanup: ${response.status}`)
+    if (response.status === 200 || response.status === 204) {
+      cy.log(`✅ User ${email} successfully deleted`)
+    } else {
+      cy.log(`⚠️ User ${email} deletion returned status ${response.status}: ${response.body?.message || 'No message'}`)
+    }
+    return response
   }).catch((error) => {
-    cy.log(`⚠️ Failed to delete user ${email}: ${error.message}`)
+    cy.log(`❌ Failed to delete user ${email}: ${error?.message || 'Unknown error'}`)
+    // Don't throw, just log - allow tests to continue
   })
 })
